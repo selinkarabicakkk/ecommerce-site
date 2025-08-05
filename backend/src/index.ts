@@ -13,6 +13,7 @@ import productRoutes from './routes/productRoutes';
 import reviewRoutes from './routes/reviewRoutes';
 import cartRoutes from './routes/cartRoutes';
 import orderRoutes from './routes/orderRoutes';
+import activityRoutes from './routes/activityRoutes';
 
 // Connect to MongoDB
 connectDB();
@@ -44,6 +45,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/activity', activityRoutes);
 
 // Error handling middleware
 app.use(notFound);
