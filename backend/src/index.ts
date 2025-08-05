@@ -3,6 +3,12 @@ import cors from 'cors';
 import connectDB from './config/db';
 import config from './config/config';
 import path from 'path';
+import { errorHandler, notFound } from './middlewares/errorMiddleware';
+
+// Import routes
+import authRoutes from './routes/authRoutes';
+import userRoutes from './routes/userRoutes';
+import categoryRoutes from './routes/categoryRoutes';
 
 // Connect to MongoDB
 connectDB();
@@ -26,22 +32,18 @@ app.get('/', (req: Request, res: Response) => {
   res.send('API is running...');
 });
 
-// TODO: Import and use route files
-// app.use('/api/users', userRoutes);
+// Use route files
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/categories', categoryRoutes);
+// TODO: Add more routes as they are created
 // app.use('/api/products', productRoutes);
-// app.use('/api/categories', categoryRoutes);
 // app.use('/api/orders', orderRoutes);
 // app.use('/api/reviews', reviewRoutes);
 
 // Error handling middleware
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
-  res.status(statusCode);
-  res.json({
-    message: err.message,
-    stack: config.nodeEnv === 'production' ? null : err.stack,
-  });
-});
+app.use(notFound);
+app.use(errorHandler);
 
 // Start server
 const PORT = config.port;
