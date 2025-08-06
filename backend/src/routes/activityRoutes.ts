@@ -17,6 +17,6 @@ router.get('/frequently-bought-together/:productId', getFrequentlyBoughtTogether
 
 // Protected routes
 router.post('/', protect, validate(logActivitySchema), logActivity);
-router.get('/recommendations', protect, getRecommendations);
+router.get('/recommended', protect, getRecommendations);
 
 export default router; 

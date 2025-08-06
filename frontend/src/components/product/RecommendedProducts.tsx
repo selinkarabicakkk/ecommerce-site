@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import ProductCard from './ProductCard';
-import { productService } from '@/services';
+import { productService, activityService } from '@/services';
 import { Product } from '@/types';
 
 interface RecommendedProductsProps {
@@ -30,7 +30,7 @@ const RecommendedProducts = ({
         
         switch (type) {
           case 'popular':
-            response = await productService.getTopRatedProducts(limit);
+            response = await activityService.getPopularProducts(limit);
             break;
           case 'related':
             if (!productId) {
@@ -39,14 +39,14 @@ const RecommendedProducts = ({
             response = await productService.getRelatedProducts(productId, limit);
             break;
           case 'history':
-            // Burada normalde kullanıcının gezinme geçmişine göre öneriler API'si çağrılacak
-            // Şimdilik örnek olarak yeni ürünleri getiriyoruz
-            response = await productService.getNewArrivals(limit);
+            // Kullanıcının gezinme geçmişine göre öneriler
+            response = await activityService.getRecommendedProducts(limit);
             break;
           case 'frequently-bought-together':
-            // Burada normalde birlikte sıkça alınan ürünler API'si çağrılacak
-            // Şimdilik örnek olarak öne çıkan ürünleri getiriyoruz
-            response = await productService.getFeaturedProducts(limit);
+            if (!productId) {
+              throw new Error('Product ID is required for frequently bought together products');
+            }
+            response = await activityService.getFrequentlyBoughtTogether(productId, limit);
             break;
           default:
             response = await productService.getTopRatedProducts(limit);

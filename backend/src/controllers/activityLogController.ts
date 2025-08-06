@@ -4,7 +4,7 @@ import { NotFoundError, ForbiddenError } from '../utils/errorUtils';
 
 /**
  * Log user activity (view, wishlist, cart)
- * @route POST /api/activity
+ * @route POST /api/activities
  * @access Private
  */
 export const logActivity = async (
@@ -44,7 +44,7 @@ export const logActivity = async (
 
 /**
  * Get popular products based on views
- * @route GET /api/activity/popular
+ * @route GET /api/activities/popular
  * @access Public
  */
 export const getPopularProducts = async (
@@ -167,7 +167,7 @@ export const getRecommendations = async (
 
 /**
  * Get frequently bought together products
- * @route GET /api/activity/frequently-bought-together/:productId
+ * @route GET /api/activities/frequently-bought-together/:productId
  * @access Public
  */
 export const getFrequentlyBoughtTogether = async (
