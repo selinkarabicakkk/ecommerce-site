@@ -7,6 +7,7 @@ import Link from 'next/link';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/Button';
 import ProductCard from '@/components/product/ProductCard';
+import ProductReviews from '@/components/product/ProductReviews';
 import { productService } from '@/services';
 import { useAppDispatch } from '@/store';
 import { addToCart } from '@/store/slices/cartSlice';
@@ -297,6 +298,9 @@ export default function ProductDetailPage() {
             </div>
           </div>
         )}
+        
+        {/* Ürün değerlendirmeleri */}
+        {product && <ProductReviews productId={product._id} productSlug={product.slug} />}
       </div>
     </MainLayout>
   );
