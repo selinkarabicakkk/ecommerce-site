@@ -32,6 +32,7 @@ const categories = [
     name: 'Electronics',
     description: 'Electronic devices and accessories',
     image: 'electronics.jpg',
+    slug: 'electronics',
     isActive: true,
     sortOrder: 1,
   },
@@ -39,6 +40,7 @@ const categories = [
     name: 'Clothing',
     description: 'Shirts, pants, and other apparel',
     image: 'clothing.jpg',
+    slug: 'clothing',
     isActive: true,
     sortOrder: 2,
   },
@@ -46,6 +48,7 @@ const categories = [
     name: 'Home and Garden',
     description: 'Furniture, decor, and gardening supplies',
     image: 'home-garden.jpg',
+    slug: 'home-and-garden',
     isActive: true,
     sortOrder: 3,
   },
@@ -53,6 +56,7 @@ const categories = [
     name: 'Sports',
     description: 'Sports equipment and activewear',
     image: 'sports.jpg',
+    slug: 'sports',
     isActive: true,
     sortOrder: 4,
   },
@@ -60,6 +64,7 @@ const categories = [
     name: 'Books',
     description: 'Fiction, non-fiction, and educational books',
     image: 'books.jpg',
+    slug: 'books',
     isActive: true,
     sortOrder: 5,
   },
@@ -67,6 +72,7 @@ const categories = [
     name: 'Health and Beauty',
     description: 'Personal care products and cosmetics',
     image: 'health-beauty.jpg',
+    slug: 'health-and-beauty',
     isActive: true,
     sortOrder: 6,
   },
@@ -74,6 +80,7 @@ const categories = [
     name: 'Toys',
     description: 'Toys for children of all ages',
     image: 'toys.jpg',
+    slug: 'toys',
     isActive: true,
     sortOrder: 7,
   },
@@ -81,6 +88,7 @@ const categories = [
     name: 'Food',
     description: 'Groceries and specialty food items',
     image: 'food.jpg',
+    slug: 'food',
     isActive: true,
     sortOrder: 8,
   },
@@ -141,6 +149,7 @@ const seedData = async () => {
           isFeatured: true,
           stock: 50,
           sku: 'ELEC-001',
+          slug: 'smartphone-x',
         },
         {
           name: 'Laptop Pro',
@@ -158,6 +167,7 @@ const seedData = async () => {
           isFeatured: true,
           stock: 30,
           sku: 'ELEC-002',
+          slug: 'laptop-pro',
         }
       );
     }
@@ -182,6 +192,7 @@ const seedData = async () => {
           isFeatured: false,
           stock: 100,
           sku: 'CLOTH-001',
+          slug: 'classic-t-shirt',
           variants: [
             {
               name: 'Size',
@@ -239,6 +250,7 @@ const seedData = async () => {
           isFeatured: true,
           stock: 80,
           sku: 'CLOTH-002',
+          slug: 'denim-jeans',
         }
       );
     }

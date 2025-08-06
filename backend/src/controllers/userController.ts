@@ -162,7 +162,7 @@ export const updateUserAddress = async (
     const { type, street, city, state, zipCode, country, isDefault } = req.body;
 
     const addressIndex = user.addresses.findIndex(
-      (address) => address._id.toString() === addressId
+      (address) => address._id && address._id.toString() === addressId
     );
 
     if (addressIndex === -1) {
@@ -172,7 +172,7 @@ export const updateUserAddress = async (
     // If this is the default address, unset any existing default of the same type
     if (isDefault) {
       user.addresses.forEach((address) => {
-        if (address.type === type && address.isDefault && address._id.toString() !== addressId) {
+        if (address.type === type && address.isDefault && address._id && address._id.toString() !== addressId) {
           address.isDefault = false;
         }
       });
@@ -220,7 +220,7 @@ export const deleteUserAddress = async (
     const addressId = req.params.addressId;
 
     const addressIndex = user.addresses.findIndex(
-      (address) => address._id.toString() === addressId
+      (address) => address._id && address._id.toString() === addressId
     );
 
     if (addressIndex === -1) {

@@ -92,7 +92,7 @@ export const getPopularProducts = async (
 
     // Sort products in the same order as popularProducts
     const sortedProducts = productIds.map((id) =>
-      products.find((product) => product._id.toString() === id.toString())
+      products.find((product) => product._id && product._id.toString() === id.toString())
     );
 
     res.status(200).json({
@@ -220,7 +220,7 @@ export const getFrequentlyBoughtTogether = async (
 
     // Sort products in the same order as topProductIds
     const sortedProducts = topProductIds.map((id) =>
-      frequentlyBoughtTogether.find((product) => product._id.toString() === id)
+      frequentlyBoughtTogether.find((product) => product._id && product._id.toString() === id)
     );
 
     res.status(200).json({

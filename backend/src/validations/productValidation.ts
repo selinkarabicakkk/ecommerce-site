@@ -28,7 +28,7 @@ export const createProductSchema = z.object({
   category: z.string().min(1, 'Category is required'),
   images: z.array(z.string()).min(1, 'At least one image is required'),
   specifications: z
-    .record(z.string())
+    .record(z.string(), z.string())
     .optional()
     .default({}),
   tags: z.array(z.string()).optional().default([]),
@@ -53,7 +53,7 @@ export const updateProductSchema = z.object({
   price: z.number().min(0, 'Price cannot be negative').optional(),
   category: z.string().min(1, 'Category is required').optional(),
   images: z.array(z.string()).min(1, 'At least one image is required').optional(),
-  specifications: z.record(z.string()).optional(),
+  specifications: z.record(z.string(), z.string()).optional(),
   tags: z.array(z.string()).optional(),
   isFeatured: z.boolean().optional(),
   variants: z.array(productVariantSchema).optional(),

@@ -4,7 +4,7 @@ import { z } from 'zod';
 const orderItemSchema = z.object({
   product: z.string().min(1, 'Product ID is required'),
   quantity: z.number().int().min(1, 'Quantity must be at least 1'),
-  variantOptions: z.record(z.string()).optional(),
+  variantOptions: z.record(z.string(), z.string()).optional(),
 });
 
 // Shipping address schema
@@ -42,10 +42,8 @@ export const updateOrderToPaidSchema = z.object({
 
 // Update order status schema
 export const updateOrderStatusSchema = z.object({
-  status: z.enum(['pending', 'processing', 'shipped', 'delivered', 'cancelled'], {
-    required_error: 'Status is required',
-    invalid_type_error: 'Invalid status',
-  }),
+  status: z.enum(['pending', 'processing', 'shipped', 'delivered', 'cancelled'])
+    .describe('Status is required'),
 });
 
 export type CreateOrderInput = z.infer<typeof createOrderSchema>;

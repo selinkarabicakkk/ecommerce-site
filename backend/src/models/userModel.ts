@@ -14,6 +14,7 @@ export interface IUser extends Document {
   resetPasswordToken?: string;
   resetPasswordExpires?: Date;
   addresses: {
+    _id?: mongoose.Types.ObjectId;
     type: 'shipping' | 'billing';
     street: string;
     city: string;

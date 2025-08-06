@@ -142,7 +142,7 @@ export const updateCartItem = async (
 
     // Find item in cart
     const itemIndex = cart.items.findIndex(
-      (item) => item._id.toString() === itemId
+      (item) => item._id && item._id.toString() === itemId
     );
 
     if (itemIndex === -1) {
@@ -207,7 +207,7 @@ export const removeCartItem = async (
 
     // Find item in cart
     const itemIndex = cart.items.findIndex(
-      (item) => item._id.toString() === itemId
+      (item) => item._id && item._id.toString() === itemId
     );
 
     if (itemIndex === -1) {

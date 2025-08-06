@@ -13,9 +13,10 @@ interface JwtPayload {
  * @returns JWT token
  */
 export const generateToken = (id: string, role: string): string => {
+  // @ts-ignore: Type compatibility issues with jsonwebtoken
   return jwt.sign(
     { id, role } as JwtPayload, 
-    config.jwt.secret as jwt.Secret, 
+    config.jwt.secret, 
     {
       expiresIn: config.jwt.expiresIn,
     }
@@ -29,9 +30,10 @@ export const generateToken = (id: string, role: string): string => {
  */
 export const verifyToken = (token: string): JwtPayload | null => {
   try {
-    const decoded = jwt.verify(token, config.jwt.secret as jwt.Secret) as JwtPayload;
+    // @ts-ignore: Type compatibility issues with jsonwebtoken
+    const decoded = jwt.verify(token, config.jwt.secret) as JwtPayload;
     return decoded;
   } catch (error) {
     return null;
   }
-}; 
+};

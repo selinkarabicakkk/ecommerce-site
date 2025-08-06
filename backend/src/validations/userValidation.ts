@@ -15,9 +15,8 @@ export const updateProfileSchema = z.object({
 });
 
 export const addressSchema = z.object({
-  type: z.enum(['shipping', 'billing'], {
-    errorMap: () => ({ message: 'Type must be either shipping or billing' }),
-  }),
+  type: z.enum(['shipping', 'billing'])
+    .describe('Type must be either shipping or billing'),
   street: z.string().min(1, 'Street is required'),
   city: z.string().min(1, 'City is required'),
   state: z.string().min(1, 'State is required'),
@@ -27,10 +26,8 @@ export const addressSchema = z.object({
 });
 
 export const updateAddressSchema = z.object({
-  type: z
-    .enum(['shipping', 'billing'], {
-      errorMap: () => ({ message: 'Type must be either shipping or billing' }),
-    })
+  type: z.enum(['shipping', 'billing'])
+    .describe('Type must be either shipping or billing')
     .optional(),
   street: z.string().min(1, 'Street is required').optional(),
   city: z.string().min(1, 'City is required').optional(),
@@ -47,4 +44,4 @@ export const favoritesCategoriesSchema = z.object({
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 export type AddressInput = z.infer<typeof addressSchema>;
 export type UpdateAddressInput = z.infer<typeof updateAddressSchema>;
-export type FavoriteCategoriesInput = z.infer<typeof favoritesCategoriesSchema>; 
+export type FavoriteCategoriesInput = z.infer<typeof favoritesCategoriesSchema>;

@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import crypto from 'crypto';
-import { User } from '../models';
+import mongoose from 'mongoose';
+import { User, IUser } from '../models';
 import { generateToken } from '../utils/jwtUtils';
 import { comparePassword, hashPassword } from '../utils/passwordUtils';
 import { BadRequestError, NotFoundError, UnauthorizedError } from '../utils/errorUtils';
@@ -49,7 +50,7 @@ export const register = async (
     });
 
     // Generate token
-    const token = generateToken(user._id.toString(), user.role);
+    const token = generateToken((user._id as mongoose.Types.ObjectId).toString(), user.role as 'admin' | 'customer');
 
     res.status(201).json({
       success: true,
@@ -95,7 +96,7 @@ export const login = async (
     }
 
     // Generate token
-    const token = generateToken(user._id.toString(), user.role);
+    const token = generateToken((user._id as mongoose.Types.ObjectId).toString(), user.role as 'admin' | 'customer');
 
     res.status(200).json({
       success: true,

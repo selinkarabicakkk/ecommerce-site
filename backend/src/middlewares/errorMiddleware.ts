@@ -30,11 +30,27 @@ export const errorHandler = (
   if (error instanceof ZodError) {
     statusCode = 422;
     message = 'Validation Error';
-    errors = error.errors.reduce((acc: Record<string, string>, curr) => {
-      const path = curr.path.join('.');
-      acc[path] = curr.message;
-      return acc;
-    }, {});
+    
+    // Zod v4+ API
+    const formattedErrors = error.format();
+    
+    // Flatten error messages
+    const flattenErrors = (obj: any, path: string = ''): Record<string, string> => {
+      const result: Record<string, string> = {};
+      
+      for (const key in obj) {
+        if (key === '_errors' && Array.isArray(obj[key]) && obj[key].length > 0) {
+          result[path] = obj[key][0];
+        } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+          const newPath = path ? `${path}.${key}` : key;
+          Object.assign(result, flattenErrors(obj[key], newPath));
+        }
+      }
+      
+      return result;
+    };
+    
+    errors = flattenErrors(formattedErrors);
   }
 
   // Handle Mongoose validation errors
@@ -72,4 +88,4 @@ export const notFound = (req: Request, res: Response, next: NextFunction): void 
   const error = new Error(`Not Found - ${req.originalUrl}`);
   res.status(404);
   next(error);
-}; 
+};
