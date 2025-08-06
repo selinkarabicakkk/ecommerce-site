@@ -1,48 +1,49 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/Button';
+import RecommendedProducts from '@/components/product/RecommendedProducts';
+import { categoryService, productService } from '@/services';
+import { Category, Product } from '@/types';
 
 export default function Home() {
-  // Örnek öne çıkan kategoriler
-  const featuredCategories = [
-    { id: 1, name: 'Elektronik', image: '/images/categories/electronics.jpg', slug: 'electronics' },
-    { id: 2, name: 'Giyim', image: '/images/categories/clothing.jpg', slug: 'clothing' },
-    { id: 3, name: 'Ev ve Bahçe', image: '/images/categories/home-garden.jpg', slug: 'home-garden' },
-    { id: 4, name: 'Spor', image: '/images/categories/sports.jpg', slug: 'sports' },
-  ];
-
-  // Örnek öne çıkan ürünler
-  const featuredProducts = [
-    {
-      id: 1,
-      name: 'Akıllı Telefon X',
-      price: 9999.99,
-      image: '/images/products/smartphone.jpg',
-      slug: 'smartphone-x',
-    },
-    {
-      id: 2,
-      name: 'Laptop Pro',
-      price: 14999.99,
-      image: '/images/products/laptop.jpg',
-      slug: 'laptop-pro',
-    },
-    {
-      id: 3,
-      name: 'Kablosuz Kulaklık',
-      price: 1299.99,
-      image: '/images/products/headphones.jpg',
-      slug: 'wireless-headphones',
-    },
-    {
-      id: 4,
-      name: 'Akıllı Saat',
-      price: 2499.99,
-      image: '/images/products/smartwatch.jpg',
-      slug: 'smart-watch',
-    },
-  ];
+  const [featuredCategories, setFeaturedCategories] = useState<Category[]>([]);
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  
+  // Kategorileri ve ürünleri yükle
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Kategorileri getir
+        const categoriesResponse = await categoryService.getCategories({
+          isActive: true,
+          limit: 4,
+          sort: 'sortOrder'
+        });
+        
+        if (categoriesResponse.success && categoriesResponse.data) {
+          setFeaturedCategories(categoriesResponse.data);
+        }
+        
+        // Öne çıkan ürünleri getir
+        const productsResponse = await productService.getFeaturedProducts(4);
+        
+        if (productsResponse.success && productsResponse.data) {
+          setFeaturedProducts(productsResponse.data);
+        }
+      } catch (error) {
+        console.error('Ana sayfa verileri yüklenirken hata oluştu:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, []);
 
   return (
     <MainLayout>
@@ -80,27 +81,51 @@ export default function Home() {
       <section className="py-12 md:py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold mb-8 text-center">Popüler Kategoriler</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredCategories.map((category) => (
-              <Link
-                key={category.id}
-                href={`/categories/${category.slug}`}
-                className="group block bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
-              >
-                <div className="relative h-48 w-full bg-gray-200">
-                  {/* Placeholder for category image */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-gray-500">{category.name} Image</span>
+          
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[...Array(4)].map((_, index) => (
+                <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
+                  <div className="h-48 bg-gray-200"></div>
+                  <div className="p-4">
+                    <div className="h-5 bg-gray-200 rounded w-3/4 mb-2"></div>
                   </div>
                 </div>
-                <div className="p-4">
-                  <h3 className="text-lg font-semibold group-hover:text-primary transition-colors">
-                    {category.name}
-                  </h3>
-                </div>
-              </Link>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {featuredCategories.map((category) => (
+                <Link
+                  key={category._id}
+                  href={`/categories/${category.slug}`}
+                  className="group block bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                >
+                  <div className="relative h-48 w-full bg-gray-200">
+                    {category.image ? (
+                      <Image
+                        src={category.image}
+                        alt={category.name}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 25vw"
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-gray-500">{category.name}</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-4">
+                    <h3 className="text-lg font-semibold group-hover:text-primary transition-colors">
+                      {category.name}
+                    </h3>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+          
           <div className="text-center mt-10">
             <Button variant="outline">
               <Link href="/categories">Tüm Kategoriler</Link>
@@ -113,34 +138,60 @@ export default function Home() {
       <section className="py-12 md:py-16">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold mb-8 text-center">Öne Çıkan Ürünler</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredProducts.map((product) => (
-              <div
-                key={product.id}
-                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
-              >
-                <Link href={`/products/${product.slug}`}>
-                  <div className="relative h-48 w-full bg-gray-200">
-                    {/* Placeholder for product image */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-gray-500">{product.name} Image</span>
-                    </div>
-                  </div>
-                </Link>
-                <div className="p-4">
-                  <Link href={`/products/${product.slug}`}>
-                    <h3 className="text-lg font-semibold hover:text-primary transition-colors">
-                      {product.name}
-                    </h3>
-                  </Link>
-                  <p className="text-gray-500 mt-1">{product.price.toLocaleString('tr-TR')} ₺</p>
-                  <div className="mt-4">
-                    <Button className="w-full">Sepete Ekle</Button>
+          
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[...Array(4)].map((_, index) => (
+                <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
+                  <div className="h-48 bg-gray-200"></div>
+                  <div className="p-4">
+                    <div className="h-5 bg-gray-200 rounded w-3/4 mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
+                    <div className="h-10 bg-gray-200 rounded"></div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {featuredProducts.map((product) => (
+                <div
+                  key={product._id}
+                  className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                >
+                  <Link href={`/products/${product.slug}`}>
+                    <div className="relative h-48 w-full bg-gray-200">
+                      {product.images && product.images.length > 0 ? (
+                        <Image
+                          src={product.images[0]}
+                          alt={product.name}
+                          fill
+                          sizes="(max-width: 768px) 100vw, 25vw"
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="text-gray-500">{product.name}</span>
+                        </div>
+                      )}
+                    </div>
+                  </Link>
+                  <div className="p-4">
+                    <Link href={`/products/${product.slug}`}>
+                      <h3 className="text-lg font-semibold hover:text-primary transition-colors">
+                        {product.name}
+                      </h3>
+                    </Link>
+                    <p className="text-gray-500 mt-1">{product.price.toLocaleString('tr-TR')} ₺</p>
+                    <div className="mt-4">
+                      <Button className="w-full">Sepete Ekle</Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          
           <div className="text-center mt-10">
             <Button variant="outline">
               <Link href="/products">Tüm Ürünler</Link>
@@ -148,9 +199,20 @@ export default function Home() {
           </div>
         </div>
       </section>
+      
+      {/* Popüler Ürünler (Öneri Sistemi) */}
+      <section className="py-12 md:py-16 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <RecommendedProducts 
+            title="Popüler Ürünler" 
+            type="popular" 
+            limit={4} 
+          />
+        </div>
+      </section>
 
       {/* Newsletter Section */}
-      <section className="py-12 md:py-16 bg-gray-50">
+      <section className="py-12 md:py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-3xl font-bold mb-4">Bültenimize Abone Olun</h2>

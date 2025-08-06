@@ -6,8 +6,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/Button';
-import ProductCard from '@/components/product/ProductCard';
 import ProductReviews from '@/components/product/ProductReviews';
+import RecommendedProducts from '@/components/product/RecommendedProducts';
 import { productService } from '@/services';
 import { useAppDispatch } from '@/store';
 import { addToCart } from '@/store/slices/cartSlice';
@@ -17,7 +17,6 @@ export default function ProductDetailPage() {
   const { slug } = useParams();
   const dispatch = useAppDispatch();
   const [product, setProduct] = useState<Product | null>(null);
-  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
@@ -31,12 +30,6 @@ export default function ProductDetailPage() {
         if (typeof slug === 'string') {
           const response = await productService.getProductBySlug(slug);
           setProduct(response.data || null);
-
-          // İlgili ürünleri getir
-          if (response.data?._id) {
-            const relatedResponse = await productService.getRelatedProducts(response.data._id);
-            setRelatedProducts(relatedResponse.data || []);
-          }
         }
       } catch (error) {
         console.error('Ürün detayları yüklenirken hata oluştu:', error);
@@ -288,16 +281,10 @@ export default function ProductDetailPage() {
         </div>
 
         {/* İlgili ürünler */}
-        {relatedProducts.length > 0 && (
-          <div className="mt-16">
-            <h2 className="text-2xl font-bold mb-6">İlgili Ürünler</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {relatedProducts.map((product) => (
-                <ProductCard key={product._id} product={product} />
-              ))}
-            </div>
-          </div>
-        )}
+        {product && <RecommendedProducts title="İlgili Ürünler" type="related" productId={product._id} limit={4} />}
+        
+        {/* Sık Birlikte Alınanlar */}
+        {product && <RecommendedProducts title="Sık Birlikte Alınanlar" type="frequently-bought-together" productId={product._id} limit={4} />}
         
         {/* Ürün değerlendirmeleri */}
         {product && <ProductReviews productId={product._id} productSlug={product.slug} />}
