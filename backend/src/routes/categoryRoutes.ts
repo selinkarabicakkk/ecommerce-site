@@ -1,0 +1,41 @@
+import express from 'express';
+import {
+  getCategories,
+  getCategoryById,
+  getCategoryBySlug,
+  createCategory,
+  updateCategory,
+  deleteCategory,
+} from '../controllers/categoryController';
+import { protect, restrictTo } from '../middlewares/authMiddleware';
+import { validate } from '../middlewares/validationMiddleware';
+import {
+  createCategorySchema,
+  updateCategorySchema,
+} from '../validations/categoryValidation';
+
+const router = express.Router();
+
+// Public routes
+router.get('/', getCategories);
+router.get('/slug/:slug', getCategoryBySlug); // Note: This route must be before /:id to avoid slug being treated as id
+router.get('/:id', getCategoryById);
+
+// Admin routes
+router.post(
+  '/',
+  protect,
+  restrictTo(['admin']),
+  validate(createCategorySchema),
+  createCategory
+);
+router.put(
+  '/:id',
+  protect,
+  restrictTo(['admin']),
+  validate(updateCategorySchema),
+  updateCategory
+);
+router.delete('/:id', protect, restrictTo(['admin']), deleteCategory);
+
+export default router; 
