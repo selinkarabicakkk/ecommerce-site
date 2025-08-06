@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAppSelector } from '@/store';
 import { Button } from '../ui/Button';
+import SearchBar from '../ui/SearchBar';
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -46,6 +47,11 @@ const Header = () => {
                 {item.name}
               </Link>
             ))}
+          </div>
+          
+          {/* Search Bar */}
+          <div className="hidden md:block w-64">
+            <SearchBar />
           </div>
 
           {/* Right Side Navigation */}
@@ -132,8 +138,24 @@ const Header = () => {
             )}
           </div>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden flex items-center">
+          {/* Mobile menu button and search */}
+          <div className="md:hidden flex items-center space-x-2">
+            <Link href="/search" className="text-gray-500 hover:text-gray-900">
+              <svg
+                className="h-6 w-6"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+            </Link>
             <button
               type="button"
               className="text-gray-500 hover:text-gray-900"
