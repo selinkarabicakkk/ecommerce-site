@@ -31,16 +31,20 @@ Bu proje, modern bir e-ticaret platformu geliştirme case study'sidir.
 - Ana Sayfa (Hero bölümü, öne çıkan ürünler, kategoriler)
 - Ürün Listeleme ve Filtreleme
 - Ürün Detay Sayfaları
-- Kullanıcı Hesabı (Kayıt, Giriş, Profil)
+- Kullanıcı Hesabı (Kayıt, Giriş, Profil, Adres Defteri)
 - Alışveriş Sepeti ve Ödeme İşlemi
 - Ürün İnceleme Sistemi
+- İstek Listesi (Wishlist)
+- Arama Özelliği (Otomatik Tamamlama)
 
 ### Admin Özellikleri
 
-- Admin Dashboard
-- Ürün Yönetimi
-- Müşteri Yönetimi
-- Kategori Yönetimi
+- Admin Dashboard (Satış istatistikleri, son siparişler, popüler ürünler)
+- Ürün Yönetimi (Ekleme, düzenleme, silme)
+- Müşteri Yönetimi (Müşteri listesi ve detayları)
+- Kategori Yönetimi (Ekleme, düzenleme, silme)
+- Sipariş Yönetimi (Sipariş listesi ve detayları)
+- İnceleme Yönetimi (Onaylama, silme)
 
 ### Öneri Sistemi
 
@@ -48,6 +52,7 @@ Bu proje, modern bir e-ticaret platformu geliştirme case study'sidir.
 - Ürün sayfalarında ilgili ürünler
 - Kullanıcı gezinme geçmişine göre öneriler
 - "Birlikte sıkça alınanlar" önerileri
+- Kişiselleştirilmiş öneriler sayfası
 
 ## Kurulum
 
@@ -186,10 +191,10 @@ Bu proje, modern bir e-ticaret platformu geliştirme case study'sidir.
 
 ### Öneri Sistemi
 
-- `POST /api/activity` - Kullanıcı etkinliği kaydet
-- `GET /api/activity/popular` - Popüler ürünleri getir
-- `GET /api/activity/recommendations` - Kullanıcıya özel öneriler getir
-- `GET /api/activity/frequently-bought-together/:productId` - Birlikte sıkça alınan ürünleri getir
+- `POST /api/activities` - Kullanıcı etkinliği kaydet
+- `GET /api/activities/popular` - Popüler ürünleri getir
+- `GET /api/activities/recommended` - Kullanıcıya özel öneriler getir
+- `GET /api/activities/frequently-bought-together/:productId` - Birlikte sıkça alınan ürünleri getir
 
 ### Kullanıcı
 
@@ -199,6 +204,12 @@ Bu proje, modern bir e-ticaret platformu geliştirme case study'sidir.
 - `PUT /api/users/addresses/:addressId` - Adres güncelle
 - `DELETE /api/users/addresses/:addressId` - Adres sil
 - `PUT /api/users/favorite-categories` - Favori kategorileri güncelle
+
+### İstek Listesi (Wishlist)
+
+- `GET /api/wishlist` - Kullanıcının istek listesini getir
+- `POST /api/wishlist` - İstek listesine ürün ekle
+- `DELETE /api/wishlist/:productId` - İstek listesinden ürün çıkar
 
 ## Demo Hesapları
 
@@ -253,6 +264,7 @@ Projenin mevcut durumunda eksik olan bileşenler ve geliştirilmesi gereken öze
 - XSS saldırılarına karşı input sanitizasyonu
 - Güvenli dosya yükleme (dosya türü ve boyut doğrulama)
 - CORS yapılandırması
+- Rol tabanlı yetkilendirme (admin/müşteri)
 
 ## Performans Optimizasyonları
 
