@@ -7,6 +7,7 @@ import { cartService } from './cartService';
 import { orderService } from './orderService';
 import { reviewService } from './reviewService';
 import { activityService } from './activityService';
+import wishlistService from './wishlistService';
 
 export {
   api,
@@ -18,4 +19,5 @@ export {
   orderService,
   reviewService,
   activityService,
+  wishlistService,
 }; 
