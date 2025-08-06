@@ -7,6 +7,11 @@ interface CreateReviewData {
   comment: string;
 }
 
+interface AddReviewData {
+  rating: number;
+  comment: string;
+}
+
 export const reviewService = {
   // Ürün incelemelerini getir
   getReviewsByProduct: async (productId: string, page: number = 1, limit: number = 10) => {
@@ -19,6 +24,15 @@ export const reviewService = {
   // İnceleme oluştur
   createReview: async (reviewData: CreateReviewData) => {
     const response = await api.post<ApiResponse<Review>>('/reviews', reviewData);
+    return response.data;
+  },
+  
+  // İnceleme ekle (productId ayrı parametre olarak)
+  addReview: async (productId: string, reviewData: AddReviewData) => {
+    const response = await api.post<ApiResponse<Review>>('/reviews', {
+      product: productId,
+      ...reviewData
+    });
     return response.data;
   },
 
