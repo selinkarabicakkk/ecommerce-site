@@ -4,6 +4,7 @@ import authReducer from './slices/authSlice';
 import cartReducer from './slices/cartSlice';
 import productReducer from './slices/productSlice';
 import categoryReducer from './slices/categorySlice';
+import wishlistReducer from './slices/wishlistSlice';
 
 export const store = configureStore({
   reducer: {
@@ -11,6 +12,7 @@ export const store = configureStore({
     cart: cartReducer,
     product: productReducer,
     category: categoryReducer,
+    wishlist: wishlistReducer,
   },
   devTools: process.env.NODE_ENV !== 'production',
 });

@@ -5,6 +5,7 @@ import Review, { IReview } from './reviewModel';
 import Cart, { ICart, ICartItem } from './cartModel';
 import Order, { IOrder, IOrderItem, IShippingAddress } from './orderModel';
 import ActivityLog, { IActivityLog } from './activityLogModel';
+import WishlistItem, { IWishlistItem } from './wishlistModel';
 
 export {
   User,
@@ -25,4 +26,6 @@ export {
   IShippingAddress,
   ActivityLog,
   IActivityLog,
+  WishlistItem,
+  IWishlistItem,
 }; 
