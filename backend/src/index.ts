@@ -61,7 +61,7 @@ app.use('/api/reviews', reviewRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/activities', activityRoutes);
-app.use('/api/wishlist', wishlistRoutes);
+// Wishlist only under /api/user/wishlist as per spec
 app.use('/api/upload', uploadRoutes);
 app.use('/api/email', emailRoutes);
 // Admin aliases
