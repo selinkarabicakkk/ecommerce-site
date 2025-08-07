@@ -17,6 +17,7 @@ import orderRoutes from './routes/orderRoutes';
 import activityRoutes from './routes/activityRoutes';
 import wishlistRoutes from './routes/wishlistRoutes';
 import searchRoutes from './routes/searchRoutes';
+import recommendationRoutes from './routes/recommendationRoutes';
 
 // Connect to MongoDB
 connectDB();
@@ -50,6 +51,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/user/wishlist', wishlistRoutes);
 app.use('/api/search', searchRoutes);
+app.use('/api/recommendations', recommendationRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/reviews', reviewRoutes);
