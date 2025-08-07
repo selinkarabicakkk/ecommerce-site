@@ -1,10 +1,5 @@
 import express from 'express';
-import {
-  logActivity,
-  getPopularProducts,
-  getRecommendations,
-  getFrequentlyBoughtTogether,
-} from '../controllers/activityLogController';
+import { logActivity } from '../controllers/activityLogController';
 import { protect } from '../middlewares/authMiddleware';
 import { validate } from '../middlewares/validationMiddleware';
 import { logActivitySchema } from '../validations/activityValidation';
@@ -14,52 +9,11 @@ const router = express.Router();
 /**
  * @swagger
  * tags:
- *   name: Recommendations
- *   description: Popüler, ilgili ve geçmişe dayalı öneriler
+ *   name: Activities
+ *   description: Kullanıcı aktivitesi kaydı
  */
 
-// Public routes
-/**
- * @swagger
- * /api/activities/popular:
- *   get:
- *     summary: Popüler ürünleri getir
- *     tags: [Recommendations]
- *     parameters:
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *       - in: query
- *         name: days
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: Başarılı
- */
-router.get('/popular', getPopularProducts);
-/**
- * @swagger
- * /api/activities/frequently-bought-together/{productId}:
- *   get:
- *     summary: Sık birlikte alınanlar
- *     tags: [Recommendations]
- *     parameters:
- *       - in: path
- *         name: productId
- *         required: true
- *         schema:
- *           type: string
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: Başarılı
- */
-router.get('/frequently-bought-together/:productId', getFrequentlyBoughtTogether);
+// No public recommendation endpoints under /activities anymore
 
 // Protected routes
 /**
@@ -67,7 +21,7 @@ router.get('/frequently-bought-together/:productId', getFrequentlyBoughtTogether
  * /api/activities:
  *   post:
  *     summary: Kullanıcı aktivitesi kaydet (view, wishlist, purchase)
- *     tags: [Recommendations]
+ *     tags: [Activities]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -85,18 +39,6 @@ router.get('/frequently-bought-together/:productId', getFrequentlyBoughtTogether
  *         description: Oluşturuldu
  */
 router.post('/', protect, validate(logActivitySchema), logActivity);
-/**
- * @swagger
- * /api/activities/recommended:
- *   get:
- *     summary: Kullanıcı geçmişine göre öneriler
- *     tags: [Recommendations]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Başarılı
- */
-router.get('/recommended', protect, getRecommendations);
+// No recommendations under /activities; use /api/recommendations instead
 
 export default router; 
