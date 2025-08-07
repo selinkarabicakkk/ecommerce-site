@@ -18,6 +18,7 @@ import activityRoutes from './routes/activityRoutes';
 import wishlistRoutes from './routes/wishlistRoutes';
 import searchRoutes from './routes/searchRoutes';
 import recommendationRoutes from './routes/recommendationRoutes';
+import adminRoutes from './routes/adminRoutes';
 
 // Connect to MongoDB
 connectDB();
@@ -62,6 +63,7 @@ app.use('/api/wishlist', wishlistRoutes);
 // Admin aliases
 app.use('/api/admin/products', adminProductsRouter);
 app.use('/api/admin/categories', adminCategoriesRouter);
+app.use('/api/admin', adminRoutes);
 
 // Error handling middleware
 app.use(notFound);
