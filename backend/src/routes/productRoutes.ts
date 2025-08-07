@@ -11,6 +11,7 @@ import {
   getNewArrivals,
   getRelatedProducts,
   getPopularProducts,
+  bulkUpdateProducts,
 } from '../controllers/productController';
 import { getReviewsByProduct } from '../controllers/reviewController';
 import { protect, restrictTo } from '../middlewares/authMiddleware';
@@ -18,6 +19,7 @@ import { validate } from '../middlewares/validationMiddleware';
 import {
   createProductSchema,
   updateProductSchema,
+  bulkUpdateProductsSchema,
 } from '../validations/productValidation';
 
 const router = express.Router();
@@ -174,5 +176,91 @@ router.put(
   updateProduct
 );
 router.delete('/:id', protect, restrictTo(['admin']), deleteProduct);
+
+/**
+ * ADMIN aliases under /api/admin/products
+ * Mirrors admin product routes for admin panel convenience
+ */
+const adminRouter = express.Router();
+/**
+ * @swagger
+ * tags:
+ *   name: AdminProducts
+ *   description: Admin ürün yönetimi
+ */
+adminRouter.post('/', protect, restrictTo(['admin']), validate(createProductSchema), createProduct);
+adminRouter.put('/:id', protect, restrictTo(['admin']), validate(updateProductSchema), updateProduct);
+adminRouter.delete('/:id', protect, restrictTo(['admin']), deleteProduct);
+adminRouter.patch('/bulk', protect, restrictTo(['admin']), validate(bulkUpdateProductsSchema), bulkUpdateProducts);
+/**
+ * @swagger
+ * /api/admin/products:
+ *   post:
+ *     summary: Yeni ürün ekle (Admin)
+ *     tags: [AdminProducts]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       201:
+ *         description: Oluşturuldu
+ */
+/**
+ * @swagger
+ * /api/admin/products/{id}:
+ *   put:
+ *     summary: Ürün güncelle (Admin)
+ *     tags: [AdminProducts]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *   delete:
+ *     summary: Ürünü sil (Admin)
+ *     tags: [AdminProducts]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ */
+
+/**
+ * @swagger
+ * /api/admin/products/bulk:
+ *   patch:
+ *     summary: Çoklu ürünleri güncelle (aktif/pasif)
+ *     tags: [AdminProducts]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               items:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     id: { type: string }
+ *                     isActive: { type: boolean }
+ *                     isFeatured: { type: boolean }
+ *     responses:
+ *       200:
+ *         description: Güncellendi
+ */
+
+// Mount admin alias under /api/admin/products
+// This router will be mounted in index.ts along with /api/products
+export const adminProductsRouter = adminRouter;
 
 export default router; 

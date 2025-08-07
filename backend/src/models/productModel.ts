@@ -19,6 +19,7 @@ export interface IProduct extends Document {
   specifications: Record<string, string>;
   tags: string[];
   isFeatured: boolean;
+  isActive: boolean;
   slug: string;
   variants: IProductVariant[];
   averageRating: number;
@@ -72,6 +73,11 @@ const productSchema = new Schema<IProduct>(
     isFeatured: {
       type: Boolean,
       default: false,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+      index: true,
     },
     slug: {
       type: String,

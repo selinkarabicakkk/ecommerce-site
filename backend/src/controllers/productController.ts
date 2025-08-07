@@ -89,6 +89,9 @@ export const getProducts = async (
       sortOption = { createdAt: -1 };
     }
 
+    // Only active products for public listing
+    filter.isActive = filter.isActive ?? true;
+
     const count = await Product.countDocuments(filter);
     const products = await Product.find(filter)
       .sort(sortOption)
@@ -320,6 +323,7 @@ export const updateProduct = async (
     if (specifications) product.specifications = specifications;
     if (tags) product.tags = tags;
     if (isFeatured !== undefined) product.isFeatured = isFeatured;
+    if ((req.body as any).isActive !== undefined) product.isActive = (req.body as any).isActive;
     if (variants) product.variants = variants;
     if (stock !== undefined) product.stock = stock;
 
@@ -366,6 +370,39 @@ export const deleteProduct = async (
       success: true,
       message: 'Product deleted',
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Bulk update products (active/featured)
+ * @route PATCH /api/admin/products/bulk
+ * @access Private/Admin
+ */
+export const bulkUpdateProducts = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { items } = req.body as { items: Array<{ id: string; isActive?: boolean; isFeatured?: boolean }> };
+    if (!items || items.length === 0) {
+      throw new BadRequestError('No items provided');
+    }
+
+    const bulkOps = items.map((it) => ({
+      updateOne: {
+        filter: { _id: it.id },
+        update: {
+          ...(it.isActive !== undefined ? { isActive: it.isActive } : {}),
+          ...(it.isFeatured !== undefined ? { isFeatured: it.isFeatured } : {}),
+        },
+      },
+    }));
+
+    const result = await Product.bulkWrite(bulkOps);
+    res.status(200).json({ success: true, result });
   } catch (error) {
     next(error);
   }

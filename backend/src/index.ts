@@ -9,8 +9,8 @@ import { setupSwagger } from './config/swagger';
 // Import routes
 import authRoutes from './routes/authRoutes';
 import userRoutes from './routes/userRoutes';
-import categoryRoutes from './routes/categoryRoutes';
-import productRoutes from './routes/productRoutes';
+import categoryRoutes, { adminCategoriesRouter } from './routes/categoryRoutes';
+import productRoutes, { adminProductsRouter } from './routes/productRoutes';
 import reviewRoutes from './routes/reviewRoutes';
 import cartRoutes from './routes/cartRoutes';
 import orderRoutes from './routes/orderRoutes';
@@ -59,6 +59,9 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/activities', activityRoutes);
 app.use('/api/wishlist', wishlistRoutes);
+// Admin aliases
+app.use('/api/admin/products', adminProductsRouter);
+app.use('/api/admin/categories', adminCategoriesRouter);
 
 // Error handling middleware
 app.use(notFound);

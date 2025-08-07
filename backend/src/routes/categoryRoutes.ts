@@ -98,4 +98,58 @@ router.put(
 );
 router.delete('/:id', protect, restrictTo(['admin']), deleteCategory);
 
+/**
+ * ADMIN aliases under /api/admin/categories
+ */
+const adminCategories = express.Router();
+/**
+ * @swagger
+ * tags:
+ *   name: AdminCategories
+ *   description: Admin kategori yönetimi
+ */
+adminCategories.post('/', protect, restrictTo(['admin']), validate(createCategorySchema), createCategory);
+adminCategories.put('/:id', protect, restrictTo(['admin']), validate(updateCategorySchema), updateCategory);
+adminCategories.delete('/:id', protect, restrictTo(['admin']), deleteCategory);
+/**
+ * @swagger
+ * /api/admin/categories:
+ *   post:
+ *     summary: Kategori oluştur (Admin)
+ *     tags: [AdminCategories]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       201:
+ *         description: Oluşturuldu
+ */
+/**
+ * @swagger
+ * /api/admin/categories/{id}:
+ *   put:
+ *     summary: Kategori güncelle (Admin)
+ *     tags: [AdminCategories]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *   delete:
+ *     summary: Kategori sil (Admin)
+ *     tags: [AdminCategories]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ */
+
+export const adminCategoriesRouter = adminCategories;
+
 export default router; 
