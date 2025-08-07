@@ -143,14 +143,15 @@ const SearchBar = ({
                     onClick={() => setShowResults(false)}
                   >
                     <div className="flex items-center">
-                      <div className="flex-shrink-0 h-10 w-10 relative">
+                      <div className="flex-shrink-0 h-10 w-10 relative" style={{ height: '40px', width: '40px' }}>
                         {product.images && product.images.length > 0 ? (
                           <Image
-                            src={product.images[0]}
+                            src={`http://localhost:5000${product.images[0]}`}
                             alt={product.name}
                             fill
                             sizes="40px"
                             className="object-cover rounded"
+                            style={{ height: '100%', width: '100%', objectFit: 'cover' }}
                           />
                         ) : (
                           <div className="h-10 w-10 bg-gray-200 rounded flex items-center justify-center">

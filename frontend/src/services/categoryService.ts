@@ -3,9 +3,26 @@ import { ApiResponse, Category } from '@/types';
 
 export const categoryService = {
   // Tüm kategorileri getir
-  getCategories: async () => {
-    const response = await api.get<ApiResponse<Category[]>>('/categories');
-    return response.data;
+  getCategories: async (params: any = {}) => {
+    try {
+      console.log('Fetching categories with params:', params);
+      const response = await api.get<ApiResponse<Category[]>>('/categories', { params });
+      console.log('Categories response:', response.data);
+      
+      // Backend'in döndürdüğü yanıt formatını frontend'in beklediği formata dönüştür
+      if (response.data && response.data.categories) {
+        return {
+          success: response.data.success,
+          message: response.data.message || '',
+          data: response.data.categories
+        };
+      }
+      
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      return { success: false, message: 'Kategoriler yüklenirken hata oluştu', data: [] };
+    }
   },
 
   // ID ile kategori detayını getir

@@ -4,6 +4,7 @@ import connectDB from './config/db';
 import config from './config/config';
 import path from 'path';
 import { errorHandler, notFound } from './middlewares/errorMiddleware';
+import { setupSwagger } from './config/swagger';
 
 // Import routes
 import authRoutes from './routes/authRoutes';
@@ -30,8 +31,11 @@ app.use(cors({
   credentials: true
 }));
 
+// Swagger dokümantasyonunu kur
+setupSwagger(app);
+
 // Static folder for uploads
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+app.use('/images', express.static(path.join(__dirname, '../uploads/images')));
 
 // API Routes
 app.get('/', (req: Request, res: Response) => {

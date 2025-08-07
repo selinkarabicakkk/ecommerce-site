@@ -7,7 +7,7 @@ import mongoose from 'mongoose';
 // Kullanıcının istek listesini getir
 export const getWishlist = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?._id;
+    const userId = req.user?.id;
 
     const wishlistItems = await WishlistItem.find({ user: userId })
       .populate({
@@ -39,14 +39,14 @@ export const getWishlist = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error('İstek listesi getirme hatası:', error);
-    throw new ApiError(500, 'İstek listesi yüklenirken bir hata oluştu');
+    throw new ApiError('İstek listesi yüklenirken bir hata oluştu', 500);
   }
 };
 
 // Ürünü istek listesine ekle
 export const addToWishlist = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?._id;
+    const userId = req.user?.id;
     const { productId } = req.body;
 
     // Ürünün var olup olmadığını kontrol et
@@ -83,14 +83,14 @@ export const addToWishlist = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Geçersiz ürün ID\'si' });
     }
     
-    throw new ApiError(500, 'Ürün istek listesine eklenirken bir hata oluştu');
+    throw new ApiError('Ürün istek listesine eklenirken bir hata oluştu', 500);
   }
 };
 
 // Ürünü istek listesinden çıkar
 export const removeFromWishlist = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?._id;
+    const userId = req.user?.id;
     const itemId = req.params.id;
 
     const deletedItem = await WishlistItem.findOneAndDelete({
@@ -107,14 +107,14 @@ export const removeFromWishlist = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error('İstek listesinden kaldırma hatası:', error);
-    throw new ApiError(500, 'Ürün istek listesinden kaldırılırken bir hata oluştu');
+    throw new ApiError('Ürün istek listesinden kaldırılırken bir hata oluştu', 500);
   }
 };
 
 // Ürünün istek listesinde olup olmadığını kontrol et
 export const checkInWishlist = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?._id;
+    const userId = req.user?.id;
     const productId = req.params.productId;
 
     const wishlistItem = await WishlistItem.findOne({
@@ -128,14 +128,14 @@ export const checkInWishlist = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error('İstek listesi kontrolü hatası:', error);
-    throw new ApiError(500, 'İstek listesi kontrolü sırasında bir hata oluştu');
+    throw new ApiError('İstek listesi kontrolü sırasında bir hata oluştu', 500);
   }
 };
 
 // İstek listesini temizle
 export const clearWishlist = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?._id;
+    const userId = req.user?.id;
 
     await WishlistItem.deleteMany({ user: userId });
 
@@ -144,6 +144,6 @@ export const clearWishlist = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error('İstek listesi temizleme hatası:', error);
-    throw new ApiError(500, 'İstek listesi temizlenirken bir hata oluştu');
+    throw new ApiError('İstek listesi temizlenirken bir hata oluştu', 500);
   }
 };

@@ -45,8 +45,25 @@ export const productService = {
 
   // Öne çıkan ürünleri getir
   getFeaturedProducts: async (limit: number = 8) => {
-    const response = await api.get<ApiResponse<Product[]>>(`/products/featured?limit=${limit}`);
-    return response.data;
+    try {
+      console.log('Fetching featured products...');
+      const response = await api.get<ApiResponse<Product[]>>(`/products/featured?limit=${limit}`);
+      console.log('Featured products response:', response.data);
+      
+      // Backend'in döndürdüğü yanıt formatını frontend'in beklediği formata dönüştür
+      if (response.data && response.data.products) {
+        return {
+          success: response.data.success,
+          message: response.data.message || '',
+          data: response.data.products
+        };
+      }
+      
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching featured products:', error);
+      return { success: false, message: 'Öne çıkan ürünler yüklenirken hata oluştu', data: [] };
+    }
   },
 
   // Yeni gelen ürünleri getir

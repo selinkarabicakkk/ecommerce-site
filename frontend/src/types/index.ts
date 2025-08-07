@@ -152,6 +152,8 @@ export interface ApiResponse<T> {
   message: string;
   data?: T;
   errors?: Record<string, string>;
+  categories?: Category[];
+  products?: Product[];
 }
 
 // Pagination types
