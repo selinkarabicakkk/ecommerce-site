@@ -19,6 +19,8 @@ import wishlistRoutes from './routes/wishlistRoutes';
 import searchRoutes from './routes/searchRoutes';
 import recommendationRoutes from './routes/recommendationRoutes';
 import adminRoutes from './routes/adminRoutes';
+import uploadRoutes from './routes/uploadRoutes';
+import emailRoutes from './routes/emailRoutes';
 
 // Connect to MongoDB
 connectDB();
@@ -60,6 +62,8 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/activities', activityRoutes);
 app.use('/api/wishlist', wishlistRoutes);
+app.use('/api/upload', uploadRoutes);
+app.use('/api/email', emailRoutes);
 // Admin aliases
 app.use('/api/admin/products', adminProductsRouter);
 app.use('/api/admin/categories', adminCategoriesRouter);
