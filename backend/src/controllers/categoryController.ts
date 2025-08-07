@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { Category } from '../models';
+import { Category, Product } from '../models';
 import { NotFoundError, BadRequestError } from '../utils/errorUtils';
 
 /**
@@ -205,3 +205,43 @@ export const deleteCategory = async (
     next(error);
   }
 }; 
+
+/**
+ * Get products by category
+ * @route GET /api/categories/:id/products
+ * @access Public
+ */
+export const getCategoryProducts = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const categoryId = req.params.id;
+
+    const category = await Category.findById(categoryId);
+    if (!category) {
+      throw new NotFoundError('Category not found');
+    }
+
+    const limit = Number(req.query.limit) || 10;
+    const page = Number(req.query.page) || 1;
+
+    const count = await Product.countDocuments({ category: categoryId });
+    const products = await Product.find({ category: categoryId })
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .skip(limit * (page - 1))
+      .populate('category', 'name slug');
+
+    res.status(200).json({
+      success: true,
+      count,
+      pages: Math.ceil(count / limit),
+      page,
+      products,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

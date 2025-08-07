@@ -6,6 +6,7 @@ import {
   createCategory,
   updateCategory,
   deleteCategory,
+  getCategoryProducts,
 } from '../controllers/categoryController';
 import { protect, restrictTo } from '../middlewares/authMiddleware';
 import { validate } from '../middlewares/validationMiddleware';
@@ -53,6 +54,32 @@ router.get('/slug/:slug', getCategoryBySlug); // Note: This route must be before
  *         description: Başarılı
  */
 router.get('/:id', getCategoryById);
+
+/**
+ * @swagger
+ * /api/categories/{id}/products:
+ *   get:
+ *     summary: Bu kategoriye ait ürünleri getir
+ *     tags: [Categories]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Başarılı
+ */
+router.get('/:id/products', getCategoryProducts);
 
 // Admin routes
 router.post(
