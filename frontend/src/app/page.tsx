@@ -6,7 +6,7 @@ import Image from 'next/image';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/Button';
 import RecommendedProducts from '@/components/product/RecommendedProducts';
-import { categoryService, productService } from '@/services';
+import { categoryService, productService, emailService } from '@/services';
 import { Category, Product } from '@/types';
 
 export default function Home() {
@@ -320,25 +320,54 @@ export default function Home() {
       </section>
 
       {/* Newsletter Section */}
-      <section className="py-12 md:py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl font-bold mb-4">Bültenimize Abone Olun</h2>
-            <p className="text-lg text-gray-600 mb-8">
-              En son ürünler, indirimler ve kampanyalardan haberdar olmak için bültenimize abone
-              olun.
-            </p>
-            <form className="flex flex-col sm:flex-row gap-4">
-              <input
-                type="email"
-                placeholder="E-posta adresiniz"
-                className="flex-grow px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-              />
-              <Button>Abone Ol</Button>
-            </form>
-          </div>
-        </div>
-      </section>
+      <NewsletterSection />
     </MainLayout>
+  );
+}
+
+function NewsletterSection() {
+  'use client';
+  const [email, setEmail] = useState('');
+  const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
+  const [message, setMessage] = useState('');
+
+  const onSubmit = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!email) return;
+    setStatus('sending');
+    try {
+      await emailService.newsletter(email);
+      setStatus('success');
+      setMessage('Abonelik başarılı.');
+      setEmail('');
+    } catch (err: any) {
+      setStatus('error');
+      setMessage(err?.message || 'Bir hata oluştu');
+    }
+  };
+
+  return (
+    <section className="py-12 md:py-16">
+      <div className="container mx-auto px-4">
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="text-3xl font-bold mb-4">Bültenimize Abone Olun</h2>
+          <p className="text-lg text-gray-600 mb-8">
+            En son ürünler, indirimler ve kampanyalardan haberdar olmak için bültenimize abone olun.
+          </p>
+          <form onSubmit={onSubmit} className="flex flex-col sm:flex-row gap-4">
+            <input
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              type="email"
+              placeholder="E-posta adresiniz"
+              className="flex-grow px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            />
+            <Button disabled={status === 'sending'} type="submit">{status === 'sending' ? 'Gönderiliyor...' : 'Abone Ol'}</Button>
+          </form>
+          {status === 'success' && <p className="text-green-600 mt-3">{message}</p>}
+          {status === 'error' && <p className="text-red-600 mt-3">{message}</p>}
+        </div>
+      </div>
+    </section>
   );
 }

@@ -6,81 +6,15 @@ import Link from 'next/link';
 import AdminLayout from '@/components/layout/AdminLayout';
 import { Button } from '@/components/ui/Button';
 import { useAppSelector } from '@/store';
+import { adminService, orderService } from '@/services';
 
 export default function AdminDashboardPage() {
   const router = useRouter();
   const { user, isAuthenticated, loading } = useAppSelector((state) => state.auth);
   
-  // Mock veri (normalde API'den gelecek)
-  const [stats, setStats] = useState({
-    totalSales: 45750.99,
-    totalOrders: 187,
-    totalCustomers: 124,
-    pendingOrders: 12,
-    lowStockProducts: 8,
-  });
-
-  const [recentOrders, setRecentOrders] = useState([
-    {
-      id: 'ORD-123456',
-      customer: 'Ahmet Yılmaz',
-      date: '2023-06-20T10:30:00Z',
-      total: 1299.99,
-      status: 'processing',
-    },
-    {
-      id: 'ORD-123455',
-      customer: 'Ayşe Demir',
-      date: '2023-06-19T14:20:00Z',
-      total: 2499.99,
-      status: 'shipped',
-    },
-    {
-      id: 'ORD-123454',
-      customer: 'Mehmet Kaya',
-      date: '2023-06-18T09:15:00Z',
-      total: 899.97,
-      status: 'delivered',
-    },
-    {
-      id: 'ORD-123453',
-      customer: 'Zeynep Çelik',
-      date: '2023-06-17T16:45:00Z',
-      total: 459.98,
-      status: 'pending',
-    },
-  ]);
-
-  const [popularProducts, setPopularProducts] = useState([
-    {
-      id: 'PROD-001',
-      name: 'Akıllı Telefon X',
-      sales: 42,
-      stock: 18,
-      price: 9999.99,
-    },
-    {
-      id: 'PROD-002',
-      name: 'Laptop Pro',
-      sales: 38,
-      stock: 7,
-      price: 14999.99,
-    },
-    {
-      id: 'PROD-003',
-      name: 'Kablosuz Kulaklık',
-      sales: 65,
-      stock: 24,
-      price: 1299.99,
-    },
-    {
-      id: 'PROD-004',
-      name: 'Akıllı Saat',
-      sales: 51,
-      stock: 15,
-      price: 2499.99,
-    },
-  ]);
+  const [stats, setStats] = useState({ totalSales: 0, totalOrders: 0, totalCustomers: 0, pendingOrders: 0, lowStockProducts: 0 });
+  const [recentOrders, setRecentOrders] = useState<any[]>([]);
+  const [popularProducts, setPopularProducts] = useState<any[]>([]);
 
   // Kullanıcı giriş yapmamışsa veya admin değilse yönlendir
   useEffect(() => {
@@ -92,6 +26,38 @@ export default function AdminDashboardPage() {
       }
     }
   }, [isAuthenticated, loading, router, user]);
+
+  // Dashboard verilerini yükle
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const [statsRes, popularRes, ordersRes] = await Promise.all([
+          adminService.getStats(),
+          adminService.getPopularProducts(5),
+          orderService.getOrders(1, 5),
+        ]);
+
+        const statsData: any = (statsRes as any)?.stats || (statsRes as any)?.data || statsRes;
+        if (statsData) {
+          setStats({
+            totalSales: statsData.revenue || 0,
+            totalOrders: statsData.ordersCount || 0,
+            totalCustomers: statsData.customersCount || 0,
+            pendingOrders: 0,
+            lowStockProducts: 0,
+          });
+        }
+
+        setPopularProducts((popularRes as any)?.products || (popularRes as any)?.data || []);
+        setRecentOrders((ordersRes as any)?.orders || (ordersRes as any)?.data || []);
+      } catch (e) {
+        console.error('Admin dashboard verileri yüklenemedi', e);
+      }
+    };
+    if (isAuthenticated && user?.role === 'admin') {
+      load();
+    }
+  }, [isAuthenticated, user]);
 
   // Tarihi formatla
   const formatDate = (dateString: string) => {
@@ -205,16 +171,16 @@ export default function AdminDashboardPage() {
                   {recentOrders.map((order) => (
                     <tr key={order.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {order.id}
+                        {order._id}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {order.customer}
+                        {order.user?.firstName} {order.user?.lastName}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {formatDate(order.date)}
+                        {formatDate(order.createdAt)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {order.total.toLocaleString('tr-TR')} ₺
+                        {order.totalPrice?.toLocaleString('tr-TR')} ₺
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span

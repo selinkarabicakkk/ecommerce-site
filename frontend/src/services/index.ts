@@ -7,6 +7,9 @@ import { cartService } from './cartService';
 import { orderService } from './orderService';
 import { reviewService } from './reviewService';
 import { activityService } from './activityService';
+import adminService from './adminService';
+import emailService from './emailService';
+import uploadService from './uploadService';
 import wishlistService from './wishlistService';
 
 export {
@@ -20,4 +23,7 @@ export {
   reviewService,
   activityService,
   wishlistService,
+  adminService,
+  emailService,
+  uploadService,
 }; 

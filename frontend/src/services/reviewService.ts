@@ -56,7 +56,7 @@ export const reviewService = {
 
   // Admin: İncelemeyi onayla
   approveReview: async (id: string) => {
-    const response = await api.put<ApiResponse<Review>>(`/reviews/${id}/approve`);
+    const response = await api.patch<ApiResponse<Review>>(`/reviews/${id}/approve`);
     return response.data;
   },
 }; 

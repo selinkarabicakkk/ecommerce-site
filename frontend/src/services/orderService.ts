@@ -45,7 +45,7 @@ export const orderService = {
 
   // Admin: Tüm siparişleri getir
   getOrders: async (page: number = 1, limit: number = 10) => {
-    const response = await api.get<PaginatedResponse<Order>>(`/orders?page=${page}&limit=${limit}`);
+    const response = await api.get<PaginatedResponse<Order>>(`/admin/orders?page=${page}&limit=${limit}`);
     return response.data;
   },
 

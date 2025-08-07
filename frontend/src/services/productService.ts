@@ -74,7 +74,7 @@ export const productService = {
 
   // İlgili ürünleri getir
   getRelatedProducts: async (productId: string, limit: number = 4) => {
-    const response = await api.get<ApiResponse<Product[]>>(`/products/${productId}/related?limit=${limit}`);
+    const response = await api.get<ApiResponse<Product[]>>(`/recommendations/related/${productId}?limit=${limit}`);
     return response.data;
   },
 
