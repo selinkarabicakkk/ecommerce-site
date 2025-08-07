@@ -16,9 +16,42 @@ import {
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * tags:
+ *   name: Categories
+ *   description: Kategori listeleme ve yönetimi
+ */
+
 // Public routes
+/**
+ * @swagger
+ * /api/categories:
+ *   get:
+ *     summary: Tüm kategorileri getir
+ *     tags: [Categories]
+ *     responses:
+ *       200:
+ *         description: Başarılı
+ */
 router.get('/', getCategories);
 router.get('/slug/:slug', getCategoryBySlug); // Note: This route must be before /:id to avoid slug being treated as id
+/**
+ * @swagger
+ * /api/categories/{id}:
+ *   get:
+ *     summary: Kategori detayını getir
+ *     tags: [Categories]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Başarılı
+ */
 router.get('/:id', getCategoryById);
 
 // Admin routes

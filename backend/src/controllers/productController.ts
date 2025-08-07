@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { Product, Category } from '../models';
+import { Product, Category, ActivityLog } from '../models';
 import { NotFoundError, BadRequestError } from '../utils/errorUtils';
 import { deleteFile } from '../utils/uploadUtils';
 
@@ -487,3 +487,54 @@ export const getRelatedProducts = async (
     next(error);
   }
 }; 
+
+/**
+ * Get popular products based on recent views/purchases
+ * @route GET /api/products/popular
+ * @access Public
+ */
+export const getPopularProducts = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const limit = Number(req.query.limit) || 8;
+    const days = Number(req.query.days) || 30;
+
+    // Date range
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+
+    // Aggregate activity logs for views and purchases
+    const popular = await ActivityLog.aggregate([
+      {
+        $match: {
+          activityType: { $in: ['view', 'purchase'] },
+          timestamp: { $gte: startDate, $lte: endDate },
+        },
+      },
+      {
+        $group: {
+          _id: '$product',
+          score: { $sum: 1 },
+        },
+      },
+      { $sort: { score: -1 } },
+      { $limit: limit },
+    ]);
+
+    const ids = popular.map((p) => p._id);
+    const products = await Product.find({ _id: { $in: ids } })
+      .populate('category', 'name slug')
+      .lean();
+
+    // Keep original aggregated order
+    const ordered = ids.map((id) => products.find((p) => p && p._id && p._id.toString() === id.toString()));
+
+    res.status(200).json({ success: true, products: ordered.filter(Boolean) });
+  } catch (error) {
+    next(error);
+  }
+};
