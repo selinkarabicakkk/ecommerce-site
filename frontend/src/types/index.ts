@@ -30,6 +30,7 @@ export interface Product {
   name: string;
   description: string;
   price: number;
+  discount: number;
   category: Category;
   images: string[];
   specifications: Record<string, string>;
