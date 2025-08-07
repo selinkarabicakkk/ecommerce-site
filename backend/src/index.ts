@@ -45,6 +45,9 @@ app.get('/', (req: Request, res: Response) => {
 // Use route files
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+// Aliases for convenience and matching spec
+app.use('/api/user', userRoutes);
+app.use('/api/user/wishlist', wishlistRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/reviews', reviewRoutes);

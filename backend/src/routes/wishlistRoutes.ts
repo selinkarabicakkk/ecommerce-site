@@ -24,4 +24,7 @@ router.get('/check/:productId', wishlistController.checkInWishlist);
 // DELETE /api/wishlist - İstek listesini temizle
 router.delete('/', wishlistController.clearWishlist);
 
+// POST /api/wishlist/:productId - Toggle wishlist
+router.post('/:productId', wishlistController.toggleWishlistItem);
+
 export default router;

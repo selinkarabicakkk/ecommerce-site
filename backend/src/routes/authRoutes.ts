@@ -5,7 +5,8 @@ import {
   verifyEmail, 
   forgotPassword, 
   resetPassword,
-  getCurrentUser
+  getCurrentUser,
+  logout,
 } from '../controllers/authController';
 import { protect } from '../middlewares/authMiddleware';
 import { validate } from '../middlewares/validationMiddleware';
@@ -122,6 +123,9 @@ router.post('/login', validate(loginSchema), login);
  *       400:
  *         description: Geçersiz veya süresi dolmuş token
  */
+// Email doğrulama: hem GET query/body hem de path token desteklenir
+router.get('/verify-email', validate(verifyEmailSchema, 'query'), verifyEmail);
+router.post('/verify-email', validate(verifyEmailSchema, 'body'), verifyEmail);
 router.get('/verify-email/:token', verifyEmail);
 
 /**
@@ -181,6 +185,7 @@ router.post('/forgot-password', validate(forgotPasswordSchema), forgotPassword);
  *         description: Geçersiz veya süresi dolmuş token
  */
 router.post('/reset-password/:token', validate(resetPasswordSchema), resetPassword);
+router.post('/reset-password', validate(resetPasswordSchema), resetPassword);
 
 /**
  * @swagger
@@ -196,6 +201,7 @@ router.post('/reset-password/:token', validate(resetPasswordSchema), resetPasswo
  *       401:
  *         description: Yetkilendirme hatası
  */
+router.post('/logout', protect, logout);
 /**
  * @swagger
  * /api/auth/me:

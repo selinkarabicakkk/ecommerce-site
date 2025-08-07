@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { User } from '../models';
 import { NotFoundError, ForbiddenError } from '../utils/errorUtils';
+import { Order } from '../models';
 
 /**
  * Get user profile
@@ -272,3 +273,54 @@ export const updateFavoriteCategories = async (
     next(error);
   }
 }; 
+
+/**
+ * Get user addresses
+ * @route GET /api/users/addresses
+ * @access Private
+ */
+export const getUserAddresses = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    if (!req.user) {
+      throw new ForbiddenError('Not authorized');
+    }
+
+    const user = await User.findById(req.user.id).select('addresses');
+    if (!user) {
+      throw new NotFoundError('User not found');
+    }
+
+    res.status(200).json({
+      success: true,
+      addresses: user.addresses,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Get user's past orders
+ * @route GET /api/users/orders
+ * @access Private
+ */
+export const getUserOrders = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    if (!req.user) {
+      throw new ForbiddenError('Not authorized');
+    }
+
+    const orders = await Order.find({ user: req.user.id }).sort({ createdAt: -1 });
+    res.status(200).json({ success: true, orders });
+  } catch (error) {
+    next(error);
+  }
+};

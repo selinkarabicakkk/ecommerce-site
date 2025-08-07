@@ -111,6 +111,33 @@ export const removeFromWishlist = async (req: Request, res: Response) => {
   }
 };
 
+// Ürünü istek listesinde toggle et (varsa kaldır, yoksa ekle)
+export const toggleWishlistItem = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    const { productId } = req.params;
+
+    // Ürünün var olup olmadığını kontrol et
+    const productExists = await Product.exists({ _id: productId });
+    if (!productExists) {
+      return res.status(404).json({ message: 'Ürün bulunamadı' });
+    }
+
+    const existingItem = await WishlistItem.findOne({ user: userId, product: productId });
+
+    if (existingItem) {
+      await existingItem.deleteOne();
+      return res.status(200).json({ message: 'Ürün istek listenizden kaldırıldı', inWishlist: false });
+    }
+
+    const created = await WishlistItem.create({ user: userId, product: productId });
+    return res.status(201).json({ message: 'Ürün istek listenize eklendi', inWishlist: true, data: created });
+  } catch (error) {
+    console.error('İstek listesi toggle hatası:', error);
+    throw new ApiError('İstek listesi güncellenirken bir hata oluştu', 500);
+  }
+};
+
 // Ürünün istek listesinde olup olmadığını kontrol et
 export const checkInWishlist = async (req: Request, res: Response) => {
   try {
