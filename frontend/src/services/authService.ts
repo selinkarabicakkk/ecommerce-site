@@ -18,8 +18,9 @@ export const authService = {
 
   // Email doğrulama
   verifyEmail: async (token: string, email: string) => {
-    const response = await api.get<ApiResponse<{ message: string }>>(
-      `/auth/verify-email?token=${token}&email=${email}`
+    const response = await api.post<ApiResponse<{ message: string }>>(
+      '/auth/verify-email',
+      { token, email }
     );
     return response.data;
   },

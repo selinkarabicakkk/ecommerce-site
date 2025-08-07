@@ -19,20 +19,20 @@ export const activityService = {
 
   // Popüler ürünleri getir
   getPopularProducts: async (limit: number = 8) => {
-    const response = await api.get<ApiResponse<any>>(`/activities/popular?limit=${limit}`);
+    const response = await api.get<ApiResponse<any>>(`/recommendations/popular?limit=${limit}`);
     return response.data;
   },
 
   // Kullanıcıya özel önerilen ürünleri getir
   getRecommendedProducts: async (limit: number = 8) => {
-    const response = await api.get<ApiResponse<any>>(`/activities/recommended?limit=${limit}`);
+    const response = await api.get<ApiResponse<any>>(`/recommendations/history?limit=${limit}`);
     return response.data;
   },
 
   // Birlikte sıkça alınan ürünleri getir
   getFrequentlyBoughtTogether: async (productId: string, limit: number = 4) => {
     const response = await api.get<ApiResponse<any>>(
-      `/activities/frequently-bought-together/${productId}?limit=${limit}`
+      `/recommendations/frequently-bought-together/${productId}?limit=${limit}`
     );
     return response.data;
   },

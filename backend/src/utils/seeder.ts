@@ -31,7 +31,7 @@ const categories = [
   {
     name: 'Electronics',
     description: 'Electronic devices and accessories',
-    image: 'electronics.jpg',
+    image: '/images/categories/electronics.jpg',
     slug: 'electronics',
     isActive: true,
     sortOrder: 1,
@@ -39,7 +39,7 @@ const categories = [
   {
     name: 'Clothing',
     description: 'Shirts, pants, and other apparel',
-    image: 'clothing.jpg',
+    image: '/images/categories/clothing.jpg',
     slug: 'clothing',
     isActive: true,
     sortOrder: 2,
@@ -47,7 +47,7 @@ const categories = [
   {
     name: 'Home and Garden',
     description: 'Furniture, decor, and gardening supplies',
-    image: 'home-garden.jpg',
+    image: '/images/categories/home-garden.jpg',
     slug: 'home-and-garden',
     isActive: true,
     sortOrder: 3,
@@ -55,7 +55,7 @@ const categories = [
   {
     name: 'Sports',
     description: 'Sports equipment and activewear',
-    image: 'sports.jpg',
+    image: '/images/categories/sports.jpg',
     slug: 'sports',
     isActive: true,
     sortOrder: 4,
@@ -63,7 +63,7 @@ const categories = [
   {
     name: 'Books',
     description: 'Fiction, non-fiction, and educational books',
-    image: 'books.jpg',
+    image: '/images/categories/books.jpg',
     slug: 'books',
     isActive: true,
     sortOrder: 5,
@@ -71,7 +71,7 @@ const categories = [
   {
     name: 'Health and Beauty',
     description: 'Personal care products and cosmetics',
-    image: 'health-beauty.jpg',
+    image: '/images/categories/health-beauty.jpg',
     slug: 'health-and-beauty',
     isActive: true,
     sortOrder: 6,
@@ -79,7 +79,7 @@ const categories = [
   {
     name: 'Toys',
     description: 'Toys for children of all ages',
-    image: 'toys.jpg',
+    image: '/images/categories/toys.jpg',
     slug: 'toys',
     isActive: true,
     sortOrder: 7,
@@ -87,7 +87,7 @@ const categories = [
   {
     name: 'Food',
     description: 'Groceries and specialty food items',
-    image: 'food.jpg',
+    image: '/images/categories/food.jpg',
     slug: 'food',
     isActive: true,
     sortOrder: 8,
@@ -138,7 +138,7 @@ const seedData = async () => {
           description: 'Latest smartphone with advanced features',
           price: 999.99,
           category: electronicsCategory._id,
-          images: ['smartphone.jpg'],
+          images: ['/images/products/smartphone.jpg'],
           specifications: {
             'Screen Size': '6.5 inches',
             'Storage': '128GB',
@@ -156,7 +156,7 @@ const seedData = async () => {
           description: 'High-performance laptop for professionals',
           price: 1499.99,
           category: electronicsCategory._id,
-          images: ['laptop.jpg'],
+          images: ['/images/products/laptop.jpg'],
           specifications: {
             'Screen Size': '15.6 inches',
             'Storage': '512GB SSD',
@@ -183,7 +183,7 @@ const seedData = async () => {
           description: 'Comfortable cotton t-shirt for everyday wear',
           price: 19.99,
           category: clothingCategory._id,
-          images: ['tshirt.jpg'],
+          images: ['/images/products/tshirt.jpg'],
           specifications: {
             'Material': '100% Cotton',
             'Fit': 'Regular',
@@ -241,7 +241,7 @@ const seedData = async () => {
           description: 'Classic denim jeans with straight fit',
           price: 49.99,
           category: clothingCategory._id,
-          images: ['jeans.jpg'],
+          images: ['/images/products/jeans.jpg'],
           specifications: {
             'Material': 'Denim',
             'Fit': 'Straight',

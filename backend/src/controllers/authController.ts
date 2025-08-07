@@ -116,6 +116,31 @@ export const login = async (
 };
 
 /**
+ * Logout user (stateless)
+ * @route POST /api/auth/logout
+ * @access Private
+ */
+export const logout = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    // Clear auth cookie if exists (defensive; token is stateless)
+    try {
+      res.clearCookie('jwt');
+    } catch {}
+
+    res.status(200).json({
+      success: true,
+      message: 'Logged out successfully',
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
  * Verify email
  * @route GET /api/auth/verify-email
  * @access Public
@@ -126,10 +151,11 @@ export const verifyEmail = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { token, email } = req.query;
+    const token = (req.body as any)?.token || (req.query as any)?.token || (req.params as any)?.token;
+    const email = (req.body as any)?.email || (req.query as any)?.email || (req.params as any)?.email;
 
     if (!token || !email) {
-      throw new BadRequestError('Invalid verification link');
+      throw new BadRequestError('Invalid verification payload');
     }
 
     // Find user
@@ -140,7 +166,7 @@ export const verifyEmail = async (
     });
 
     if (!user) {
-      throw new BadRequestError('Invalid or expired verification link');
+      throw new BadRequestError('Invalid or expired verification token');
     }
 
     // Update user
@@ -214,7 +240,9 @@ export const resetPassword = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { token, email, password } = req.body;
+    // Accept token either from body or URL param for compatibility
+    const token = (req.body as any)?.token || (req.params as any)?.token;
+    const { email, password } = req.body;
 
     // Find user
     const user = await User.findOne({

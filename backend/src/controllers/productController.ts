@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { Product, Category } from '../models';
+import { Product, Category, ActivityLog } from '../models';
 import { NotFoundError, BadRequestError } from '../utils/errorUtils';
 import { deleteFile } from '../utils/uploadUtils';
 
@@ -88,6 +88,9 @@ export const getProducts = async (
       // Default sort by newest
       sortOption = { createdAt: -1 };
     }
+
+    // Only active products for public listing
+    filter.isActive = filter.isActive ?? true;
 
     const count = await Product.countDocuments(filter);
     const products = await Product.find(filter)
@@ -320,6 +323,7 @@ export const updateProduct = async (
     if (specifications) product.specifications = specifications;
     if (tags) product.tags = tags;
     if (isFeatured !== undefined) product.isFeatured = isFeatured;
+    if ((req.body as any).isActive !== undefined) product.isActive = (req.body as any).isActive;
     if (variants) product.variants = variants;
     if (stock !== undefined) product.stock = stock;
 
@@ -366,6 +370,39 @@ export const deleteProduct = async (
       success: true,
       message: 'Product deleted',
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Bulk update products (active/featured)
+ * @route PATCH /api/admin/products/bulk
+ * @access Private/Admin
+ */
+export const bulkUpdateProducts = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { items } = req.body as { items: Array<{ id: string; isActive?: boolean; isFeatured?: boolean }> };
+    if (!items || items.length === 0) {
+      throw new BadRequestError('No items provided');
+    }
+
+    const bulkOps = items.map((it) => ({
+      updateOne: {
+        filter: { _id: it.id },
+        update: {
+          ...(it.isActive !== undefined ? { isActive: it.isActive } : {}),
+          ...(it.isFeatured !== undefined ? { isFeatured: it.isFeatured } : {}),
+        },
+      },
+    }));
+
+    const result = await Product.bulkWrite(bulkOps);
+    res.status(200).json({ success: true, result });
   } catch (error) {
     next(error);
   }
@@ -487,3 +524,54 @@ export const getRelatedProducts = async (
     next(error);
   }
 }; 
+
+/**
+ * Get popular products based on recent views/purchases
+ * @route GET /api/products/popular
+ * @access Public
+ */
+export const getPopularProducts = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const limit = Number(req.query.limit) || 8;
+    const days = Number(req.query.days) || 30;
+
+    // Date range
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+
+    // Aggregate activity logs for views and purchases
+    const popular = await ActivityLog.aggregate([
+      {
+        $match: {
+          activityType: { $in: ['view', 'purchase'] },
+          timestamp: { $gte: startDate, $lte: endDate },
+        },
+      },
+      {
+        $group: {
+          _id: '$product',
+          score: { $sum: 1 },
+        },
+      },
+      { $sort: { score: -1 } },
+      { $limit: limit },
+    ]);
+
+    const ids = popular.map((p) => p._id);
+    const products = await Product.find({ _id: { $in: ids } })
+      .populate('category', 'name slug')
+      .lean();
+
+    // Keep original aggregated order
+    const ordered = ids.map((id) => products.find((p) => p && p._id && p._id.toString() === id.toString()));
+
+    res.status(200).json({ success: true, products: ordered.filter(Boolean) });
+  } catch (error) {
+    next(error);
+  }
+};

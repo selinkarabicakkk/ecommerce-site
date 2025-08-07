@@ -6,6 +6,7 @@ import Link from 'next/link';
 import AdminLayout from '@/components/layout/AdminLayout';
 import { Button } from '@/components/ui/Button';
 import { useAppSelector } from '@/store';
+import { adminService } from '@/services';
 
 // Kullanıcı tipi
 interface User {
@@ -29,87 +30,23 @@ export default function AdminCustomersPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   
-  // Örnek veri (normalde API'den gelecek)
-  const mockCustomers: User[] = [
-    {
-      _id: '1',
-      firstName: 'Ahmet',
-      lastName: 'Yılmaz',
-      email: 'ahmet@example.com',
-      role: 'customer',
-      isEmailVerified: true,
-      createdAt: '2023-06-15T10:30:00Z',
-    },
-    {
-      _id: '2',
-      firstName: 'Ayşe',
-      lastName: 'Demir',
-      email: 'ayse@example.com',
-      role: 'customer',
-      isEmailVerified: true,
-      createdAt: '2023-06-10T14:20:00Z',
-    },
-    {
-      _id: '3',
-      firstName: 'Mehmet',
-      lastName: 'Kaya',
-      email: 'mehmet@example.com',
-      role: 'customer',
-      isEmailVerified: false,
-      createdAt: '2023-06-05T09:15:00Z',
-    },
-    {
-      _id: '4',
-      firstName: 'Zeynep',
-      lastName: 'Çelik',
-      email: 'zeynep@example.com',
-      role: 'customer',
-      isEmailVerified: true,
-      createdAt: '2023-05-20T16:45:00Z',
-    },
-    {
-      _id: '5',
-      firstName: 'Ali',
-      lastName: 'Öztürk',
-      email: 'ali@example.com',
-      role: 'customer',
-      isEmailVerified: true,
-      createdAt: '2023-05-15T11:30:00Z',
-    },
-  ];
 
   // Müşterileri getir
   const fetchCustomers = async (page = 1, search = '') => {
     setIsLoading(true);
     try {
-      // Burada normalde API çağrısı olacak
-      // const response = await userService.getUsers({
-      //   page,
-      //   limit: 10,
-      //   search,
-      //   role: 'customer',
-      // });
-      
-      // Mock veri kullan
-      setTimeout(() => {
-        let filteredCustomers = mockCustomers;
-        
-        // Arama filtresi
-        if (search) {
-          const searchLower = search.toLowerCase();
-          filteredCustomers = mockCustomers.filter(
-            (customer) =>
-              customer.firstName.toLowerCase().includes(searchLower) ||
-              customer.lastName.toLowerCase().includes(searchLower) ||
-              customer.email.toLowerCase().includes(searchLower)
-          );
-        }
-        
-        setCustomers(filteredCustomers);
-        setTotalPages(1); // Mock veri için 1 sayfa
-        setCurrentPage(page);
-        setIsLoading(false);
-      }, 500);
+      const response: any = await adminService.getCustomers();
+      let list: any[] = response?.users || response?.data || [];
+      if (search) {
+        const s = search.toLowerCase();
+        list = list.filter((c: any) =>
+          `${c.firstName} ${c.lastName}`.toLowerCase().includes(s) || c.email?.toLowerCase().includes(s)
+        );
+      }
+      setCustomers(list);
+      setTotalPages(1);
+      setCurrentPage(page);
+      setIsLoading(false);
     } catch (err) {
       setError('Müşteriler yüklenirken bir hata oluştu.');
       console.error('Müşteriler yüklenirken hata:', err);

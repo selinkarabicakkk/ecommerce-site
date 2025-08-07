@@ -42,7 +42,7 @@ const config: Config = {
     from: process.env.EMAIL_FROM || 'noreply@ecommerce.com',
   },
   upload: {
-    path: process.env.UPLOAD_PATH || 'uploads/',
+    path: process.env.UPLOAD_PATH || 'uploads/images',
     maxSize: parseInt(process.env.MAX_FILE_SIZE || '5242880', 10), // 5MB
   },
   frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3000',

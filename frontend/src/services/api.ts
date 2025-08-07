@@ -2,6 +2,7 @@ import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 
 // API URL'ini ortam değişkeninden alıyoruz, yoksa varsayılan olarak localhost:5000 kullanıyoruz
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+console.log('API URL:', API_URL);
 
 // Axios instance oluşturuyoruz
 const api = axios.create({

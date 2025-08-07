@@ -4,17 +4,23 @@ import connectDB from './config/db';
 import config from './config/config';
 import path from 'path';
 import { errorHandler, notFound } from './middlewares/errorMiddleware';
+import { setupSwagger } from './config/swagger';
 
 // Import routes
 import authRoutes from './routes/authRoutes';
 import userRoutes from './routes/userRoutes';
-import categoryRoutes from './routes/categoryRoutes';
-import productRoutes from './routes/productRoutes';
+import categoryRoutes, { adminCategoriesRouter } from './routes/categoryRoutes';
+import productRoutes, { adminProductsRouter } from './routes/productRoutes';
 import reviewRoutes from './routes/reviewRoutes';
 import cartRoutes from './routes/cartRoutes';
 import orderRoutes from './routes/orderRoutes';
 import activityRoutes from './routes/activityRoutes';
 import wishlistRoutes from './routes/wishlistRoutes';
+import searchRoutes from './routes/searchRoutes';
+import recommendationRoutes from './routes/recommendationRoutes';
+import adminRoutes from './routes/adminRoutes';
+import uploadRoutes from './routes/uploadRoutes';
+import emailRoutes from './routes/emailRoutes';
 
 // Connect to MongoDB
 connectDB();
@@ -30,8 +36,11 @@ app.use(cors({
   credentials: true
 }));
 
+// Swagger dokümantasyonunu kur
+setupSwagger(app);
+
 // Static folder for uploads
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+app.use('/images', express.static(path.join(__dirname, '../uploads/images')));
 
 // API Routes
 app.get('/', (req: Request, res: Response) => {
@@ -41,13 +50,24 @@ app.get('/', (req: Request, res: Response) => {
 // Use route files
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+// Aliases for convenience and matching spec
+app.use('/api/user', userRoutes);
+app.use('/api/user/wishlist', wishlistRoutes);
+app.use('/api/search', searchRoutes);
+app.use('/api/recommendations', recommendationRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/activities', activityRoutes);
-app.use('/api/wishlist', wishlistRoutes);
+// Wishlist only under /api/user/wishlist as per spec
+app.use('/api/upload', uploadRoutes);
+app.use('/api/email', emailRoutes);
+// Admin aliases
+app.use('/api/admin/products', adminProductsRouter);
+app.use('/api/admin/categories', adminCategoriesRouter);
+app.use('/api/admin', adminRoutes);
 
 // Error handling middleware
 app.use(notFound);

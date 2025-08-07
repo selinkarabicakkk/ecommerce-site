@@ -45,8 +45,25 @@ export const productService = {
 
   // Öne çıkan ürünleri getir
   getFeaturedProducts: async (limit: number = 8) => {
-    const response = await api.get<ApiResponse<Product[]>>(`/products/featured?limit=${limit}`);
-    return response.data;
+    try {
+      console.log('Fetching featured products...');
+      const response = await api.get<ApiResponse<Product[]>>(`/products/featured?limit=${limit}`);
+      console.log('Featured products response:', response.data);
+      
+      // Backend'in döndürdüğü yanıt formatını frontend'in beklediği formata dönüştür
+      if (response.data && response.data.products) {
+        return {
+          success: response.data.success,
+          message: response.data.message || '',
+          data: response.data.products
+        };
+      }
+      
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching featured products:', error);
+      return { success: false, message: 'Öne çıkan ürünler yüklenirken hata oluştu', data: [] };
+    }
   },
 
   // Yeni gelen ürünleri getir
@@ -57,33 +74,31 @@ export const productService = {
 
   // İlgili ürünleri getir
   getRelatedProducts: async (productId: string, limit: number = 4) => {
-    const response = await api.get<ApiResponse<Product[]>>(`/products/${productId}/related?limit=${limit}`);
+    const response = await api.get<ApiResponse<Product[]>>(`/recommendations/related/${productId}?limit=${limit}`);
     return response.data;
   },
 
-  // Admin: Ürün oluştur
-  createProduct: async (productData: FormData) => {
-    const response = await api.post<ApiResponse<Product>>('/products', productData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+  // Admin: Ürün oluştur (JSON)
+  createProduct: async (productData: Partial<Product> & { images: string[] }) => {
+    const response = await api.post<ApiResponse<Product>>('/admin/products', productData);
     return response.data;
   },
 
-  // Admin: Ürün güncelle
-  updateProduct: async (id: string, productData: FormData) => {
-    const response = await api.put<ApiResponse<Product>>(`/products/${id}`, productData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+  // Admin: Ürün güncelle (JSON)
+  updateProduct: async (id: string, productData: Partial<Product> & { images?: string[] }) => {
+    const response = await api.put<ApiResponse<Product>>(`/admin/products/${id}`, productData);
     return response.data;
   },
 
   // Admin: Ürün sil
   deleteProduct: async (id: string) => {
-    const response = await api.delete<ApiResponse<{ message: string }>>(`/products/${id}`);
+    const response = await api.delete<ApiResponse<{ message: string }>>(`/admin/products/${id}`);
+    return response.data;
+  },
+
+  // Admin: Toplu güncelle (aktif/pasif, öne çıkar/çıkarma)
+  bulkUpdateProducts: async (items: Array<{ id: string; isActive?: boolean; isFeatured?: boolean }>) => {
+    const response = await api.patch<ApiResponse<any>>('/admin/products/bulk', { items });
     return response.data;
   },
 }; 

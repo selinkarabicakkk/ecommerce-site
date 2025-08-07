@@ -6,81 +6,16 @@ import Link from 'next/link';
 import AdminLayout from '@/components/layout/AdminLayout';
 import { Button } from '@/components/ui/Button';
 import { useAppSelector } from '@/store';
+import { adminService, orderService } from '@/services';
 
 export default function AdminDashboardPage() {
   const router = useRouter();
   const { user, isAuthenticated, loading } = useAppSelector((state) => state.auth);
   
-  // Mock veri (normalde API'den gelecek)
-  const [stats, setStats] = useState({
-    totalSales: 45750.99,
-    totalOrders: 187,
-    totalCustomers: 124,
-    pendingOrders: 12,
-    lowStockProducts: 8,
-  });
-
-  const [recentOrders, setRecentOrders] = useState([
-    {
-      id: 'ORD-123456',
-      customer: 'Ahmet Yılmaz',
-      date: '2023-06-20T10:30:00Z',
-      total: 1299.99,
-      status: 'processing',
-    },
-    {
-      id: 'ORD-123455',
-      customer: 'Ayşe Demir',
-      date: '2023-06-19T14:20:00Z',
-      total: 2499.99,
-      status: 'shipped',
-    },
-    {
-      id: 'ORD-123454',
-      customer: 'Mehmet Kaya',
-      date: '2023-06-18T09:15:00Z',
-      total: 899.97,
-      status: 'delivered',
-    },
-    {
-      id: 'ORD-123453',
-      customer: 'Zeynep Çelik',
-      date: '2023-06-17T16:45:00Z',
-      total: 459.98,
-      status: 'pending',
-    },
-  ]);
-
-  const [popularProducts, setPopularProducts] = useState([
-    {
-      id: 'PROD-001',
-      name: 'Akıllı Telefon X',
-      sales: 42,
-      stock: 18,
-      price: 9999.99,
-    },
-    {
-      id: 'PROD-002',
-      name: 'Laptop Pro',
-      sales: 38,
-      stock: 7,
-      price: 14999.99,
-    },
-    {
-      id: 'PROD-003',
-      name: 'Kablosuz Kulaklık',
-      sales: 65,
-      stock: 24,
-      price: 1299.99,
-    },
-    {
-      id: 'PROD-004',
-      name: 'Akıllı Saat',
-      sales: 51,
-      stock: 15,
-      price: 2499.99,
-    },
-  ]);
+  const [stats, setStats] = useState({ totalSales: 0, totalOrders: 0, totalCustomers: 0, pendingOrders: 0, lowStockProducts: 0 });
+  const [recentOrders, setRecentOrders] = useState<any[]>([]);
+  const [popularProducts, setPopularProducts] = useState<any[]>([]);
+  const [salesSeries, setSalesSeries] = useState<Array<{ date: string; revenue: number; count: number }>>([]);
 
   // Kullanıcı giriş yapmamışsa veya admin değilse yönlendir
   useEffect(() => {
@@ -92,6 +27,47 @@ export default function AdminDashboardPage() {
       }
     }
   }, [isAuthenticated, loading, router, user]);
+
+  // Dashboard verilerini yükle
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const [statsRes, popularRes, ordersRes, salesRes] = await Promise.all([
+          adminService.getStats(),
+          adminService.getPopularProducts(5),
+          orderService.getOrders(1, 5),
+          adminService.getSalesGraph(30),
+        ]);
+
+        const statsData: any = (statsRes as any)?.stats || (statsRes as any)?.data || statsRes;
+        if (statsData) {
+          setStats({
+            totalSales: statsData.revenue || 0,
+            totalOrders: statsData.ordersCount || 0,
+            totalCustomers: statsData.customersCount || 0,
+            pendingOrders: 0,
+            lowStockProducts: 0,
+          });
+        }
+
+        setPopularProducts((popularRes as any)?.products || (popularRes as any)?.data || []);
+        setRecentOrders((ordersRes as any)?.orders || (ordersRes as any)?.data || []);
+
+        const seriesRaw: any[] = (salesRes as any)?.series || (salesRes as any)?.data || [];
+        const normalized = seriesRaw.map((s) => ({
+          date: s._id || s.date || '',
+          revenue: Number(s.revenue) || 0,
+          count: Number(s.count) || 0,
+        }));
+        setSalesSeries(normalized);
+      } catch (e) {
+        console.error('Admin dashboard verileri yüklenemedi', e);
+      }
+    };
+    if (isAuthenticated && user?.role === 'admin') {
+      load();
+    }
+  }, [isAuthenticated, user]);
 
   // Tarihi formatla
   const formatDate = (dateString: string) => {
@@ -205,16 +181,16 @@ export default function AdminDashboardPage() {
                   {recentOrders.map((order) => (
                     <tr key={order.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {order.id}
+                        {order._id}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {order.customer}
+                        {order.user?.firstName} {order.user?.lastName}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {formatDate(order.date)}
+                        {formatDate(order.createdAt)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {order.total.toLocaleString('tr-TR')} ₺
+                        {order.totalPrice?.toLocaleString('tr-TR')} ₺
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span
@@ -305,32 +281,27 @@ export default function AdminDashboardPage() {
           </div>
         </div>
 
-        {/* Satış Grafiği - Basit bir görselleştirme */}
+        {/* Satış Grafiği - Gerçek veri ile basit görselleştirme */}
         <div className="mt-8 bg-white rounded-lg shadow-md p-6">
           <h2 className="text-lg font-semibold mb-4">Satış Trendi</h2>
           <div className="h-64 flex items-end space-x-2">
-            {[35, 45, 30, 65, 80, 70, 60, 75, 50, 55, 70, 90].map((value, index) => (
-              <div
-                key={index}
-                className="flex-1 bg-primary hover:bg-primary/80 rounded-t transition-all"
-                style={{ height: `${value}%` }}
-                title={`Ay ${index + 1}: ${value * 100}`}
-              ></div>
-            ))}
-          </div>
-          <div className="flex justify-between mt-2 text-xs text-gray-500">
-            <span>Oca</span>
-            <span>Şub</span>
-            <span>Mar</span>
-            <span>Nis</span>
-            <span>May</span>
-            <span>Haz</span>
-            <span>Tem</span>
-            <span>Ağu</span>
-            <span>Eyl</span>
-            <span>Eki</span>
-            <span>Kas</span>
-            <span>Ara</span>
+            {(() => {
+              const maxRevenue = Math.max(1, ...salesSeries.map((s) => s.revenue));
+              return salesSeries.map((s, index) => {
+                const heightPct = Math.round((s.revenue / maxRevenue) * 100);
+                const label = new Date(s.date).toLocaleDateString('tr-TR', { month: 'short', day: '2-digit' });
+                return (
+                  <div key={index} className="flex-1 flex flex-col items-center">
+                    <div
+                      className="w-full bg-primary hover:bg-primary/80 rounded-t transition-all"
+                      style={{ height: `${heightPct}%` }}
+                      title={`${label}: ${s.revenue.toLocaleString('tr-TR')} ₺ / ${s.count} sipariş`}
+                    ></div>
+                    <span className="mt-2 text-[10px] text-gray-500">{label}</span>
+                  </div>
+                );
+              });
+            })()}
           </div>
         </div>
       </div>

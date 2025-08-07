@@ -56,10 +56,25 @@ export const updateProductSchema = z.object({
   specifications: z.record(z.string(), z.string()).optional(),
   tags: z.array(z.string()).optional(),
   isFeatured: z.boolean().optional(),
+  isActive: z.boolean().optional(),
   variants: z.array(productVariantSchema).optional(),
   stock: z.number().int().min(0, 'Stock cannot be negative').optional(),
   sku: z.string().min(1, 'SKU is required').optional(),
 });
 
+// Bulk update products schema (active/featured)
+export const bulkUpdateProductsSchema = z.object({
+  items: z
+    .array(
+      z.object({
+        id: z.string().min(1, 'Product ID is required'),
+        isActive: z.boolean().optional(),
+        isFeatured: z.boolean().optional(),
+      })
+    )
+    .min(1, 'At least one item is required'),
+});
+
 export type CreateProductInput = z.infer<typeof createProductSchema>;
 export type UpdateProductInput = z.infer<typeof updateProductSchema>; 
+export type BulkUpdateProductsInput = z.infer<typeof bulkUpdateProductsSchema>;

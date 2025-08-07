@@ -30,6 +30,7 @@ export interface Product {
   name: string;
   description: string;
   price: number;
+  discount: number;
   category: Category;
   images: string[];
   specifications: Record<string, string>;
@@ -152,6 +153,8 @@ export interface ApiResponse<T> {
   message: string;
   data?: T;
   errors?: Record<string, string>;
+  categories?: Category[];
+  products?: Product[];
 }
 
 // Pagination types
