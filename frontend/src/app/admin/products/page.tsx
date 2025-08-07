@@ -20,6 +20,7 @@ export default function AdminProductsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
+  const [bulkLoading, setBulkLoading] = useState(false);
   
   // Ürünleri getir
   const fetchProducts = async (page = 1, search = '') => {
@@ -31,8 +32,10 @@ export default function AdminProductsPage() {
         search,
       });
       
-      setProducts(response.data || []);
-      setTotalPages(Math.ceil(response.totalCount / 10));
+      const list = (response as any)?.products || (response as any)?.data || [];
+      const count = (response as any)?.count || (response as any)?.totalCount || list.length;
+      setProducts(list);
+      setTotalPages(Math.max(1, Math.ceil(count / 10)));
       setCurrentPage(page);
     } catch (err) {
       setError('Ürünler yüklenirken bir hata oluştu.');
@@ -119,6 +122,23 @@ export default function AdminProductsPage() {
     }
   };
 
+  // Toplu aktif/pasif veya öne çıkarma
+  const handleBulkUpdate = async (payload: { isActive?: boolean; isFeatured?: boolean }) => {
+    if (selectedProducts.length === 0) return;
+    setBulkLoading(true);
+    try {
+      const items = selectedProducts.map((id) => ({ id, ...payload }));
+      await productService.bulkUpdateProducts(items);
+      setSelectedProducts([]);
+      fetchProducts(currentPage, searchQuery);
+    } catch (err) {
+      setError('Toplu güncelleme sırasında hata oluştu.');
+      console.error('Toplu güncelleme hatası:', err);
+    } finally {
+      setBulkLoading(false);
+    }
+  };
+
   // Yükleniyor durumu
   if (loading || !user || user.role !== 'admin') {
     return (
@@ -159,6 +179,18 @@ export default function AdminProductsPage() {
             <div className="flex gap-2">
               <Button variant="outline" onClick={() => setSelectedProducts([])}>
                 Seçimi Temizle
+              </Button>
+              <Button variant="outline" disabled={bulkLoading} onClick={() => handleBulkUpdate({ isActive: true })}>
+                Aktif Yap
+              </Button>
+              <Button variant="outline" disabled={bulkLoading} onClick={() => handleBulkUpdate({ isActive: false })}>
+                Pasif Yap
+              </Button>
+              <Button variant="outline" disabled={bulkLoading} onClick={() => handleBulkUpdate({ isFeatured: true })}>
+                Öne Çıkar
+              </Button>
+              <Button variant="outline" disabled={bulkLoading} onClick={() => handleBulkUpdate({ isFeatured: false })}>
+                Öne Çıkarmayı Kaldır
               </Button>
               <Button variant="destructive" onClick={handleBulkDelete}>
                 Seçilenleri Sil
@@ -233,7 +265,7 @@ export default function AdminProductsPage() {
                           <div className="h-10 w-10 bg-gray-200 rounded-md mr-3">
                             {product.images && product.images.length > 0 && (
                               <img
-                                src={`/uploads/${product.images[0]}`}
+                                src={`/uploads/images/${product.images[0]}`}
                                 alt={product.name}
                                 className="h-10 w-10 object-cover rounded-md"
                               />

@@ -15,6 +15,7 @@ export default function AdminDashboardPage() {
   const [stats, setStats] = useState({ totalSales: 0, totalOrders: 0, totalCustomers: 0, pendingOrders: 0, lowStockProducts: 0 });
   const [recentOrders, setRecentOrders] = useState<any[]>([]);
   const [popularProducts, setPopularProducts] = useState<any[]>([]);
+  const [salesSeries, setSalesSeries] = useState<Array<{ date: string; revenue: number; count: number }>>([]);
 
   // Kullanıcı giriş yapmamışsa veya admin değilse yönlendir
   useEffect(() => {
@@ -31,10 +32,11 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     const load = async () => {
       try {
-        const [statsRes, popularRes, ordersRes] = await Promise.all([
+        const [statsRes, popularRes, ordersRes, salesRes] = await Promise.all([
           adminService.getStats(),
           adminService.getPopularProducts(5),
           orderService.getOrders(1, 5),
+          adminService.getSalesGraph(30),
         ]);
 
         const statsData: any = (statsRes as any)?.stats || (statsRes as any)?.data || statsRes;
@@ -50,6 +52,14 @@ export default function AdminDashboardPage() {
 
         setPopularProducts((popularRes as any)?.products || (popularRes as any)?.data || []);
         setRecentOrders((ordersRes as any)?.orders || (ordersRes as any)?.data || []);
+
+        const seriesRaw: any[] = (salesRes as any)?.series || (salesRes as any)?.data || [];
+        const normalized = seriesRaw.map((s) => ({
+          date: s._id || s.date || '',
+          revenue: Number(s.revenue) || 0,
+          count: Number(s.count) || 0,
+        }));
+        setSalesSeries(normalized);
       } catch (e) {
         console.error('Admin dashboard verileri yüklenemedi', e);
       }
@@ -271,32 +281,27 @@ export default function AdminDashboardPage() {
           </div>
         </div>
 
-        {/* Satış Grafiği - Basit bir görselleştirme */}
+        {/* Satış Grafiği - Gerçek veri ile basit görselleştirme */}
         <div className="mt-8 bg-white rounded-lg shadow-md p-6">
           <h2 className="text-lg font-semibold mb-4">Satış Trendi</h2>
           <div className="h-64 flex items-end space-x-2">
-            {[35, 45, 30, 65, 80, 70, 60, 75, 50, 55, 70, 90].map((value, index) => (
-              <div
-                key={index}
-                className="flex-1 bg-primary hover:bg-primary/80 rounded-t transition-all"
-                style={{ height: `${value}%` }}
-                title={`Ay ${index + 1}: ${value * 100}`}
-              ></div>
-            ))}
-          </div>
-          <div className="flex justify-between mt-2 text-xs text-gray-500">
-            <span>Oca</span>
-            <span>Şub</span>
-            <span>Mar</span>
-            <span>Nis</span>
-            <span>May</span>
-            <span>Haz</span>
-            <span>Tem</span>
-            <span>Ağu</span>
-            <span>Eyl</span>
-            <span>Eki</span>
-            <span>Kas</span>
-            <span>Ara</span>
+            {(() => {
+              const maxRevenue = Math.max(1, ...salesSeries.map((s) => s.revenue));
+              return salesSeries.map((s, index) => {
+                const heightPct = Math.round((s.revenue / maxRevenue) * 100);
+                const label = new Date(s.date).toLocaleDateString('tr-TR', { month: 'short', day: '2-digit' });
+                return (
+                  <div key={index} className="flex-1 flex flex-col items-center">
+                    <div
+                      className="w-full bg-primary hover:bg-primary/80 rounded-t transition-all"
+                      style={{ height: `${heightPct}%` }}
+                      title={`${label}: ${s.revenue.toLocaleString('tr-TR')} ₺ / ${s.count} sipariş`}
+                    ></div>
+                    <span className="mt-2 text-[10px] text-gray-500">{label}</span>
+                  </div>
+                );
+              });
+            })()}
           </div>
         </div>
       </div>

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import AdminLayout from '@/components/layout/AdminLayout';
 import { Button } from '@/components/ui/Button';
 import { useAppSelector } from '@/store';
+import { orderService } from '@/services';
 
 // Sipariş tipi
 interface Order {
@@ -47,180 +48,27 @@ export default function AdminOrdersPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   
-  // Örnek veri (normalde API'den gelecek)
-  const mockOrders: Order[] = [
-    {
-      _id: 'ord1',
-      orderNumber: 'ORD-123456',
-      user: {
-        _id: 'user1',
-        firstName: 'Ahmet',
-        lastName: 'Yılmaz',
-        email: 'ahmet@example.com',
-      },
-      totalPrice: 1299.99,
-      status: 'delivered',
-      createdAt: '2023-06-20T10:30:00Z',
-      isPaid: true,
-      paidAt: '2023-06-20T10:35:00Z',
-      items: [
-        {
-          product: {
-            _id: 'prod1',
-            name: 'Akıllı Telefon',
-            price: 1299.99,
-            image: 'phone.jpg',
-          },
-          quantity: 1,
-          price: 1299.99,
-        },
-      ],
-    },
-    {
-      _id: 'ord2',
-      orderNumber: 'ORD-123457',
-      user: {
-        _id: 'user2',
-        firstName: 'Ayşe',
-        lastName: 'Demir',
-        email: 'ayse@example.com',
-      },
-      totalPrice: 499.99,
-      status: 'shipped',
-      createdAt: '2023-07-05T14:20:00Z',
-      isPaid: true,
-      paidAt: '2023-07-05T14:25:00Z',
-      items: [
-        {
-          product: {
-            _id: 'prod2',
-            name: 'Kablosuz Kulaklık',
-            price: 499.99,
-            image: 'headphones.jpg',
-          },
-          quantity: 1,
-          price: 499.99,
-        },
-      ],
-    },
-    {
-      _id: 'ord3',
-      orderNumber: 'ORD-123458',
-      user: {
-        _id: 'user3',
-        firstName: 'Mehmet',
-        lastName: 'Kaya',
-        email: 'mehmet@example.com',
-      },
-      totalPrice: 2499.99,
-      status: 'pending',
-      createdAt: '2023-07-15T09:15:00Z',
-      isPaid: false,
-      items: [
-        {
-          product: {
-            _id: 'prod3',
-            name: 'Laptop',
-            price: 2499.99,
-            image: 'laptop.jpg',
-          },
-          quantity: 1,
-          price: 2499.99,
-        },
-      ],
-    },
-    {
-      _id: 'ord4',
-      orderNumber: 'ORD-123459',
-      user: {
-        _id: 'user4',
-        firstName: 'Zeynep',
-        lastName: 'Çelik',
-        email: 'zeynep@example.com',
-      },
-      totalPrice: 349.98,
-      status: 'processing',
-      createdAt: '2023-07-18T16:45:00Z',
-      isPaid: true,
-      paidAt: '2023-07-18T16:50:00Z',
-      items: [
-        {
-          product: {
-            _id: 'prod4',
-            name: 'Akıllı Saat',
-            price: 349.99,
-            image: 'smartwatch.jpg',
-          },
-          quantity: 1,
-          price: 349.99,
-        },
-      ],
-    },
-    {
-      _id: 'ord5',
-      orderNumber: 'ORD-123460',
-      user: {
-        _id: 'user5',
-        firstName: 'Ali',
-        lastName: 'Öztürk',
-        email: 'ali@example.com',
-      },
-      totalPrice: 799.99,
-      status: 'cancelled',
-      createdAt: '2023-07-10T11:30:00Z',
-      isPaid: false,
-      items: [
-        {
-          product: {
-            _id: 'prod5',
-            name: 'Tablet',
-            price: 799.99,
-            image: 'tablet.jpg',
-          },
-          quantity: 1,
-          price: 799.99,
-        },
-      ],
-    },
-  ];
 
   // Siparişleri getir
   const fetchOrders = async (page = 1, search = '', status = 'all') => {
     setIsLoading(true);
     try {
-      // Burada normalde API çağrısı olacak
-      // const response = await orderService.getOrders({
-      //   page,
-      //   limit: 10,
-      //   search,
-      //   status: status !== 'all' ? status : undefined,
-      // });
-      
-      // Mock veri kullan
-      setTimeout(() => {
-        let filteredOrders = [...mockOrders];
-        
-        // Durum filtresi
-        if (status !== 'all') {
-          filteredOrders = filteredOrders.filter((order) => order.status === status);
-        }
-        
-        // Arama filtresi
-        if (search) {
-          const searchLower = search.toLowerCase();
-          filteredOrders = filteredOrders.filter(
-            (order) =>
-              order.orderNumber.toLowerCase().includes(searchLower) ||
-              `${order.user.firstName} ${order.user.lastName}`.toLowerCase().includes(searchLower) ||
-              order.user.email.toLowerCase().includes(searchLower)
-          );
-        }
-        
-        setOrders(filteredOrders);
-        setTotalPages(1); // Mock veri için 1 sayfa
-        setCurrentPage(page);
-        setIsLoading(false);
-      }, 500);
+      const response: any = await orderService.getOrders(page, 10);
+      let filteredOrders = (response?.orders || response?.data || []) as any[];
+      if (status !== 'all') filteredOrders = filteredOrders.filter((o) => o.status === status);
+      if (search) {
+        const q = search.toLowerCase();
+        filteredOrders = filteredOrders.filter(
+          (o) =>
+            (o.orderNumber || o._id)?.toString().toLowerCase().includes(q) ||
+            `${o.user?.firstName} ${o.user?.lastName}`.toLowerCase().includes(q) ||
+            o.user?.email?.toLowerCase().includes(q)
+        );
+      }
+      setOrders(filteredOrders as any);
+      setTotalPages(response?.pages || 1);
+      setCurrentPage(page);
+      setIsLoading(false);
     } catch (err) {
       setError('Siparişler yüklenirken bir hata oluştu.');
       console.error('Siparişler yüklenirken hata:', err);
@@ -282,8 +130,7 @@ export default function AdminOrdersPage() {
   // Sipariş durumunu güncelleme
   const handleUpdateStatus = async (orderId: string, newStatus: string) => {
     try {
-      // Burada normalde API çağrısı olacak
-      // await orderService.updateOrderStatus(orderId, newStatus);
+      await orderService.updateOrderStatus(orderId, newStatus as any);
       
       // Mock veri güncelle
       setOrders((prevOrders) =>
@@ -306,9 +153,7 @@ export default function AdminOrdersPage() {
     try {
       // Burada normalde bir bulk update API çağrısı olabilir
       // Şimdilik her siparişi tek tek güncelliyoruz
-      for (const orderId of selectedOrders) {
-        // await orderService.updateOrderStatus(orderId, newStatus);
-      }
+      for (const orderId of selectedOrders) await orderService.updateOrderStatus(orderId, newStatus as any);
       
       // Mock veri güncelle
       setOrders((prevOrders) =>

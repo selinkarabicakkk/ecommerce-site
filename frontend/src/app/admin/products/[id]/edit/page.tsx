@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import AdminLayout from '@/components/layout/AdminLayout';
 import { Button } from '@/components/ui/Button';
 import { useAppSelector } from '@/store';
-import { productService, categoryService } from '@/services';
+import { productService, categoryService, uploadService } from '@/services';
 import { Category, Product } from '@/types';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -194,33 +194,31 @@ export default function EditProductPage({ params }: EditProductPageProps) {
         }
       });
       
-      // Form verisi oluştur
-      const formData = new FormData();
-      formData.append('name', data.name);
-      formData.append('description', data.description);
-      formData.append('price', data.price.toString());
-      formData.append('category', data.category);
-      formData.append('stock', data.stock.toString());
-      formData.append('sku', data.sku);
-      formData.append('isFeatured', data.isFeatured ? 'true' : 'false');
-      
-      if (data.tags) {
-        const tagsArray = data.tags.split(',').map((tag) => tag.trim());
-        formData.append('tags', JSON.stringify(tagsArray));
+      // 1) Yeni resimleri yükle ve dosya adlarını topla
+      const uploadedFilenames: string[] = [];
+      for (const image of selectedImages) {
+        const res = await uploadService.uploadImage(image);
+        const filename = (res as any)?.data?.filename || (res as any)?.filename;
+        if (filename) uploadedFilenames.push(filename);
       }
-      
-      formData.append('specifications', JSON.stringify(specifications));
-      
-      // Mevcut resimleri ekle
-      formData.append('existingImages', JSON.stringify(existingImages));
-      
-      // Yeni resimleri ekle
-      selectedImages.forEach((image) => {
-        formData.append('images', image);
-      });
-      
-      // API'ye gönder
-      await productService.updateProduct(id, formData);
+
+      // 2) Mevcut + yeni resimleri birleştir
+      const finalImages = [...existingImages, ...uploadedFilenames];
+
+      // 3) JSON payload hazırla ve gönder
+      const tagsArray = data.tags ? data.tags.split(',').map((t) => t.trim()).filter(Boolean) : [];
+      await productService.updateProduct(id, {
+        name: data.name,
+        description: data.description,
+        price: data.price,
+        category: data.category,
+        stock: data.stock,
+        sku: data.sku,
+        isFeatured: !!data.isFeatured,
+        tags: tagsArray as any,
+        specifications: specifications as any,
+        images: finalImages,
+      } as any);
       
       // Başarılı olursa ürünler sayfasına yönlendir
       router.push('/admin/products');

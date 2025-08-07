@@ -6,6 +6,7 @@ import Link from 'next/link';
 import AdminLayout from '@/components/layout/AdminLayout';
 import { Button } from '@/components/ui/Button';
 import { useAppSelector } from '@/store';
+import { adminService, orderService } from '@/services';
 
 // Kullanıcı tipi
 interface User {
@@ -57,71 +58,6 @@ export default function CustomerDetailPage({ params }: CustomerDetailPageProps) 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Örnek veri (normalde API'den gelecek)
-  const mockCustomer: User = {
-    _id: id,
-    firstName: 'Ahmet',
-    lastName: 'Yılmaz',
-    email: 'ahmet@example.com',
-    phoneNumber: '555-123-4567',
-    role: 'customer',
-    isEmailVerified: true,
-    createdAt: '2023-06-15T10:30:00Z',
-    addresses: [
-      {
-        _id: 'addr1',
-        type: 'shipping',
-        street: 'Atatürk Cad. No:123',
-        city: 'İstanbul',
-        state: 'İstanbul',
-        zipCode: '34000',
-        country: 'Türkiye',
-        isDefault: true,
-      },
-      {
-        _id: 'addr2',
-        type: 'billing',
-        street: 'İnönü Cad. No:456',
-        city: 'İstanbul',
-        state: 'İstanbul',
-        zipCode: '34100',
-        country: 'Türkiye',
-        isDefault: true,
-      },
-    ],
-  };
-
-  const mockOrders: Order[] = [
-    {
-      _id: 'ord1',
-      orderNumber: 'ORD-123456',
-      user: id,
-      totalPrice: 1299.99,
-      status: 'delivered',
-      createdAt: '2023-06-20T10:30:00Z',
-      isPaid: true,
-      paidAt: '2023-06-20T10:35:00Z',
-    },
-    {
-      _id: 'ord2',
-      orderNumber: 'ORD-123457',
-      user: id,
-      totalPrice: 499.99,
-      status: 'shipped',
-      createdAt: '2023-07-05T14:20:00Z',
-      isPaid: true,
-      paidAt: '2023-07-05T14:25:00Z',
-    },
-    {
-      _id: 'ord3',
-      orderNumber: 'ORD-123458',
-      user: id,
-      totalPrice: 2499.99,
-      status: 'pending',
-      createdAt: '2023-07-15T09:15:00Z',
-      isPaid: false,
-    },
-  ];
 
   // Müşteri ve sipariş verilerini getir
   useEffect(() => {
@@ -129,16 +65,12 @@ export default function CustomerDetailPage({ params }: CustomerDetailPageProps) 
       try {
         setIsLoading(true);
         
-        // Burada normalde API çağrıları olacak
-        // const customerResponse = await userService.getUserById(id);
-        // const ordersResponse = await orderService.getOrdersByUser(id);
-        
-        // Mock veri kullan
-        setTimeout(() => {
-          setCustomer(mockCustomer);
-          setOrders(mockOrders);
-          setIsLoading(false);
-        }, 500);
+        const customerRes: any = await adminService.getCustomerById(id);
+        setCustomer((customerRes as any)?.user || (customerRes as any)?.data || null);
+        const ordersRes: any = await orderService.getOrders(1, 50);
+        const list = (ordersRes?.orders || ordersRes?.data || []).filter((o: any) => o.user?._id === id || o.user === id);
+        setOrders(list);
+        setIsLoading(false);
       } catch (err) {
         setError('Müşteri bilgileri yüklenirken bir hata oluştu.');
         console.error('Veri yükleme hatası:', err);
