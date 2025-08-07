@@ -12,6 +12,7 @@ import {
   getRelatedProducts,
   getPopularProducts,
 } from '../controllers/productController';
+import { getReviewsByProduct } from '../controllers/reviewController';
 import { protect, restrictTo } from '../middlewares/authMiddleware';
 import { validate } from '../middlewares/validationMiddleware';
 import {
@@ -127,6 +128,35 @@ router.get('/:id', getProductById);
  *         description: Başarılı
  */
 router.get('/:id/related', getRelatedProducts);
+
+/**
+ * @swagger
+ * /api/products/{id}/reviews:
+ *   get:
+ *     summary: Belirli ürünün yorumlarını getir
+ *     tags: [Products]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Başarılı
+ */
+router.get('/:id/reviews', (req, res, next) => {
+  (req.params as any).productId = req.params.id;
+  return getReviewsByProduct(req, res, next);
+});
 
 // Admin routes
 router.post(
