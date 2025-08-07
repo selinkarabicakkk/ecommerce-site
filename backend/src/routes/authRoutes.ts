@@ -125,6 +125,33 @@ router.post('/login', validate(loginSchema), login);
  */
 // Email doğrulama: hem GET query/body hem de path token desteklenir
 router.get('/verify-email', validate(verifyEmailSchema, 'query'), verifyEmail);
+/**
+ * @swagger
+ * /api/auth/verify-email:
+ *   post:
+ *     summary: E-posta doğrulama (token body ile)
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - token
+ *               - email
+ *             properties:
+ *               token:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *                 format: email
+ *     responses:
+ *       200:
+ *         description: E-posta başarıyla doğrulandı
+ *       400:
+ *         description: Geçersiz veya süresi dolmuş token
+ */
 router.post('/verify-email', validate(verifyEmailSchema, 'body'), verifyEmail);
 router.get('/verify-email/:token', verifyEmail);
 
