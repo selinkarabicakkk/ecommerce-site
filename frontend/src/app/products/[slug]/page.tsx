@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
+import { getAssetUrl } from '@/lib/utils';
 import Link from 'next/link';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/Button';
@@ -118,7 +119,7 @@ export default function ProductDetailPage() {
             <div className="relative h-80 md:h-96 w-full mb-4 bg-gray-100 rounded-lg overflow-hidden">
               {product.images && product.images.length > 0 ? (
                 <Image
-                  src={product.images[selectedImage]}
+                  src={getAssetUrl(product.images[selectedImage])}
                   alt={product.name}
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"
@@ -145,7 +146,7 @@ export default function ProductDetailPage() {
                     }`}
                   >
                     <Image
-                      src={image}
+                      src={getAssetUrl(image)}
                       alt={`${product.name} - Görsel ${index + 1}`}
                       fill
                       sizes="(max-width: 768px) 20vw, 10vw"
