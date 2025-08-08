@@ -4,16 +4,18 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import MainLayout from '@/components/layout/MainLayout';
+import Image from 'next/image';
+import { getAssetUrl } from '@/lib/utils';
 import { Button } from '@/components/ui/Button';
 import { useAppDispatch, useAppSelector } from '@/store';
 import { fetchWishlist, removeFromWishlist, clearWishlist } from '@/store/slices/wishlistSlice';
 import { addToCart } from '@/store/slices/cartSlice';
-import useProductTracking from '@/hooks/useProductTracking';
+import { activityService } from '@/services';
 
 export default function WishlistPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { trackProductActivity } = useProductTracking();
+  // Aktivite takibi işlemlerini direkt servis üzerinden yapacağız
   
   const { user, isAuthenticated, loading: authLoading } = useAppSelector((state) => state.auth);
   const { items, loading, error, totalCount } = useAppSelector((state) => state.wishlist);
@@ -47,8 +49,10 @@ export default function WishlistPage() {
   const handleAddToCart = async (productId: string, itemId: string) => {
     setIsAddingToCart((prev) => ({ ...prev, [itemId]: true }));
     try {
-      await dispatch(addToCart({ productId, quantity: 1 })).unwrap();
-      trackProductActivity(productId, 'cart');
+      const product = items.find((i) => i._id === itemId)?.product;
+      const price = product?.price ?? 0;
+      await dispatch(addToCart({ product: productId, quantity: 1, price })).unwrap();
+      await activityService.logActivity({ productId, activityType: 'cart' });
       await handleRemoveFromWishlist(itemId);
     } finally {
       setIsAddingToCart((prev) => ({ ...prev, [itemId]: false }));
@@ -138,12 +142,14 @@ export default function WishlistPage() {
               {items.map((item) => (
                 <div key={item._id} className="bg-white rounded-lg shadow-md overflow-hidden">
                   <Link href={`/products/${item.product.slug}`}>
-                    <div className="h-48 bg-gray-200 overflow-hidden">
+                    <div className="h-48 bg-gray-200 overflow-hidden relative">
                       {item.product.image ? (
-                        <img
-                          src={`/uploads/${item.product.image}`}
+                        <Image
+                          src={getAssetUrl(item.product.image)}
                           alt={item.product.name}
-                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                          fill
+                          sizes="(max-width: 768px) 100vw, 25vw"
+                          className="object-cover hover:scale-105 transition-transform duration-300"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-gray-500">

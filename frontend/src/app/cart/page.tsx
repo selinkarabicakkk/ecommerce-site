@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { getAssetUrl } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/Button';
@@ -158,7 +159,7 @@ export default function CartPage() {
                                 {product.images && product.images.length > 0 ? (
                                   <div className="relative h-16 w-16">
                                     <Image
-                                      src={product.images[0]}
+                                      src={getAssetUrl(product.images[0])}
                                       alt={product.name}
                                       fill
                                       sizes="64px"

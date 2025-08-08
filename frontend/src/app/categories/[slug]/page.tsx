@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import { getAssetUrl } from '@/lib/utils';
 import MainLayout from '@/components/layout/MainLayout';
 import ProductCard from '@/components/product/ProductCard';
 import ProductFilter from '@/components/product/ProductFilter';
@@ -129,7 +130,7 @@ export default function CategoryPage() {
         {category?.image && (
           <div className="relative h-48 md:h-64 w-full mb-8 rounded-lg overflow-hidden">
             <Image
-              src={category.image}
+              src={getAssetUrl(category.image)}
               alt={category.name}
               fill
               sizes="100vw"
