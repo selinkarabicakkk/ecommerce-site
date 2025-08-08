@@ -81,13 +81,13 @@ export default function Home() {
   return (
     <MainLayout>
       {/* Hero Section */}
-      <section className="bg-primary text-white">
+      <section className="text-[rgb(var(--foreground))]">
         <div className="container mx-auto px-4 py-16 md:py-24 lg:py-32 flex flex-col md:flex-row items-center">
           <div className="md:w-1/2 md:pr-8">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-[rgb(var(--foreground))]">
               Alışverişin Yeni Adresi
             </h1>
-            <p className="text-lg md:text-xl mb-8">
+            <p className="text-lg md:text-xl mb-8 text-gray-600">
               Binlerce ürün, uygun fiyatlar ve hızlı teslimat ile online alışverişin keyfini çıkarın.
             </p>
             <div className="flex flex-wrap gap-4">
