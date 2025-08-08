@@ -72,19 +72,22 @@ export default function ProductsPage() {
   return (
     <MainLayout>
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-6">Ürünler</h1>
+        <div className="flex items-end justify-between mb-6">
+          <h1 className="text-3xl font-bold tracking-tight">Ürünler</h1>
+          {!loading && (
+            <span className="text-sm text-gray-500">Toplam {totalProducts} ürün</span>
+          )}
+        </div>
 
         {/* Üst bilgi ve sıralama */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-          <div className="mb-4 md:mb-0">
-            <p className="text-gray-600">
-              {loading ? 'Yükleniyor...' : `${totalProducts} ürün bulundu`}
-            </p>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+          <div className="hidden md:block text-sm text-gray-600">
+            {loading ? 'Yükleniyor...' : `${totalProducts} sonuç görüntüleniyor`}
           </div>
 
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center gap-3">
             {/* Görünüm modu değiştirme */}
-            <div className="flex items-center space-x-2 border rounded-md p-1">
+            <div className="flex items-center gap-1 border rounded-md p-1">
               <button
                 onClick={() => setViewMode('grid')}
                 className={`p-1 rounded ${
@@ -135,7 +138,7 @@ export default function ProductsPage() {
             <select
               value={filters.sort || 'newest'}
               onChange={(e) => handleSortChange(e.target.value as ProductFilters['sort'])}
-              className="border rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary"
+              className="border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[rgb(var(--ring))]"
             >
               <option value="newest">En Yeniler</option>
               <option value="price">Fiyat (Artan)</option>
