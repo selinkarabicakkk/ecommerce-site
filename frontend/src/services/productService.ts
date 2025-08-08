@@ -11,8 +11,18 @@ export const productService = {
     if (filters.minPrice !== undefined) queryParams.append('minPrice', filters.minPrice.toString());
     if (filters.maxPrice !== undefined) queryParams.append('maxPrice', filters.maxPrice.toString());
     if (filters.rating !== undefined) queryParams.append('rating', filters.rating.toString());
-    if (filters.search) queryParams.append('search', filters.search);
-    if (filters.sort) queryParams.append('sort', filters.sort);
+    // Backend beklenen isim: keyword
+    if (filters.search) queryParams.append('keyword', filters.search);
+    // Backend beklenen isim ve değerler: sortBy = price_asc | price_desc | rating | newest
+    if (filters.sort) {
+      const sortMap: Record<NonNullable<ProductFilters['sort']>, string> = {
+        price: 'price_asc',
+        'price-desc': 'price_desc',
+        rating: 'rating',
+        newest: 'newest',
+      };
+      queryParams.append('sortBy', sortMap[filters.sort]);
+    }
     if (filters.page) queryParams.append('page', filters.page.toString());
     if (filters.limit) queryParams.append('limit', filters.limit.toString());
     if (filters.tags && filters.tags.length > 0) {
@@ -21,7 +31,20 @@ export const productService = {
     if (filters.featured !== undefined) queryParams.append('featured', filters.featured.toString());
     
     const queryString = queryParams.toString();
-    const response = await api.get<PaginatedResponse<Product>>(`/products${queryString ? `?${queryString}` : ''}`);
+    const response = await api.get<PaginatedResponse<Product> & { products?: Product[]; count?: number }>(
+      `/products${queryString ? `?${queryString}` : ''}`
+    );
+    const data = response.data as any;
+    if (data && Array.isArray(data.products)) {
+      return {
+        success: true,
+        message: '',
+        data: data.products as Product[],
+        page: data.page ?? 1,
+        pages: data.pages ?? 1,
+        total: data.count ?? data.total ?? (data.products as Product[]).length,
+      } as PaginatedResponse<Product>;
+    }
     return response.data;
   },
 
