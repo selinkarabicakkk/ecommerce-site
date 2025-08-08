@@ -207,7 +207,7 @@ export default function RegisterPage() {
               {/* Telefon */}
               <div>
                 <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700 mb-1">
-                  Telefon (İsteğe bağlı)
+                  Telefon
                 </label>
                 <input
                   id="phoneNumber"
