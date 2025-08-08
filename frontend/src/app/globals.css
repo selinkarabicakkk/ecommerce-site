@@ -75,6 +75,44 @@
 }
 
 @layer components {
+  /* Form controls - global baseline */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="tel"],
+  input[type="url"],
+  input[type="search"],
+  select,
+  textarea {
+    @apply w-full bg-white text-[rgb(var(--foreground))] placeholder-gray-400 border border-[rgb(var(--input))] rounded-lg px-3.5 py-2.5 text-sm shadow-xs focus:outline-none focus:ring-2 focus:ring-[rgb(var(--ring))] focus:border-transparent disabled:opacity-60 disabled:cursor-not-allowed;
+  }
+
+  textarea {
+    @apply min-h-[120px];
+  }
+
+  label {
+    @apply text-sm font-medium text-gray-700 mb-1.5 inline-block;
+  }
+
+  .form-help {
+    @apply text-xs text-gray-500 mt-1;
+  }
+
+  .form-error {
+    @apply text-xs text-red-600 mt-1;
+  }
+
+  input[type="checkbox"],
+  input[type="radio"] {
+    @apply h-4 w-4 text-[rgb(var(--primary))] border-gray-300 focus:ring-[rgb(var(--ring))] rounded;
+  }
+
+  .card {
+    @apply bg-white rounded-xl shadow-sm border border-gray-200;
+  }
+
   .container {
     padding-left: 1rem;
     padding-right: 1rem;

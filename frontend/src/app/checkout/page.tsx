@@ -233,7 +233,7 @@ export default function CheckoutPage() {
             <div className="lg:w-2/3">
               <form onSubmit={handleSubmit(handlePlaceOrder)} className="space-y-8">
                 {/* Teslimat Adresi */}
-                <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="card p-6">
                   <h2 className="text-lg font-semibold mb-4">Teslimat Adresi</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="md:col-span-2">
@@ -333,7 +333,7 @@ export default function CheckoutPage() {
                 </div>
 
                 {/* Fatura Adresi */}
-                <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="card p-6">
                   <div className="flex justify-between items-center mb-4">
                     <h2 className="text-lg font-semibold">Fatura Adresi</h2>
                     <div className="flex items-center">
@@ -449,7 +449,7 @@ export default function CheckoutPage() {
                 </div>
 
                 {/* Ödeme Yöntemi */}
-                <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="card p-6">
                   <h2 className="text-lg font-semibold mb-4">Ödeme Yöntemi</h2>
                   <div className="space-y-4">
                     <div className="flex items-center">
@@ -580,7 +580,7 @@ export default function CheckoutPage() {
 
             {/* Sipariş özeti */}
             <div className="lg:w-1/3">
-              <div className="bg-white rounded-lg shadow-md p-6 sticky top-8">
+              <div className="card p-6 sticky top-8">
                 <h2 className="text-lg font-semibold mb-4">Sipariş Özeti</h2>
                 <div className="space-y-4 mb-6">
                   {items.map((item) => (
