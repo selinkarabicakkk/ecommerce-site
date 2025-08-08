@@ -63,16 +63,16 @@ const Pagination = ({
         </p>
       )}
       
-      <ul className="flex items-center -space-x-px">
+      <ul className="flex items-center -space-x-px rounded-md shadow-sm overflow-hidden border border-[rgb(var(--input))] bg-white">
         {/* Önceki sayfa butonu */}
         <li>
           <button
             onClick={() => onPageChange(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
-            className={`relative block px-3 py-2 ml-0 leading-tight bg-white border border-gray-300 rounded-l-lg ${
+            className={`relative block px-3 py-2 ml-0 leading-tight bg-white ${
               currentPage === 1
-                ? 'text-gray-400 cursor-not-allowed'
-                : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'
+                ? 'text-gray-300 cursor-not-allowed'
+                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
             }`}
           >
             <span className="sr-only">Önceki</span>
@@ -97,16 +97,16 @@ const Pagination = ({
         {pageNumbers.map((page, index) => (
           <li key={index}>
             {page === '...' ? (
-              <span className="relative block px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300">
+              <span className="relative block px-3 py-2 leading-tight text-gray-400 bg-white">
                 ...
               </span>
             ) : (
               <button
                 onClick={() => typeof page === 'number' && onPageChange(page)}
-                className={`relative block px-3 py-2 leading-tight border ${
+                className={`relative block px-3 py-2 leading-tight ${
                   currentPage === page
-                    ? 'z-10 text-white bg-primary border-primary'
-                    : 'text-gray-500 bg-white border-gray-300 hover:bg-gray-100 hover:text-gray-700'
+                    ? 'z-10 text-white bg-[rgb(var(--primary))]'
+                    : 'text-gray-600 bg-white hover:bg-gray-50 hover:text-gray-900'
                 }`}
               >
                 {page}
@@ -120,10 +120,10 @@ const Pagination = ({
           <button
             onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
             disabled={currentPage === totalPages}
-            className={`relative block px-3 py-2 leading-tight bg-white border border-gray-300 rounded-r-lg ${
+            className={`relative block px-3 py-2 leading-tight bg-white ${
               currentPage === totalPages
-                ? 'text-gray-400 cursor-not-allowed'
-                : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'
+                ? 'text-gray-300 cursor-not-allowed'
+                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
             }`}
           >
             <span className="sr-only">Sonraki</span>

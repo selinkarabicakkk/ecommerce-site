@@ -66,7 +66,7 @@ export default function LoginPage() {
   return (
     <MainLayout>
       <div className="container mx-auto px-4 py-8">
-        <div className="max-w-md mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="max-w-md mx-auto card overflow-hidden">
           <div className="p-6">
             <h1 className="text-2xl font-bold text-center mb-6">Giriş Yap</h1>
 
@@ -95,7 +95,7 @@ export default function LoginPage() {
               </div>
             )}
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               {/* E-posta */}
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
@@ -126,9 +126,7 @@ export default function LoginPage() {
                     type={showPassword ? 'text' : 'password'}
                     autoComplete="current-password"
                     {...register('password')}
-                    className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary ${
-                      errors.password ? 'border-red-500' : 'border-gray-300'
-                    }`}
+                    className={`${errors.password ? 'border-red-500' : ''}`}
                   />
                   <button
                     type="button"

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import { getAssetUrl } from '@/lib/utils';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { useAppDispatch } from '@/store';
@@ -38,12 +39,12 @@ const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) => {
 
   if (viewMode === 'list') {
     return (
-      <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex">
-        <div className="relative h-40 w-40 flex-shrink-0 bg-gray-100">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex">
+        <div className="relative h-40 w-40 flex-shrink-0 bg-gray-50">
           <Link href={`/products/${product.slug}`}>
             {product.images && product.images.length > 0 ? (
               <Image
-                src={product.images[0]}
+                src={getAssetUrl(product.images[0])}
                 alt={product.name}
                 fill
                 sizes="(max-width: 768px) 100vw, 33vw"
@@ -60,7 +61,7 @@ const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) => {
         <div className="p-4 flex-grow flex flex-col">
           <div className="flex-grow">
             <Link href={`/products/${product.slug}`}>
-              <h3 className="text-lg font-semibold hover:text-primary transition-colors mb-2">
+              <h3 className="text-lg font-semibold hover:text-primary transition-colors mb-1 line-clamp-1">
                 {product.name}
               </h3>
             </Link>
@@ -87,14 +88,14 @@ const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) => {
               </span>
             </div>
             
-            <p className="text-gray-600 text-sm mb-4 line-clamp-2">{product.description}</p>
+            <p className="text-gray-600 text-sm mb-3 line-clamp-2">{product.description}</p>
             
             {product.tags && product.tags.length > 0 && (
               <div className="flex flex-wrap gap-1 mb-3">
                 {product.tags.slice(0, 3).map((tag) => (
                   <span
                     key={tag}
-                    className="bg-gray-100 text-gray-800 text-xs px-2 py-0.5 rounded"
+                    className="bg-gray-100 text-gray-800 text-xs px-2 py-0.5 rounded-full"
                   >
                     {tag}
                   </span>
@@ -107,9 +108,14 @@ const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) => {
           </div>
           
           <div className="flex items-center justify-between mt-2">
-            <p className="text-lg font-bold text-primary">
-              {product.price.toLocaleString('tr-TR')} ₺
-            </p>
+            <div className="flex items-baseline gap-2">
+              <p className="text-lg font-bold text-[rgb(var(--primary))]">
+                {product.price.toLocaleString('tr-TR')} ₺
+              </p>
+              {product.oldPrice && (
+                <span className="text-sm text-gray-500 line-through">{product.oldPrice.toLocaleString('tr-TR')} ₺</span>
+              )}
+            </div>
             <Button
               onClick={handleAddToCart}
               isLoading={isAddingToCart}
@@ -125,12 +131,12 @@ const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) => {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all duration-300 group">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group">
       <div className="relative">
         <Link href={`/products/${product.slug}`} className="block relative h-56 bg-gray-50">
           {product.images && product.images.length > 0 ? (
             <Image
-              src={`http://localhost:5000${product.images[0]}`}
+              src={getAssetUrl(product.images[0])}
               alt={product.name}
               fill
               sizes="(max-width: 768px) 100vw, 33vw"
@@ -143,15 +149,14 @@ const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) => {
             </div>
           )}
           
-          <div className="absolute top-0 left-0 w-full p-2 flex justify-between items-start">
+          <div className="absolute inset-x-0 top-0 p-2 flex justify-between items-start">
             {product.isFeatured && (
-              <span className="bg-[rgb(var(--primary))] text-white text-xs px-2 py-1 rounded-sm">
+              <span className="bg-[rgb(var(--primary))] text-white text-[11px] px-2 py-0.5 rounded-full shadow-sm">
                 Öne Çıkan
               </span>
             )}
-            
             {product.discount > 0 && (
-              <span className="bg-[rgb(var(--destructive))] text-white text-xs px-2 py-1 rounded-sm ml-auto">
+              <span className="bg-[rgb(var(--destructive))] text-white text-[11px] px-2 py-0.5 rounded-full shadow-sm ml-auto">
                 %{product.discount} İndirim
               </span>
             )}
@@ -174,7 +179,7 @@ const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) => {
       
       <div className="p-4">
         <Link href={`/products/${product.slug}`}>
-          <h3 className="text-base font-medium text-gray-800 hover:text-primary transition-colors mb-1 line-clamp-1">
+          <h3 className="text-base font-semibold text-gray-900 hover:text-primary transition-colors mb-1 line-clamp-1">
             {product.name}
           </h3>
         </Link>

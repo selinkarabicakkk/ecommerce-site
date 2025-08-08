@@ -1,15 +1,30 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useAppSelector } from '@/store';
+import { usePathname, useRouter } from 'next/navigation';
+import { useAppSelector, useAppDispatch } from '@/store';
+import { logout } from '@/store/slices/authSlice';
 import { Button } from '../ui/Button';
 import SearchBar from '../ui/SearchBar';
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
   const pathname = usePathname();
+  const router = useRouter();
+  const dispatch = useAppDispatch();
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
   const { items } = useAppSelector((state) => state.cart);
 
@@ -21,15 +36,23 @@ const Header = () => {
     { name: 'İletişim', href: '/contact' },
   ];
 
+  const handleLogout = async () => {
+    try {
+      await dispatch(logout()).unwrap();
+    } catch {}
+    setUserMenuOpen(false);
+    router.push('/');
+  };
+
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
-      <div className="bg-[rgb(var(--primary))] text-white py-1">
-        <div className="container mx-auto px-4 text-center text-xs font-medium">
+    <header className="bg-white/90 backdrop-blur border-b border-gray-200 sticky top-0 z-50">
+      <div className="bg-[rgb(var(--primary))] text-white">
+        <div className="container mx-auto px-4 text-center text-[11px] font-medium py-1.5">
           Tüm siparişlerde ücretsiz kargo! 150₺ üzeri alışverişlerde %10 indirim
         </div>
       </div>
       <nav className="container mx-auto px-4 sm:px-6 lg:px-8" aria-label="Top">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-16 gap-4">
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="text-2xl font-bold text-primary flex items-center gap-2">
@@ -46,15 +69,15 @@ const Header = () => {
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex space-x-6">
+          <div className="hidden lg:flex items-center gap-6">
             {navigation.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
-                className={`text-sm font-medium transition-colors duration-200 ${
+                className={`text-sm font-medium transition-colors duration-200 pb-1 ${
                   pathname === item.href
                     ? 'text-primary border-b-2 border-primary'
-                    : 'text-gray-600 hover:text-primary'
+                    : 'text-gray-700 hover:text-primary'
                 }`}
               >
                 {item.name}
@@ -63,7 +86,7 @@ const Header = () => {
           </div>
           
           {/* Right Side Navigation */}
-          <div className="hidden md:flex items-center space-x-6">
+          <div className="hidden md:flex items-center gap-6">
             <Link href="/wishlist" className="relative text-gray-600 hover:text-primary transition-colors duration-200">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -86,15 +109,20 @@ const Header = () => {
                 />
               </svg>
               {items.length > 0 && (
-                <span className="absolute -top-2 -right-2 bg-[rgb(var(--destructive))] text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                <span className="absolute -top-2 -right-2 bg-[rgb(var(--destructive))] text-white text-[11px] font-bold rounded-full h-5 w-5 flex items-center justify-center shadow-sm">
                   {items.length}
                 </span>
               )}
             </Link>
 
             {isAuthenticated ? (
-              <div className="relative group">
-                <button className="flex items-center text-sm font-medium text-gray-600 hover:text-primary transition-colors duration-200">
+              <div className="relative" ref={userMenuRef}>
+                <button
+                  onClick={() => setUserMenuOpen((o) => !o)}
+                  className="flex items-center text-sm font-medium text-gray-700 hover:text-primary transition-colors duration-200"
+                  aria-haspopup="menu"
+                  aria-expanded={userMenuOpen}
+                >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
@@ -113,7 +141,7 @@ const Header = () => {
                     />
                   </svg>
                 </button>
-                <div className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-gray-200 focus:outline-none hidden group-hover:block">
+                <div className={`absolute right-0 z-10 mt-2 w-52 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-gray-200 focus:outline-none ${userMenuOpen ? 'block' : 'hidden'}`}>
                   <Link
                     href="/profile"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
@@ -151,7 +179,7 @@ const Header = () => {
                     </Link>
                   )}
                   <hr className="my-1 border-gray-200" />
-                  <button className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-red-500">
+                  <button className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-red-500" onClick={handleLogout}>
                     <span className="flex items-center">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -163,12 +191,12 @@ const Header = () => {
               </div>
             ) : (
               <div className="flex space-x-3">
-                <Link href="/login">
+                <Link href="/auth/login">
                   <Button variant="ghost" size="sm" className="hover:text-primary hover:bg-gray-50">
                     Giriş Yap
                   </Button>
                 </Link>
-                <Link href="/register">
+                <Link href="/auth/register">
                   <Button size="sm" className="bg-[rgb(var(--primary))] hover:bg-[rgb(var(--primary)/0.9)]">
                     Kayıt Ol
                   </Button>
@@ -332,7 +360,7 @@ const Header = () => {
                   <div className="border-t border-gray-200 mt-2"></div>
                   <button
                     className="w-full text-left flex items-center px-4 py-2 text-base font-medium text-red-500 hover:bg-red-50"
-                    onClick={() => setMobileMenuOpen(false)}
+                    onClick={() => { setMobileMenuOpen(false); handleLogout(); }}
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -342,12 +370,12 @@ const Header = () => {
                 </>
               ) : (
                 <div className="p-4 space-y-3">
-                  <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
+                  <Link href="/auth/login" onClick={() => setMobileMenuOpen(false)}>
                     <Button variant="ghost" size="sm" className="w-full justify-center hover:bg-gray-50 hover:text-primary">
                       Giriş Yap
                     </Button>
                   </Link>
-                  <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
+                  <Link href="/auth/register" onClick={() => setMobileMenuOpen(false)}>
                     <Button size="sm" className="w-full justify-center bg-[rgb(var(--primary))] hover:bg-[rgb(var(--primary)/0.9)]">
                       Kayıt Ol
                     </Button>

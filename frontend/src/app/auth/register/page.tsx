@@ -83,7 +83,7 @@ export default function RegisterPage() {
     return (
       <MainLayout>
         <div className="container mx-auto px-4 py-8">
-          <div className="max-w-md mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+          <div className="max-w-md mx-auto card overflow-hidden">
             <div className="p-6 text-center">
               <svg
                 className="mx-auto h-12 w-12 text-green-500"
@@ -117,7 +117,7 @@ export default function RegisterPage() {
   return (
     <MainLayout>
       <div className="container mx-auto px-4 py-8">
-        <div className="max-w-md mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="max-w-md mx-auto card overflow-hidden">
           <div className="p-6">
             <h1 className="text-2xl font-bold text-center mb-6">Kayıt Ol</h1>
 
@@ -146,7 +146,7 @@ export default function RegisterPage() {
               </div>
             )}
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               {/* Ad ve Soyad */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -207,7 +207,7 @@ export default function RegisterPage() {
               {/* Telefon */}
               <div>
                 <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700 mb-1">
-                  Telefon (İsteğe bağlı)
+                  Telefon
                 </label>
                 <input
                   id="phoneNumber"

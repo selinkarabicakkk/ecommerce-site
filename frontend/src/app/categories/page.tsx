@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { getAssetUrl } from '@/lib/utils';
 import MainLayout from '@/components/layout/MainLayout';
 import { categoryService } from '@/services';
 import { Category } from '@/types';
@@ -70,7 +71,7 @@ export default function CategoriesPage() {
                 <div className="relative h-48 w-full bg-gray-100">
                   {category.image ? (
                     <Image
-                      src={category.image}
+                      src={getAssetUrl(category.image)}
                       alt={category.name}
                       fill
                       sizes="(max-width: 768px) 100vw, 25vw"

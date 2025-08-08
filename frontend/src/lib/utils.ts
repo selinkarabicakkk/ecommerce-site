@@ -48,6 +48,19 @@ export function truncateText(text: string, maxLength: number) {
 }
 
 /**
+ * Asset URL oluşturma yardımcı fonksiyonu
+ * API'den gelen görsel yolları genellikle "/images/..." gibi bağıl olur.
+ * Mutlak URL ise olduğu gibi döner.
+ */
+export function getAssetUrl(pathOrUrl?: string) {
+  if (!pathOrUrl) return '';
+  const isAbsolute = /^https?:\/\//i.test(pathOrUrl);
+  if (isAbsolute) return pathOrUrl;
+  const base = process.env.NEXT_PUBLIC_ASSETS_BASE_URL || 'http://localhost:5000';
+  return `${base}${pathOrUrl.startsWith('/') ? '' : '/'}${pathOrUrl}`;
+}
+
+/**
  * Slug oluşturmak için yardımcı fonksiyon
  * @param text - Slug'a dönüştürülecek metin
  * @returns Slug dizesi

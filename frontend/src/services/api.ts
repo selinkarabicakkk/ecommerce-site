@@ -40,25 +40,9 @@ api.interceptors.response.use(
     // 401 hatası ve token yenileme mekanizması
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-      
-      try {
-        // Token yenileme isteği yapılabilir
-        // const refreshToken = localStorage.getItem('refreshToken');
-        // const response = await api.post('/auth/refresh-token', { refreshToken });
-        // localStorage.setItem('token', response.data.token);
-        // originalRequest.headers!.Authorization = `Bearer ${response.data.token}`;
-        // return api(originalRequest);
-        
-        // Şimdilik basitçe oturumu sonlandırıyoruz
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        window.location.href = '/login';
-      } catch (refreshError) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        window.location.href = '/login';
-        return Promise.reject(refreshError);
-      }
+      // Oturumu otomatik sonlandırma yerine, isteği reddediyoruz.
+      // Yönlendirme ve logout sayfa/flow bazında yapılacak.
+      return Promise.reject(error);
     }
     
     return Promise.reject(error);

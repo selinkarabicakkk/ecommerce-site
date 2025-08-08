@@ -149,7 +149,7 @@ export default function ProfilePage() {
           )}
           
           {/* Profil formu */}
-          <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="card p-6">
             <h2 className="text-lg font-medium mb-4">Profil Bilgileri</h2>
             
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
