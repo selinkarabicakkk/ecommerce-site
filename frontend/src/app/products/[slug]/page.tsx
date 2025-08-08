@@ -160,7 +160,7 @@ export default function ProductDetailPage() {
 
           {/* Ürün bilgileri */}
           <div className="md:w-1/2">
-            <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
+            <h1 className="text-3xl font-bold tracking-tight mb-2 text-[rgb(var(--foreground))]">{product.name}</h1>
 
             {/* Puan */}
             <div className="flex items-center mb-4">
@@ -186,16 +186,26 @@ export default function ProductDetailPage() {
             </div>
 
             {/* Fiyat */}
-            <div className="mb-6">
-              <span className="text-2xl font-bold text-primary">
+            <div className="mb-6 flex items-center gap-3">
+              <span className="text-3xl font-bold text-[rgb(var(--primary))]">
                 {product.price.toLocaleString('tr-TR')} ₺
               </span>
+              {product.oldPrice && (
+                <span className="text-base text-gray-500 line-through">
+                  {product.oldPrice.toLocaleString('tr-TR')} ₺
+                </span>
+              )}
+              {product.discount > 0 && (
+                <span className="text-xs bg-[rgb(var(--destructive))] text-white px-2 py-0.5 rounded-full">
+                  %{product.discount} indirim
+                </span>
+              )}
               {product.stock > 0 ? (
-                <span className="ml-4 inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
+                <span className="ml-2 inline-block bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full">
                   Stokta
                 </span>
               ) : (
-                <span className="ml-4 inline-block bg-red-100 text-red-800 text-xs px-2 py-1 rounded">
+                <span className="ml-2 inline-block bg-red-100 text-red-800 text-xs px-2 py-0.5 rounded-full">
                   Tükendi
                 </span>
               )}
@@ -228,11 +238,12 @@ export default function ProductDetailPage() {
             <div className="mb-6">
               <div className="flex items-center mb-4">
                 <button
+                  aria-label="Azalt"
                   onClick={() => handleQuantityChange(quantity - 1)}
                   disabled={quantity <= 1}
-                  className="w-10 h-10 rounded-l border border-gray-300 flex items-center justify-center bg-gray-50 text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+                  className="w-10 h-10 rounded-l-md border border-gray-300 flex items-center justify-center bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50"
                 >
-                  -
+                  −
                 </button>
                 <input
                   type="number"
@@ -240,12 +251,13 @@ export default function ProductDetailPage() {
                   max={product.stock}
                   value={quantity}
                   onChange={(e) => handleQuantityChange(parseInt(e.target.value) || 1)}
-                  className="w-16 h-10 border-t border-b border-gray-300 text-center [-moz-appearance:_textfield] [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none"
+                  className="w-16 h-10 text-sm border-t border-b border-gray-300 text-center [-moz-appearance:_textfield] [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none"
                 />
                 <button
+                  aria-label="Arttır"
                   onClick={() => handleQuantityChange(quantity + 1)}
                   disabled={quantity >= product.stock}
-                  className="w-10 h-10 rounded-r border border-gray-300 flex items-center justify-center bg-gray-50 text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+                  className="w-10 h-10 rounded-r-md border border-gray-300 flex items-center justify-center bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50"
                 >
                   +
                 </button>
