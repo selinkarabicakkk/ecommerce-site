@@ -22,14 +22,14 @@ const Header = () => {
   ];
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
-      <div className="bg-[rgb(var(--primary))] text-white py-1">
-        <div className="container mx-auto px-4 text-center text-xs font-medium">
+    <header className="bg-white/90 backdrop-blur border-b border-gray-200 sticky top-0 z-50">
+      <div className="bg-[rgb(var(--primary))] text-white">
+        <div className="container mx-auto px-4 text-center text-[11px] font-medium py-1.5">
           Tüm siparişlerde ücretsiz kargo! 150₺ üzeri alışverişlerde %10 indirim
         </div>
       </div>
       <nav className="container mx-auto px-4 sm:px-6 lg:px-8" aria-label="Top">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-16 gap-4">
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="text-2xl font-bold text-primary flex items-center gap-2">
@@ -46,15 +46,15 @@ const Header = () => {
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex space-x-6">
+          <div className="hidden lg:flex items-center gap-6">
             {navigation.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
-                className={`text-sm font-medium transition-colors duration-200 ${
+                className={`text-sm font-medium transition-colors duration-200 pb-1 ${
                   pathname === item.href
                     ? 'text-primary border-b-2 border-primary'
-                    : 'text-gray-600 hover:text-primary'
+                    : 'text-gray-700 hover:text-primary'
                 }`}
               >
                 {item.name}
@@ -63,7 +63,7 @@ const Header = () => {
           </div>
           
           {/* Right Side Navigation */}
-          <div className="hidden md:flex items-center space-x-6">
+          <div className="hidden md:flex items-center gap-6">
             <Link href="/wishlist" className="relative text-gray-600 hover:text-primary transition-colors duration-200">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -86,7 +86,7 @@ const Header = () => {
                 />
               </svg>
               {items.length > 0 && (
-                <span className="absolute -top-2 -right-2 bg-[rgb(var(--destructive))] text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                <span className="absolute -top-2 -right-2 bg-[rgb(var(--destructive))] text-white text-[11px] font-bold rounded-full h-5 w-5 flex items-center justify-center shadow-sm">
                   {items.length}
                 </span>
               )}
@@ -94,7 +94,7 @@ const Header = () => {
 
             {isAuthenticated ? (
               <div className="relative group">
-                <button className="flex items-center text-sm font-medium text-gray-600 hover:text-primary transition-colors duration-200">
+                <button className="flex items-center text-sm font-medium text-gray-700 hover:text-primary transition-colors duration-200">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
@@ -113,7 +113,7 @@ const Header = () => {
                     />
                   </svg>
                 </button>
-                <div className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-gray-200 focus:outline-none hidden group-hover:block">
+                <div className="absolute right-0 z-10 mt-2 w-52 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-gray-200 focus:outline-none hidden group-hover:block">
                   <Link
                     href="/profile"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
