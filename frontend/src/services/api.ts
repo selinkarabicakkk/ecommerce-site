@@ -52,11 +52,11 @@ api.interceptors.response.use(
         // Şimdilik basitçe oturumu sonlandırıyoruz
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        window.location.href = '/login';
+        window.location.href = '/auth/login';
       } catch (refreshError) {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        window.location.href = '/login';
+        window.location.href = '/auth/login';
         return Promise.reject(refreshError);
       }
     }

@@ -163,12 +163,12 @@ const Header = () => {
               </div>
             ) : (
               <div className="flex space-x-3">
-                <Link href="/login">
+                <Link href="/auth/login">
                   <Button variant="ghost" size="sm" className="hover:text-primary hover:bg-gray-50">
                     Giriş Yap
                   </Button>
                 </Link>
-                <Link href="/register">
+                <Link href="/auth/register">
                   <Button size="sm" className="bg-[rgb(var(--primary))] hover:bg-[rgb(var(--primary)/0.9)]">
                     Kayıt Ol
                   </Button>
@@ -342,12 +342,12 @@ const Header = () => {
                 </>
               ) : (
                 <div className="p-4 space-y-3">
-                  <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
+                  <Link href="/auth/login" onClick={() => setMobileMenuOpen(false)}>
                     <Button variant="ghost" size="sm" className="w-full justify-center hover:bg-gray-50 hover:text-primary">
                       Giriş Yap
                     </Button>
                   </Link>
-                  <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
+                  <Link href="/auth/register" onClick={() => setMobileMenuOpen(false)}>
                     <Button size="sm" className="w-full justify-center bg-[rgb(var(--primary))] hover:bg-[rgb(var(--primary)/0.9)]">
                       Kayıt Ol
                     </Button>
