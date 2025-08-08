@@ -2,8 +2,9 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useAppSelector } from '@/store';
+import { usePathname, useRouter } from 'next/navigation';
+import { useAppSelector, useAppDispatch } from '@/store';
+import { logout } from '@/store/slices/authSlice';
 import { Button } from '../ui/Button';
 import SearchBar from '../ui/SearchBar';
 
@@ -22,6 +23,8 @@ const Header = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
   const pathname = usePathname();
+  const router = useRouter();
+  const dispatch = useAppDispatch();
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
   const { items } = useAppSelector((state) => state.cart);
 
@@ -32,6 +35,14 @@ const Header = () => {
     { name: 'Hakkımızda', href: '/about' },
     { name: 'İletişim', href: '/contact' },
   ];
+
+  const handleLogout = async () => {
+    try {
+      await dispatch(logout()).unwrap();
+    } catch {}
+    setUserMenuOpen(false);
+    router.push('/');
+  };
 
   return (
     <header className="bg-white/90 backdrop-blur border-b border-gray-200 sticky top-0 z-50">
@@ -168,7 +179,7 @@ const Header = () => {
                     </Link>
                   )}
                   <hr className="my-1 border-gray-200" />
-                  <button className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-red-500" onClick={() => setUserMenuOpen(false)}>
+                  <button className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-red-500" onClick={handleLogout}>
                     <span className="flex items-center">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -349,7 +360,7 @@ const Header = () => {
                   <div className="border-t border-gray-200 mt-2"></div>
                   <button
                     className="w-full text-left flex items-center px-4 py-2 text-base font-medium text-red-500 hover:bg-red-50"
-                    onClick={() => setMobileMenuOpen(false)}
+                    onClick={() => { setMobileMenuOpen(false); handleLogout(); }}
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
