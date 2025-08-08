@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { getAssetUrl } from '@/lib/utils';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/Button';
 import RecommendedProducts from '@/components/product/RecommendedProducts';
@@ -135,14 +136,14 @@ export default function Home() {
                 >
                   <div className="relative h-32 w-32 rounded-full overflow-hidden my-4 bg-gray-50 border-4 border-gray-50 shadow-sm">
                     {category.image ? (
-                      <Image
-                        src={`http://localhost:5000${category.image}`}
-                        alt={category.name}
-                        fill
-                        sizes="(max-width: 768px) 100vw, 128px"
-                        className="object-cover group-hover:scale-110 transition-transform duration-300"
-                        style={{ height: '100%', width: '100%', objectFit: 'cover' }}
-                      />
+                        <Image
+                          src={getAssetUrl(category.image)}
+                          alt={category.name}
+                          fill
+                          sizes="(max-width: 768px) 100vw, 128px"
+                          className="object-cover group-hover:scale-110 transition-transform duration-300"
+                          style={{ height: '100%', width: '100%', objectFit: 'cover' }}
+                        />
                     ) : (
                       <div className="absolute inset-0 flex items-center justify-center">
                         <span className="text-gray-500">{category.name}</span>
@@ -201,7 +202,7 @@ export default function Home() {
                     <Link href={`/products/${product.slug}`} className="block relative h-56 bg-gray-50">
                       {product.images && product.images.length > 0 ? (
                         <Image
-                          src={`http://localhost:5000${product.images[0]}`}
+                          src={getAssetUrl(product.images[0])}
                           alt={product.name}
                           fill
                           sizes="(max-width: 768px) 100vw, 25vw"

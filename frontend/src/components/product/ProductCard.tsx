@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import { getAssetUrl } from '@/lib/utils';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { useAppDispatch } from '@/store';
@@ -43,7 +44,7 @@ const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) => {
           <Link href={`/products/${product.slug}`}>
             {product.images && product.images.length > 0 ? (
               <Image
-                src={product.images[0]}
+                src={getAssetUrl(product.images[0])}
                 alt={product.name}
                 fill
                 sizes="(max-width: 768px) 100vw, 33vw"
@@ -130,7 +131,7 @@ const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) => {
         <Link href={`/products/${product.slug}`} className="block relative h-56 bg-gray-50">
           {product.images && product.images.length > 0 ? (
             <Image
-              src={`http://localhost:5000${product.images[0]}`}
+              src={getAssetUrl(product.images[0])}
               alt={product.name}
               fill
               sizes="(max-width: 768px) 100vw, 33vw"

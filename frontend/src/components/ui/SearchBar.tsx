@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import { getAssetUrl } from '@/lib/utils';
 import { productService } from '@/services';
 import { Product } from '@/types';
 
@@ -146,7 +147,7 @@ const SearchBar = ({
                       <div className="flex-shrink-0 h-10 w-10 relative" style={{ height: '40px', width: '40px' }}>
                         {product.images && product.images.length > 0 ? (
                           <Image
-                            src={`http://localhost:5000${product.images[0]}`}
+                            src={getAssetUrl(product.images[0])}
                             alt={product.name}
                             fill
                             sizes="40px"
