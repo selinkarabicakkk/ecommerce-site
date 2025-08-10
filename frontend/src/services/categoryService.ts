@@ -33,8 +33,16 @@ export const categoryService = {
 
   // Slug ile kategori detayını getir
   getCategoryBySlug: async (slug: string) => {
-    const response = await api.get<ApiResponse<Category>>(`/categories/slug/${slug}`);
-    return response.data;
+    const response = await api.get(`/categories/slug/${slug}`);
+    const raw: any = response.data;
+    if (raw && raw.category) {
+      return {
+        success: Boolean(raw.success),
+        message: raw.message || '',
+        data: raw.category as Category,
+      } as ApiResponse<Category>;
+    }
+    return raw as ApiResponse<Category>;
   },
 
   // Admin: Kategori oluştur

@@ -126,7 +126,7 @@ export default function CategoryPage() {
           </div>
         )}
 
-        {/* Kategori banner */}
+        {/* Kategori görseli (anasayfadaki gibi net görünsün, overlay yok) */}
         {category?.image && (
           <div className="relative h-48 md:h-64 w-full mb-8 rounded-lg overflow-hidden">
             <Image
@@ -136,9 +136,6 @@ export default function CategoryPage() {
               sizes="100vw"
               className="object-cover"
             />
-            <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-              <h2 className="text-white text-3xl md:text-4xl font-bold">{category.name}</h2>
-            </div>
           </div>
         )}
 
