@@ -16,15 +16,13 @@ export const login = createAsyncThunk(
   'auth/login',
   async (credentials: LoginCredentials, { rejectWithValue }) => {
     try {
-      const response = await authService.login(credentials);
-      
-      // Token ve kullanıcı bilgisini localStorage'a kaydet
-      if (response.data?.token) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+      const response: any = await authService.login(credentials);
+      // Backend { success, token, user } döndürüyor
+      if (response?.token) {
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('user', JSON.stringify(response.user));
       }
-      
-      return response.data;
+      return response;
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message || 'Giriş yapılırken bir hata oluştu'

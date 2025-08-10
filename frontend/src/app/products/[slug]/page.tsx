@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter, usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { getAssetUrl } from '@/lib/utils';
 import Link from 'next/link';
@@ -10,13 +10,16 @@ import { Button } from '@/components/ui/Button';
 import ProductReviews from '@/components/product/ProductReviews';
 import RecommendedProducts from '@/components/product/RecommendedProducts';
 import { productService } from '@/services';
-import { useAppDispatch } from '@/store';
-import { addToCart } from '@/store/slices/cartSlice';
+import { useAppDispatch, useAppSelector } from '@/store';
+import { addToCart, fetchCart } from '@/store/slices/cartSlice';
 import { Product } from '@/types';
 
 export default function ProductDetailPage() {
   const { slug } = useParams();
+  const router = useRouter();
+  const pathname = usePathname();
   const dispatch = useAppDispatch();
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -44,15 +47,21 @@ export default function ProductDetailPage() {
   }, [slug]);
 
   // Sepete ekle
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    if (!isAuthenticated || !token) {
+      router.push(`/auth/login?redirect=${encodeURIComponent(pathname || '/')}`);
+      return;
+    }
     if (product) {
-      dispatch(
+      await dispatch(
         addToCart({
           product: product._id,
           quantity,
           price: product.price,
         })
-      );
+      ).unwrap();
+      await dispatch(fetchCart());
     }
   };
 
@@ -190,9 +199,9 @@ export default function ProductDetailPage() {
               <span className="text-3xl font-bold text-[rgb(var(--primary))]">
                 {product.price.toLocaleString('tr-TR')} ₺
               </span>
-              {product.oldPrice && (
+              {product.discount > 0 && (
                 <span className="text-base text-gray-500 line-through">
-                  {product.oldPrice.toLocaleString('tr-TR')} ₺
+                  {Math.round(product.price / (1 - product.discount / 100)).toLocaleString('tr-TR')} ₺
                 </span>
               )}
               {product.discount > 0 && (

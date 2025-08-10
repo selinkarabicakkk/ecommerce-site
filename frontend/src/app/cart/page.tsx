@@ -20,13 +20,18 @@ export default function CartPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { items, totalPrice, loading, error } = useAppSelector((state) => state.cart);
-  const { isAuthenticated } = useAppSelector((state) => state.auth);
+  const { isAuthenticated, loading: authLoading } = useAppSelector((state) => state.auth);
   const [isUpdating, setIsUpdating] = useState<string | null>(null);
 
-  // Sepeti getir
+  // Sepeti getir / auth yoksa login'e yönlendir
   useEffect(() => {
+    if (authLoading) return;
+    if (!isAuthenticated) {
+      router.push('/auth/login?redirect=/cart');
+      return;
+    }
     dispatch(fetchCart());
-  }, [dispatch]);
+  }, [dispatch, isAuthenticated, authLoading, router]);
 
   // Ürün miktarını güncelle
   const handleQuantityChange = async (itemId: string, quantity: number) => {
