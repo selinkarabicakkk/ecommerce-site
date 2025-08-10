@@ -33,7 +33,6 @@ const Header = () => {
     { name: 'Ürünler', href: '/products' },
     { name: 'Kategoriler', href: '/categories' },
     { name: 'Hakkımızda', href: '/about' },
-    { name: 'İletişim', href: '/contact' },
   ];
 
   const handleLogout = async () => {
