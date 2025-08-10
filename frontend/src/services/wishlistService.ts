@@ -25,9 +25,10 @@ const wishlistService = {
     return response.data;
   },
 
-  // Ürünü istek listesine ekle
-  addToWishlist: async (productId: string): Promise<{ message: string }> => {
-    const response = await api.post('/user/wishlist', { productId });
+  // Ürünü istek listesine ekle (toggle endpoint kullan)
+  addToWishlist: async (productId: string): Promise<{ message: string; inWishlist?: boolean }> => {
+    const id = String(productId);
+    const response = await api.post(`/user/wishlist/${id}`);
     return response.data;
   },
 

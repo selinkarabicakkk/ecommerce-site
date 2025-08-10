@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store';
 import { addToWishlist, removeFromWishlist } from '@/store/slices/wishlistSlice';
 import wishlistService from '@/services/wishlistService';
 import useProductTracking from '@/hooks/useProductTracking';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 interface WishlistButtonProps {
   productId: string;
@@ -15,7 +15,8 @@ interface WishlistButtonProps {
 export default function WishlistButton({ productId, className = '' }: WishlistButtonProps) {
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const { trackProductActivity } = useProductTracking();
+  const pathname = usePathname();
+  const { trackActivity } = useProductTracking(productId, 'wishlist');
   const { isAuthenticated, loading: authLoading } = useAppSelector((state) => state.auth);
   
   const [inWishlist, setInWishlist] = useState(false);
@@ -46,9 +47,13 @@ export default function WishlistButton({ productId, className = '' }: WishlistBu
   }, [productId, isAuthenticated, authLoading]);
 
   // İstek listesine ekle/çıkar
-  const toggleWishlist = async () => {
-    if (!isAuthenticated) {
-      router.push(`/auth/login?redirect=/products/${productId}`);
+  const toggleWishlist = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    // Link içinde tıklamayı yut
+    e.preventDefault();
+    e.stopPropagation();
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    if (!isAuthenticated || !token) {
+      router.push(`/auth/login?redirect=${encodeURIComponent(pathname || '/')}`);
       return;
     }
 
@@ -60,7 +65,7 @@ export default function WishlistButton({ productId, className = '' }: WishlistBu
         setWishlistItemId(null);
       } else {
         const result = await dispatch(addToWishlist(productId)).unwrap();
-        trackProductActivity(productId, 'wishlist');
+        await trackActivity();
         setInWishlist(true);
         
         // İstek listesi durumunu yeniden kontrol et
@@ -69,8 +74,9 @@ export default function WishlistButton({ productId, className = '' }: WishlistBu
           setWishlistItemId(response.itemId);
         }
       }
-    } catch (error) {
-      console.error('İstek listesi işlemi sırasında hata:', error);
+    } catch (error: any) {
+      // Hata durumunda sayfa yönlendirmesi yapmayalım; gereksiz login flicker'ını önler
+      console.error('İstek listesi işlemi hatası:', error);
     } finally {
       setIsLoading(false);
     }

@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { getAssetUrl } from '@/lib/utils';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
+import WishlistButton from '@/components/product/WishlistButton';
 import { useAppDispatch, useAppSelector } from '@/store';
 import { addToCart, fetchCart } from '@/store/slices/cartSlice';
 import { Product } from '@/types';
@@ -179,18 +180,12 @@ const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) => {
             )}
           </div>
           
-          <button 
-            className="absolute top-2 right-2 p-1.5 bg-white rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-gray-100"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              // Favorilere ekle işlemi
-            }}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600 hover:text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-            </svg>
-          </button>
+          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <WishlistButton
+              productId={product._id}
+              className="p-1.5 bg-white rounded-full shadow-md hover:bg-gray-100"
+            />
+          </div>
         </Link>
       </div>
       
