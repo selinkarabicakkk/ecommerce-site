@@ -22,13 +22,20 @@ export default function WishlistButton({ productId, className = '' }: WishlistBu
   const [inWishlist, setInWishlist] = useState(false);
   const [wishlistItemId, setWishlistItemId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isChecking, setIsChecking] = useState(true);
+  const [isChecking, setIsChecking] = useState(false);
 
   // İstek listesinde olup olmadığını kontrol et
   useEffect(() => {
     const checkWishlistStatus = async () => {
-      if (!isAuthenticated || authLoading) return;
-      
+      // Auth yüklenmiyorsa ve kullanıcı giriş yapmamışsa kontrol yapma, ikon normal kalsın
+      if (authLoading) return;
+      if (!isAuthenticated) {
+        setIsChecking(false);
+        setInWishlist(false);
+        setWishlistItemId(null);
+        return;
+      }
+
       try {
         setIsChecking(true);
         const response = await wishlistService.checkInWishlist(productId);
@@ -85,7 +92,7 @@ export default function WishlistButton({ productId, className = '' }: WishlistBu
   return (
     <button
       onClick={toggleWishlist}
-      disabled={isLoading || isChecking}
+      disabled={isLoading || (isChecking && isAuthenticated)}
       className={`flex items-center justify-center rounded-full p-2 transition-colors ${
         inWishlist
           ? 'bg-red-100 text-red-600 hover:bg-red-200'
@@ -94,7 +101,7 @@ export default function WishlistButton({ productId, className = '' }: WishlistBu
       aria-label={inWishlist ? 'İstek listesinden çıkar' : 'İstek listesine ekle'}
       title={inWishlist ? 'İstek listesinden çıkar' : 'İstek listesine ekle'}
     >
-      {isLoading || isChecking ? (
+      {isLoading || (isChecking && isAuthenticated) ? (
         <div className="animate-spin h-5 w-5 border-t-2 border-b-2 border-current rounded-full"></div>
       ) : (
         <svg
