@@ -1,12 +1,14 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { getAssetUrl } from '@/lib/utils';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
-import { useAppDispatch } from '@/store';
-import { addToCart } from '@/store/slices/cartSlice';
+import WishlistButton from '@/components/product/WishlistButton';
+import { useAppDispatch, useAppSelector } from '@/store';
+import { addToCart, fetchCart } from '@/store/slices/cartSlice';
 import { Product } from '@/types';
 
 interface ProductCardProps {
@@ -16,25 +18,39 @@ interface ProductCardProps {
 
 const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) => {
   const dispatch = useAppDispatch();
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
+  const router = useRouter();
+  const pathname = usePathname();
   const [isAddingToCart, setIsAddingToCart] = useState(false);
 
-  const handleAddToCart = (e: React.MouseEvent) => {
+  const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     
+    // Oturum veya token yoksa login sayfasına yönlendir
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    if (!isAuthenticated || !token) {
+      router.push(`/auth/login?redirect=${encodeURIComponent(pathname || '/')}`);
+      return;
+    }
+
     setIsAddingToCart(true);
-    
-    dispatch(
-      addToCart({
-        product: product._id,
-        quantity: 1,
-        price: product.price,
-      })
-    );
-    
-    setTimeout(() => {
+    try {
+      await dispatch(
+        addToCart({
+          product: product._id,
+          quantity: 1,
+          price: product.price,
+        })
+      ).unwrap();
+      // Sunucudaki sepet durumunu eşitle
+      await dispatch(fetchCart());
+    } catch (err) {
+      // Yetkisiz hata durumunda login'e yönlendir
+      router.push(`/auth/login?redirect=${encodeURIComponent(pathname || '/')}`);
+    } finally {
       setIsAddingToCart(false);
-    }, 1000);
+    }
   };
 
   if (viewMode === 'list') {
@@ -112,8 +128,10 @@ const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) => {
               <p className="text-lg font-bold text-[rgb(var(--primary))]">
                 {product.price.toLocaleString('tr-TR')} ₺
               </p>
-              {product.oldPrice && (
-                <span className="text-sm text-gray-500 line-through">{product.oldPrice.toLocaleString('tr-TR')} ₺</span>
+              {product.discount > 0 && (
+                <span className="text-sm text-gray-500 line-through">
+                  {Math.round(product.price / (1 - product.discount / 100)).toLocaleString('tr-TR')} ₺
+                </span>
               )}
             </div>
             <Button
@@ -162,18 +180,12 @@ const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) => {
             )}
           </div>
           
-          <button 
-            className="absolute top-2 right-2 p-1.5 bg-white rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-gray-100"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              // Favorilere ekle işlemi
-            }}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600 hover:text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-            </svg>
-          </button>
+          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <WishlistButton
+              productId={product._id}
+              className="p-1.5 bg-white rounded-full shadow-md hover:bg-gray-100"
+            />
+          </div>
         </Link>
       </div>
       
@@ -214,9 +226,9 @@ const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) => {
             <p className="text-lg font-bold text-[rgb(var(--primary))]">
               {product.price.toLocaleString('tr-TR')} ₺
             </p>
-            {product.oldPrice && (
+            {product.discount > 0 && (
               <p className="text-sm text-gray-500 line-through">
-                {product.oldPrice.toLocaleString('tr-TR')} ₺
+                {Math.round(product.price / (1 - product.discount / 100)).toLocaleString('tr-TR')} ₺
               </p>
             )}
           </div>

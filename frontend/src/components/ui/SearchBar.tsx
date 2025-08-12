@@ -139,9 +139,10 @@ const SearchBar = ({
               {results.map((product) => (
                 <li key={product._id} className="border-b last:border-b-0">
                   <Link
-                    href={`/products/${product.slug}`}
+                    href={{ pathname: `/products/${product.slug}` }}
                     className="block hover:bg-gray-50 p-3"
                     onClick={() => setShowResults(false)}
+                    prefetch={false}
                   >
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10 relative" style={{ height: '40px', width: '40px' }}>

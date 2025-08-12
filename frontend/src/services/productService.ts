@@ -12,7 +12,7 @@ export const productService = {
     if (filters.maxPrice !== undefined) queryParams.append('maxPrice', filters.maxPrice.toString());
     if (filters.rating !== undefined) queryParams.append('rating', filters.rating.toString());
     // Backend beklenen isim: keyword
-    if (filters.search) queryParams.append('keyword', filters.search);
+    if (filters.search) queryParams.append('q', filters.search);
     // Backend beklenen isim ve değerler: sortBy = price_asc | price_desc | rating | newest
     if (filters.sort) {
       const sortMap: Record<NonNullable<ProductFilters['sort']>, string> = {
@@ -32,7 +32,7 @@ export const productService = {
     
     const queryString = queryParams.toString();
     const response = await api.get<PaginatedResponse<Product> & { products?: Product[]; count?: number }>(
-      `/products${queryString ? `?${queryString}` : ''}`
+      `/search${queryString ? `?${queryString}` : ''}`
     );
     const data = response.data as any;
     if (data && Array.isArray(data.products)) {
@@ -56,8 +56,17 @@ export const productService = {
 
   // Slug ile ürün detayını getir
   getProductBySlug: async (slug: string) => {
-    const response = await api.get<ApiResponse<Product>>(`/products/slug/${slug}`);
-    return response.data;
+    const response = await api.get(`/products/slug/${slug}`);
+    // Backend { success, product } döndürüyor; frontend ApiResponse<Product> bekliyor
+    const raw: any = response.data;
+    if (raw && raw.product) {
+      return {
+        success: Boolean(raw.success),
+        message: raw.message || '',
+        data: raw.product as Product,
+      } as ApiResponse<Product>;
+    }
+    return raw as ApiResponse<Product>;
   },
 
   // En yüksek puanlı ürünleri getir

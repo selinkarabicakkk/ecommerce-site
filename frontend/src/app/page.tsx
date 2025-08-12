@@ -82,7 +82,7 @@ export default function Home() {
     <MainLayout>
       {/* Hero Section */}
       <section className="text-[rgb(var(--foreground))]">
-        <div className="container mx-auto px-4 py-16 md:py-24 lg:py-32 flex flex-col md:flex-row items-center">
+        <div className="container mx-auto px-4 pt-0 pb-16 md:pb-24 lg:pb-32 flex flex-col md:flex-row items-center">
           <div className="md:w-1/2 md:pr-8">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-[rgb(var(--foreground))]">
               Alışverişin Yeni Adresi
@@ -100,11 +100,15 @@ export default function Home() {
             </div>
           </div>
           <div className="md:w-1/2 mt-10 md:mt-0">
-            <div className="relative h-64 md:h-80 lg:h-96 w-full">
-              {/* Placeholder for hero image */}
-              <div className="absolute inset-0 bg-gray-300 rounded-lg flex items-center justify-center">
-                <span className="text-gray-500">Hero Image</span>
-              </div>
+            <div className="relative h-[28rem] md:h-[36rem] lg:h-[44rem] w-full">
+              <Image
+                src="/hero.png"
+                alt="ShopZone Hero"
+                fill
+                priority
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-contain object-top rounded-lg"
+              />
             </div>
           </div>
         </div>

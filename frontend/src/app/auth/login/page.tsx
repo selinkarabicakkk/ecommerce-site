@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
@@ -27,6 +27,13 @@ export default function LoginPage() {
   const dispatch = useAppDispatch();
   const { loading, error, isAuthenticated } = useAppSelector((state) => state.auth);
   const [showPassword, setShowPassword] = useState(false);
+
+  // Giriş yaptıysa yönlendir (render sırasında değil, effect içinde)
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.replace(redirect);
+    }
+  }, [isAuthenticated, redirect, router]);
 
   // Form hook'u
   const {
@@ -57,11 +64,7 @@ export default function LoginPage() {
     dispatch(clearError());
   };
 
-  // Kullanıcı zaten giriş yapmışsa ana sayfaya yönlendir
-  if (isAuthenticated) {
-    router.push(redirect);
-    return null;
-  }
+  // isAuthenticated ise efekt yönlendirecek
 
   return (
     <MainLayout>

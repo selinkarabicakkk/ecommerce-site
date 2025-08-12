@@ -33,7 +33,6 @@ const Header = () => {
     { name: 'Ürünler', href: '/products' },
     { name: 'Kategoriler', href: '/categories' },
     { name: 'Hakkımızda', href: '/about' },
-    { name: 'İletişim', href: '/contact' },
   ];
 
   const handleLogout = async () => {
@@ -68,25 +67,25 @@ const Header = () => {
             <SearchBar />
           </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-6">
-            {navigation.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={`text-sm font-medium transition-colors duration-200 pb-1 ${
-                  pathname === item.href
-                    ? 'text-primary border-b-2 border-primary'
-                    : 'text-gray-700 hover:text-primary'
-                }`}
-              >
-                {item.name}
-              </Link>
-            ))}
-          </div>
+          {/* Desktop Navigation moved next to right icons */}
           
-          {/* Right Side Navigation */}
-          <div className="hidden md:flex items-center gap-6">
+          {/* Right Side Navigation (nav links + icons) */}
+          <div className="hidden md:flex items-center gap-4">
+            <div className="hidden lg:flex items-center gap-4 mr-2 mt-1 ">
+              {navigation.map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.href}  
+                  className={`text-sm font-medium transition-colors duration-200 pb-1 ${
+                    pathname === item.href
+                      ? 'text-primary border-b-2 border-primary'
+                      : 'text-gray-700 hover:text-primary'
+                  }`}
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </div>
             <Link href="/wishlist" className="relative text-gray-600 hover:text-primary transition-colors duration-200">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
