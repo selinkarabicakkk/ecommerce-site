@@ -6,7 +6,7 @@ import Link from 'next/link';
 import AdminLayout from '@/components/layout/AdminLayout';
 import { Button } from '@/components/ui/Button';
 import { useAppSelector } from '@/store';
-import { productService } from '@/services';
+import { productService, categoryService } from '@/services';
 import { Product } from '@/types';
 import { getAssetUrl } from '@/lib/utils';
 
@@ -25,6 +25,7 @@ export default function AdminProductsPage() {
   const [stockFilter, setStockFilter] = useState<'all' | 'in-stock' | 'out-of-stock'>('all');
   const [featuredFilter, setFeaturedFilter] = useState<'all' | 'featured' | 'normal'>('all');
   const [assignCategoryId, setAssignCategoryId] = useState<string>('');
+  const [categories, setCategories] = useState<Array<{_id: string, name: string}>>([]);
   const [bulkLoading, setBulkLoading] = useState(false);
   
   // Ürünleri getir
@@ -61,6 +62,17 @@ export default function AdminProductsPage() {
         router.push('/');
       } else {
         fetchProducts();
+        // Kategorileri getir
+        const fetchCategories = async () => {
+          try {
+            const response = await categoryService.getCategories({ limit: 100 });
+            const categoryList = (response as any)?.categories || [];
+            setCategories(categoryList);
+          } catch (err) {
+            console.error('Kategoriler yüklenirken hata:', err);
+          }
+        };
+        fetchCategories();
       }
     }
   }, [isAuthenticated, loading, router, user]);
@@ -223,13 +235,18 @@ export default function AdminProductsPage() {
                 Öne Çıkarmayı Kaldır
               </Button>
               <div className="flex items-center gap-2">
-                <input
-                  type="text"
-                  placeholder="Kategori ID"
+                <select
                   value={assignCategoryId}
                   onChange={(e) => setAssignCategoryId(e.target.value)}
-                  className="px-3 py-2 border rounded-md text-sm w-40"
-                />
+                  className="px-3 py-2 border rounded-md text-sm w-48"
+                >
+                  <option value="">Kategori seçin...</option>
+                  {categories.map((category) => (
+                    <option key={category._id} value={category._id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
                 <Button
                   variant="outline"
                   disabled={bulkLoading || !assignCategoryId}
