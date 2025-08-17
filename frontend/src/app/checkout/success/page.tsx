@@ -75,7 +75,7 @@ export default function CheckoutSuccessPage() {
     if (!dateString) return '';
     
     const date = new Date(dateString);
-    return new Intl.DateTimeFormat('tr-TR', {
+    return new Intl.DateTimeFormat('en-US', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
@@ -120,11 +120,11 @@ export default function CheckoutSuccessPage() {
                   />
                 </svg>
               </div>
-              <h1 className="text-2xl font-bold mb-4">Bir Hata Oluştu</h1>
-              <p className="text-gray-600 mb-6">{error || 'Sipariş bilgileri yüklenirken bir hata oluştu'}</p>
+              <h1 className="text-2xl font-bold mb-4">An Error Occurred</h1>
+              <p className="text-gray-600 mb-6">{error || 'An error occurred while loading the order information'}</p>
               <div className="flex justify-center">
                 <Link href="/">
-                  <Button>Ana Sayfaya Dön</Button>
+                  <Button>Go to Home</Button>
                 </Link>
               </div>
             </div>
@@ -156,19 +156,17 @@ export default function CheckoutSuccessPage() {
                   />
                 </svg>
               </div>
-              <h1 className="text-3xl font-bold mb-2">Siparişiniz Alındı!</h1>
-              <p className="text-gray-600">
-                Siparişiniz başarıyla oluşturuldu ve onaylandı.
-              </p>
+              <h1 className="text-3xl font-bold mb-2">Your Order is Confirmed!</h1>
+              <p className="text-gray-600">Your order has been successfully created and confirmed.</p>
             </div>
 
             {/* Sipariş bilgileri */}
             <div className="border border-gray-200 rounded-lg p-6 mb-6">
               <div className="flex flex-col md:flex-row justify-between mb-4">
                 <div>
-                  <h2 className="font-bold text-lg">Sipariş Bilgileri</h2>
-                  <p className="text-gray-600">Sipariş No: {order.orderNumber}</p>
-                  <p className="text-gray-600">Tarih: {formatDate(order.createdAt)}</p>
+                  <h2 className="font-bold text-lg">Order Information</h2>
+                  <p className="text-gray-600">Order No: {order.orderNumber}</p>
+                  <p className="text-gray-600">Date: {formatDate(order.createdAt)}</p>
                 </div>
                 <div className="mt-4 md:mt-0">
                   <span
@@ -178,26 +176,26 @@ export default function CheckoutSuccessPage() {
                         : 'bg-yellow-100 text-yellow-800'
                     }`}
                   >
-                    {order.isPaid ? 'Ödendi' : 'Ödeme Bekleniyor'}
+                    {order.isPaid ? 'Paid' : 'Awaiting Payment'}
                   </span>
                   <span
                     className="ml-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800"
                   >
                     {order.status === 'pending'
-                      ? 'Beklemede'
+                      ? 'Pending'
                       : order.status === 'processing'
-                      ? 'İşleniyor'
+                      ? 'Processing'
                       : order.status === 'shipped'
-                      ? 'Kargoya Verildi'
+                      ? 'Shipped'
                       : order.status === 'delivered'
-                      ? 'Teslim Edildi'
-                      : 'İptal Edildi'}
+                      ? 'Delivered'
+                      : 'Cancelled'}
                   </span>
                 </div>
               </div>
 
               <div className="border-t border-gray-200 pt-4 mt-4">
-                <h3 className="font-medium mb-2">Teslimat Adresi</h3>
+                <h3 className="font-medium mb-2">Shipping Address</h3>
                 <p>{order.shippingAddress.street}</p>
                 <p>
                   {order.shippingAddress.city}, {order.shippingAddress.state}{' '}
@@ -210,9 +208,9 @@ export default function CheckoutSuccessPage() {
             {/* Toplam fiyat */}
             <div className="bg-gray-50 p-6 rounded-lg mb-6">
               <div className="flex justify-between items-center">
-                <span className="font-bold text-lg">Toplam Tutar</span>
+                <span className="font-bold text-lg">Total Amount</span>
                 <span className="font-bold text-xl text-primary">
-                  {order.totalPrice.toLocaleString('tr-TR')} ₺
+                  {order.totalPrice.toLocaleString('en-US')} ₺
                 </span>
               </div>
             </div>
@@ -220,12 +218,12 @@ export default function CheckoutSuccessPage() {
             <div className="flex flex-col md:flex-row justify-between gap-4">
               <Link href="/profile/orders" className="w-full md:w-auto">
                 <Button variant="outline" className="w-full">
-                  Siparişlerimi Görüntüle
+                  View My Orders
                 </Button>
               </Link>
               <Link href="/" className="w-full md:w-auto">
                 <Button className="w-full">
-                  Alışverişe Devam Et
+                  Continue Shopping
                 </Button>
               </Link>
             </div>

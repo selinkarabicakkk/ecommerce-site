@@ -59,7 +59,7 @@ export default function CheckoutPaymentPage() {
               shippingPrice: totalPrice > 500 ? 0 : 29.99, // 500 TL üzeri kargo bedava
             });
           } catch (error) {
-            console.error('Teslimat bilgileri yüklenirken hata:', error);
+            console.error('Error while loading shipping info:', error);
             router.push('/checkout/shipping');
           }
         }
@@ -136,21 +136,21 @@ export default function CheckoutPaymentPage() {
     
     // Kart numarası kontrolü
     if (!formData.cardNumber.trim()) {
-      newErrors.cardNumber = 'Kart numarası gereklidir';
+      newErrors.cardNumber = 'Card number is required';
     } else if (formData.cardNumber.replace(/\s/g, '').length !== 16) {
-      newErrors.cardNumber = 'Kart numarası 16 haneli olmalıdır';
+      newErrors.cardNumber = 'Card number must be 16 digits';
     }
     
     // Kart sahibi kontrolü
     if (!formData.cardName.trim()) {
-      newErrors.cardName = 'Kart sahibinin adı gereklidir';
+      newErrors.cardName = 'Cardholder name is required';
     }
     
     // Son kullanma tarihi kontrolü
     if (!formData.expiryDate.trim()) {
-      newErrors.expiryDate = 'Son kullanma tarihi gereklidir';
+      newErrors.expiryDate = 'Expiry date is required';
     } else if (!/^\d{2}\/\d{2}$/.test(formData.expiryDate)) {
-      newErrors.expiryDate = 'Geçersiz format (AA/YY)';
+      newErrors.expiryDate = 'Invalid format (MM/YY)';
     } else {
       const [month, year] = formData.expiryDate.split('/').map(Number);
       const currentDate = new Date();
@@ -158,20 +158,20 @@ export default function CheckoutPaymentPage() {
       const currentMonth = currentDate.getMonth() + 1;
       
       if (month < 1 || month > 12) {
-        newErrors.expiryDate = 'Geçersiz ay';
+        newErrors.expiryDate = 'Invalid month';
       } else if (
         (year < currentYear) || 
         (year === currentYear && month < currentMonth)
       ) {
-        newErrors.expiryDate = 'Kartınızın süresi dolmuş';
+        newErrors.expiryDate = 'Your card has expired';
       }
     }
     
     // CVV kontrolü
     if (!formData.cvv.trim()) {
-      newErrors.cvv = 'CVV gereklidir';
+      newErrors.cvv = 'CVV is required';
     } else if (formData.cvv.length !== 3) {
-      newErrors.cvv = 'CVV 3 haneli olmalıdır';
+      newErrors.cvv = 'CVV must be 3 digits';
     }
     
     setErrors(newErrors);
@@ -191,7 +191,7 @@ export default function CheckoutPaymentPage() {
     
     try {
       if (!orderDetails) {
-        throw new Error('Sipariş bilgileri bulunamadı');
+        throw new Error('Order details not found');
       }
       
       // Ödeme işlemi simülasyonu
@@ -247,8 +247,8 @@ export default function CheckoutPaymentPage() {
       // Başarı sayfasına yönlendir
       router.push(`/checkout/success?orderId=${response.data._id}`);
     } catch (error: any) {
-      console.error('Ödeme işlemi sırasında hata:', error);
-      setPaymentError(error.message || 'Ödeme işlemi sırasında bir hata oluştu');
+      console.error('Error during payment:', error);
+      setPaymentError(error.message || 'An error occurred during payment');
     } finally {
       setIsProcessing(false);
     }
@@ -281,7 +281,7 @@ export default function CheckoutPaymentPage() {
           {/* Ödeme formu */}
           <div className="w-full md:w-2/3">
             <div className="bg-white rounded-lg shadow-md p-6">
-              <h1 className="text-2xl font-bold mb-6">Ödeme Bilgileri</h1>
+              <h1 className="text-2xl font-bold mb-6">Payment Information</h1>
               
               {/* Adım göstergesi */}
               <div className="flex items-center mb-8">
@@ -289,21 +289,21 @@ export default function CheckoutPaymentPage() {
                   <div className="bg-primary text-white w-8 h-8 rounded-full flex items-center justify-center">
                     1
                   </div>
-                  <span className="ml-2 text-primary font-medium">Teslimat</span>
+                  <span className="ml-2 text-primary font-medium">Shipping</span>
                 </div>
                 <div className="h-1 w-12 bg-primary mx-2"></div>
                 <div className="flex items-center">
                   <div className="bg-primary text-white w-8 h-8 rounded-full flex items-center justify-center">
                     2
                   </div>
-                  <span className="ml-2 text-primary font-medium">Ödeme</span>
+                  <span className="ml-2 text-primary font-medium">Payment</span>
                 </div>
                 <div className="h-1 w-12 bg-gray-300 mx-2"></div>
                 <div className="flex items-center">
                   <div className="bg-gray-300 text-gray-600 w-8 h-8 rounded-full flex items-center justify-center">
                     3
                   </div>
-                  <span className="ml-2 text-gray-600">Onay</span>
+                  <span className="ml-2 text-gray-600">Confirmation</span>
                 </div>
               </div>
 
@@ -320,7 +320,7 @@ export default function CheckoutPaymentPage() {
                   {/* Kart numarası */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Kart Numarası <span className="text-red-500">*</span>
+                      Card Number <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -340,14 +340,14 @@ export default function CheckoutPaymentPage() {
                   {/* Kart sahibi */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Kart Sahibinin Adı <span className="text-red-500">*</span>
+                      Cardholder Name <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
                       name="cardName"
                       value={formData.cardName}
                       onChange={handleChange}
-                      placeholder="Ad Soyad"
+                      placeholder="Name Surname"
                       className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
                         errors.cardName ? 'border-red-500' : 'border-gray-300'
                       }`}
@@ -361,14 +361,14 @@ export default function CheckoutPaymentPage() {
                     {/* Son kullanma tarihi */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Son Kullanma Tarihi <span className="text-red-500">*</span>
+                        Expiry Date <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
                         name="expiryDate"
                         value={formData.expiryDate}
                         onChange={handleChange}
-                        placeholder="AA/YY"
+                        placeholder="MM/YY"
                         className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
                           errors.expiryDate ? 'border-red-500' : 'border-gray-300'
                         }`}
@@ -401,7 +401,7 @@ export default function CheckoutPaymentPage() {
 
                   <div className="flex justify-between mt-8">
                     <Link href="/checkout/shipping">
-                      <Button variant="outline">Geri</Button>
+                      <Button variant="outline">Back</Button>
                     </Link>
                     <Button
                       type="submit"
@@ -410,10 +410,10 @@ export default function CheckoutPaymentPage() {
                       {isProcessing ? (
                         <div className="flex items-center">
                           <div className="animate-spin mr-2 h-4 w-4 border-t-2 border-b-2 border-white rounded-full"></div>
-                          Ödeme İşleniyor...
+                          Processing Payment...
                         </div>
                       ) : (
-                        'Ödemeyi Tamamla'
+                        'Complete Payment'
                       )}
                     </Button>
                   </div>
@@ -425,48 +425,46 @@ export default function CheckoutPaymentPage() {
           {/* Sipariş özeti */}
           <div className="w-full md:w-1/3">
             <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-lg font-bold mb-4">Sipariş Özeti</h2>
+              <h2 className="text-lg font-bold mb-4">Order Summary</h2>
               
               <div className="divide-y divide-gray-200">
                 {orderDetails.items.map((item: any) => (
                   <div key={item._id} className="py-3 flex justify-between">
                     <div>
                       <p className="font-medium">{item.product.name}</p>
-                      <p className="text-sm text-gray-600">Adet: {item.quantity}</p>
+                      <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
                     </div>
-                    <p className="font-medium">
-                      {(item.product.price * item.quantity).toLocaleString('tr-TR')} ₺
-                    </p>
+                    <p className="font-medium">{(item.product.price * item.quantity).toLocaleString('en-US')} ₺</p>
                   </div>
                 ))}
               </div>
               
               <div className="mt-4 pt-4 border-t border-gray-200">
                 <div className="flex justify-between py-1">
-                  <p className="text-gray-600">Ara Toplam</p>
-                  <p className="font-medium">{orderDetails.totalPrice.toLocaleString('tr-TR')} ₺</p>
+                  <p className="text-gray-600">Subtotal</p>
+                  <p className="font-medium">{orderDetails.totalPrice.toLocaleString('en-US')} ₺</p>
                 </div>
                 <div className="flex justify-between py-1">
-                  <p className="text-gray-600">KDV (%18)</p>
-                  <p className="font-medium">{orderDetails.taxPrice.toLocaleString('tr-TR')} ₺</p>
+                  <p className="text-gray-600">VAT (18%)</p>
+                  <p className="font-medium">{orderDetails.taxPrice.toLocaleString('en-US')} ₺</p>
                 </div>
                 <div className="flex justify-between py-1">
-                  <p className="text-gray-600">Kargo</p>
+                  <p className="text-gray-600">Shipping</p>
                   <p className="font-medium">
                     {orderDetails.shippingPrice === 0 
-                      ? 'Ücretsiz' 
-                      : `${orderDetails.shippingPrice.toLocaleString('tr-TR')} ₺`}
+                      ? 'Free' 
+                      : `${orderDetails.shippingPrice.toLocaleString('en-US')} ₺`}
                   </p>
                 </div>
                 <div className="flex justify-between py-3 font-bold text-lg border-t border-gray-200 mt-2">
-                  <p>Toplam</p>
-                  <p>{calculateTotal().toLocaleString('tr-TR')} ₺</p>
+                  <p>Total</p>
+                  <p>{calculateTotal().toLocaleString('en-US')} ₺</p>
                 </div>
               </div>
 
               <div className="mt-6">
                 <div className="bg-gray-100 p-4 rounded-md">
-                  <h3 className="font-medium mb-2">Teslimat Adresi</h3>
+                  <h3 className="font-medium mb-2">Shipping Address</h3>
                   <p>{orderDetails.shipping.street}</p>
                   <p>
                     {orderDetails.shipping.city}, {orderDetails.shipping.state}{' '}
