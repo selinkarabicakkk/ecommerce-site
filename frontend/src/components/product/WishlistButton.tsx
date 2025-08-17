@@ -24,10 +24,8 @@ export default function WishlistButton({ productId, className = '' }: WishlistBu
   const [isLoading, setIsLoading] = useState(false);
   const [isChecking, setIsChecking] = useState(false);
 
-  // İstek listesinde olup olmadığını kontrol et
   useEffect(() => {
     const checkWishlistStatus = async () => {
-      // Auth yüklenmiyorsa ve kullanıcı giriş yapmamışsa kontrol yapma, ikon normal kalsın
       if (authLoading) return;
       if (!isAuthenticated) {
         setIsChecking(false);
@@ -44,7 +42,7 @@ export default function WishlistButton({ productId, className = '' }: WishlistBu
           setWishlistItemId(response.itemId);
         }
       } catch (error) {
-        console.error('İstek listesi kontrolü sırasında hata:', error);
+        console.error('Error while checking wishlist status:', error);
       } finally {
         setIsChecking(false);
       }
@@ -53,9 +51,7 @@ export default function WishlistButton({ productId, className = '' }: WishlistBu
     checkWishlistStatus();
   }, [productId, isAuthenticated, authLoading]);
 
-  // İstek listesine ekle/çıkar
   const toggleWishlist = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    // Link içinde tıklamayı yut
     e.preventDefault();
     e.stopPropagation();
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
@@ -75,15 +71,13 @@ export default function WishlistButton({ productId, className = '' }: WishlistBu
         await trackActivity();
         setInWishlist(true);
         
-        // İstek listesi durumunu yeniden kontrol et
         const response = await wishlistService.checkInWishlist(productId);
         if (response.itemId) {
           setWishlistItemId(response.itemId);
         }
       }
     } catch (error: any) {
-      // Hata durumunda sayfa yönlendirmesi yapmayalım; gereksiz login flicker'ını önler
-      console.error('İstek listesi işlemi hatası:', error);
+      console.error('Wishlist operation error:', error);
     } finally {
       setIsLoading(false);
     }
@@ -98,8 +92,8 @@ export default function WishlistButton({ productId, className = '' }: WishlistBu
           ? 'bg-red-100 text-red-600 hover:bg-red-200'
           : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
       } ${className}`}
-      aria-label={inWishlist ? 'İstek listesinden çıkar' : 'İstek listesine ekle'}
-      title={inWishlist ? 'İstek listesinden çıkar' : 'İstek listesine ekle'}
+      aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+      title={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
     >
       {isLoading || (isChecking && isAuthenticated) ? (
         <div className="animate-spin h-5 w-5 border-t-2 border-b-2 border-current rounded-full"></div>

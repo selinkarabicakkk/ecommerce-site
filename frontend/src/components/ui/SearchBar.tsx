@@ -17,7 +17,7 @@ interface SearchBarProps {
 
 const SearchBar = ({
   className = '',
-  placeholder = 'Ürün ara...',
+  placeholder = 'Search products...',
   onSearch,
   maxResults = 5,
 }: SearchBarProps) => {
@@ -28,7 +28,6 @@ const SearchBar = ({
   const [showResults, setShowResults] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
-  // Dışarı tıklandığında sonuçları kapat
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
@@ -42,7 +41,6 @@ const SearchBar = ({
     };
   }, []);
 
-  // Arama sorgusu değiştiğinde ürünleri getir
   useEffect(() => {
     const fetchResults = async () => {
       if (query.trim().length < 2) {
@@ -63,14 +61,13 @@ const SearchBar = ({
           setResults([]);
         }
       } catch (error) {
-        console.error('Arama sonuçları yüklenirken hata:', error);
+        console.error('Error while loading search results:', error);
         setResults([]);
       } finally {
         setLoading(false);
       }
     };
 
-    // Debounce işlemi
     const timer = setTimeout(() => {
       fetchResults();
     }, 300);
@@ -78,7 +75,6 @@ const SearchBar = ({
     return () => clearTimeout(timer);
   }, [query, maxResults]);
 
-  // Form gönderme
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (query.trim()) {
@@ -123,11 +119,10 @@ const SearchBar = ({
           type="submit"
           className="absolute inset-y-0 right-0 pr-3 flex items-center"
         >
-          <span className="text-sm font-medium text-primary">Ara</span>
+          <span className="text-sm font-medium text-primary">Search</span>
         </button>
       </form>
 
-      {/* Arama sonuçları dropdown */}
       {showResults && (query.trim().length >= 2) && (
         <div className="absolute z-10 mt-1 w-full bg-white rounded-md shadow-lg overflow-hidden">
           {loading ? (
@@ -157,13 +152,13 @@ const SearchBar = ({
                           />
                         ) : (
                           <div className="h-10 w-10 bg-gray-200 rounded flex items-center justify-center">
-                            <span className="text-xs text-gray-500">Görsel yok</span>
+                            <span className="text-xs text-gray-500">No image</span>
                           </div>
                         )}
                       </div>
                       <div className="ml-3">
                         <p className="text-sm font-medium text-gray-900 line-clamp-1">{product.name}</p>
-                        <p className="text-sm text-primary">{product.price.toLocaleString('tr-TR')} ₺</p>
+                        <p className="text-sm text-primary">{product.price.toLocaleString('en-US')} ₺</p>
                       </div>
                     </div>
                   </Link>
@@ -172,11 +167,10 @@ const SearchBar = ({
             </ul>
           ) : (
             <div className="p-4 text-center text-sm text-gray-500">
-              Sonuç bulunamadı
+              No results found
             </div>
           )}
           
-          {/* Tüm sonuçları göster bağlantısı */}
           {results.length > 0 && (
             <div className="p-2 bg-gray-50 border-t">
               <Link
@@ -184,7 +178,7 @@ const SearchBar = ({
                 className="block text-center text-sm text-primary hover:underline"
                 onClick={() => setShowResults(false)}
               >
-                Tüm sonuçları göster
+                Show all results
               </Link>
             </div>
           )}

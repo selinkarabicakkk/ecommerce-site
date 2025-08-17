@@ -15,21 +15,17 @@ const Pagination = ({
   onPageChange,
   showSummary = false,
 }: PaginationProps) => {
-  // Sayfa numaralarını hesapla (her zaman 1 ve son sayfa görünür, aralarda '...' kullanılır)
   const pageNumbers = useMemo(() => {
     const pages: (number | string)[] = [];
     if (totalPages <= 1) return pages;
 
-    // Küçük aralıklarda tüm sayfaları göster
     if (totalPages <= 7) {
       for (let i = 1; i <= totalPages; i++) pages.push(i);
       return pages;
     }
 
-    // Her zaman ilk sayfa
     pages.push(1);
 
-    // Baş taraf (aktif sayfa 4 ve altı ise 2-5'i göster)
     if (currentPage <= 4) {
       pages.push(2, 3, 4, 5);
       pages.push('...');
@@ -37,14 +33,12 @@ const Pagination = ({
       return pages;
     }
 
-    // Son taraf (aktif sayfa sondan 3 içinde ise sondan 4 sayfayı göster)
     if (currentPage >= totalPages - 3) {
       pages.push('...');
       pages.push(totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
       return pages;
     }
 
-    // Orta kısım (her iki yanda ... ve aktif sayfanın komşuları)
     pages.push('...');
     pages.push(currentPage - 1, currentPage, currentPage + 1);
     pages.push('...');
@@ -66,7 +60,7 @@ const Pagination = ({
       )}
       
       <ul className="flex items-center -space-x-px rounded-md shadow-sm overflow-hidden border border-[rgb(var(--input))] bg-white">
-        {/* Önceki sayfa butonu */}
+        {/* Previous button */}
         <li>
           <button
             onClick={() => onPageChange(Math.max(1, currentPage - 1))}
@@ -77,7 +71,7 @@ const Pagination = ({
                 : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
             }`}
           >
-            <span className="sr-only">Önceki</span>
+            <span className="sr-only">Previous</span>
             <svg
               className="w-5 h-5"
               fill="none"
@@ -95,7 +89,7 @@ const Pagination = ({
           </button>
         </li>
         
-        {/* Sayfa numaraları */}
+        {/* Page numbers */}
         {pageNumbers.map((page, index) => (
           <li key={index}>
             {page === '...' ? (
@@ -117,7 +111,7 @@ const Pagination = ({
           </li>
         ))}
         
-        {/* Sonraki sayfa butonu */}
+        {/* Next button */}
         <li>
           <button
             onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
@@ -128,7 +122,7 @@ const Pagination = ({
                 : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
             }`}
           >
-            <span className="sr-only">Sonraki</span>
+            <span className="sr-only">Next</span>
             <svg
               className="w-5 h-5"
               fill="none"

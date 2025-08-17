@@ -68,7 +68,7 @@ const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) => {
               />
             ) : (
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-gray-500">Görsel yok</span>
+                <span className="text-gray-500">No image</span>
               </div>
             )}
           </Link>
@@ -126,11 +126,11 @@ const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) => {
           <div className="flex items-center justify-between mt-2">
             <div className="flex items-baseline gap-2">
               <p className="text-lg font-bold text-[rgb(var(--primary))]">
-                {product.price.toLocaleString('tr-TR')} ₺
+                {product.price.toLocaleString('en-US')} ₺
               </p>
               {product.discount > 0 && (
                 <span className="text-sm text-gray-500 line-through">
-                  {Math.round(product.price / (1 - product.discount / 100)).toLocaleString('tr-TR')} ₺
+                  {Math.round(product.price / (1 - product.discount / 100)).toLocaleString('en-US')} ₺
                 </span>
               )}
             </div>
@@ -140,7 +140,7 @@ const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) => {
               disabled={product.stock <= 0}
               size="sm"
             >
-              {product.stock > 0 ? 'Sepete Ekle' : 'Stokta Yok'}
+              {product.stock > 0 ? 'Add to Cart' : 'Out of Stock'}
             </Button>
           </div>
         </div>
@@ -163,19 +163,19 @@ const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) => {
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-gray-500">Görsel yok</span>
+              <span className="text-gray-500">No image</span>
             </div>
           )}
           
           <div className="absolute inset-x-0 top-0 p-2 flex justify-between items-start">
             {product.isFeatured && (
               <span className="bg-[rgb(var(--primary))] text-white text-[11px] px-2 py-0.5 rounded-full shadow-sm">
-                Öne Çıkan
+                Featured
               </span>
             )}
             {product.discount > 0 && (
               <span className="bg-[rgb(var(--destructive))] text-white text-[11px] px-2 py-0.5 rounded-full shadow-sm ml-auto">
-                %{product.discount} İndirim
+                %{product.discount} Off
               </span>
             )}
           </div>
@@ -214,21 +214,21 @@ const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) => {
           </div>
           
           {product.stock <= 5 && product.stock > 0 && (
-            <span className="ml-auto text-xs text-orange-500">Son {product.stock} ürün</span>
+            <span className="ml-auto text-xs text-orange-500">Only {product.stock} left</span>
           )}
           {product.stock <= 0 && (
-            <span className="ml-auto text-xs text-red-500">Stokta yok</span>
+            <span className="ml-auto text-xs text-red-500">Out of stock</span>
           )}
         </div>
         
         <div className="flex items-center justify-between mt-3">
           <div>
             <p className="text-lg font-bold text-[rgb(var(--primary))]">
-              {product.price.toLocaleString('tr-TR')} ₺
+              {product.price.toLocaleString('en-US')} ₺
             </p>
             {product.discount > 0 && (
               <p className="text-sm text-gray-500 line-through">
-                {Math.round(product.price / (1 - product.discount / 100)).toLocaleString('tr-TR')} ₺
+                {Math.round(product.price / (1 - product.discount / 100)).toLocaleString('en-US')} ₺
               </p>
             )}
           </div>
@@ -245,9 +245,9 @@ const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) => {
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
-                Sepete Ekle
+                Add to Cart
               </span>
-            ) : 'Stokta Yok'}
+            ) : 'Out of Stock'}
           </Button>
         </div>
       </div>
