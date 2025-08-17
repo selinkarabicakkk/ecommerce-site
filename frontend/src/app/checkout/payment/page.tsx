@@ -7,8 +7,7 @@ import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/Button';
 import { useAppDispatch, useAppSelector } from '@/store';
 import { clearCart } from '@/store/slices/cartSlice';
-import { orderService } from '@/services';
-import useProductTracking from '@/hooks/useProductTracking';
+import { orderService, activityService } from '@/services';
 
 interface PaymentFormData {
   cardNumber: string;
@@ -20,7 +19,6 @@ interface PaymentFormData {
 export default function CheckoutPaymentPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { trackProductActivity } = useProductTracking();
   
   const { user, isAuthenticated, loading: authLoading } = useAppSelector((state) => state.auth);
   const { items, totalPrice, loading: cartLoading } = useAppSelector((state) => state.cart);
@@ -36,7 +34,6 @@ export default function CheckoutPaymentPage() {
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [orderDetails, setOrderDetails] = useState<any>(null);
 
-  // Ödeme sayfası yüklendiğinde sipariş detaylarını kontrol et
   useEffect(() => {
     if (!authLoading) {
       if (!isAuthenticated) {
@@ -44,7 +41,6 @@ export default function CheckoutPaymentPage() {
       } else if (!cartLoading && items.length === 0) {
         router.push('/cart');
       } else {
-        // Sepet ve teslimat bilgilerini localStorage'dan al
         const shippingInfo = localStorage.getItem('shippingInfo');
         if (!shippingInfo) {
           router.push('/checkout/shipping');
@@ -55,8 +51,8 @@ export default function CheckoutPaymentPage() {
               items,
               totalPrice,
               shipping: parsedShippingInfo,
-              taxPrice: totalPrice * 0.18, // %18 KDV
-              shippingPrice: totalPrice > 500 ? 0 : 29.99, // 500 TL üzeri kargo bedava
+              taxPrice: totalPrice * 0.18,
+              shippingPrice: totalPrice > 500 ? 0 : 29.99,
             });
           } catch (error) {
             console.error('Error while loading shipping info:', error);
@@ -67,86 +63,43 @@ export default function CheckoutPaymentPage() {
     }
   }, [authLoading, isAuthenticated, cartLoading, items, totalPrice, router]);
 
-  // Form değişikliklerini izle
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    
-    // Kart numarası formatlaması
     if (name === 'cardNumber') {
-      // Sadece rakamları al
       const cleaned = value.replace(/\D/g, '');
-      // 16 karakterle sınırla
       const limited = cleaned.substring(0, 16);
-      // Her 4 rakamdan sonra boşluk ekle
       const formatted = limited.replace(/(\d{4})(?=\d)/g, '$1 ');
-      
-      setFormData((prev) => ({
-        ...prev,
-        [name]: formatted,
-      }));
-    }
-    // Son kullanma tarihi formatlaması
-    else if (name === 'expiryDate') {
-      // Sadece rakamları al
+      setFormData((prev) => ({ ...prev, [name]: formatted }));
+    } else if (name === 'expiryDate') {
       const cleaned = value.replace(/\D/g, '');
-      // 4 karakterle sınırla
       const limited = cleaned.substring(0, 4);
-      
-      // Ay ve yıl formatı (MM/YY)
       let formatted = limited;
       if (limited.length > 2) {
         formatted = `${limited.substring(0, 2)}/${limited.substring(2)}`;
       }
-      
-      setFormData((prev) => ({
-        ...prev,
-        [name]: formatted,
-      }));
-    }
-    // CVV formatlaması
-    else if (name === 'cvv') {
-      // Sadece rakamları al ve 3 karakterle sınırla
+      setFormData((prev) => ({ ...prev, [name]: formatted }));
+    } else if (name === 'cvv') {
       const formatted = value.replace(/\D/g, '').substring(0, 3);
-      
-      setFormData((prev) => ({
-        ...prev,
-        [name]: formatted,
-      }));
+      setFormData((prev) => ({ ...prev, [name]: formatted }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
-    // Diğer alanlar
-    else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
-    }
-    
-    // Hata mesajını temizle
+
     if (errors[name as keyof PaymentFormData]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: undefined,
-      }));
+      setErrors((prev) => ({ ...prev, [name]: undefined }));
     }
   };
 
-  // Form doğrulama
   const validateForm = (): boolean => {
     const newErrors: Partial<PaymentFormData> = {};
-    
-    // Kart numarası kontrolü
     if (!formData.cardNumber.trim()) {
       newErrors.cardNumber = 'Card number is required';
     } else if (formData.cardNumber.replace(/\s/g, '').length !== 16) {
       newErrors.cardNumber = 'Card number must be 16 digits';
     }
-    
-    // Kart sahibi kontrolü
     if (!formData.cardName.trim()) {
       newErrors.cardName = 'Cardholder name is required';
     }
-    
-    // Son kullanma tarihi kontrolü
     if (!formData.expiryDate.trim()) {
       newErrors.expiryDate = 'Expiry date is required';
     } else if (!/^\d{2}\/\d{2}$/.test(formData.expiryDate)) {
@@ -154,98 +107,74 @@ export default function CheckoutPaymentPage() {
     } else {
       const [month, year] = formData.expiryDate.split('/').map(Number);
       const currentDate = new Date();
-      const currentYear = currentDate.getFullYear() % 100; // Son iki hane
+      const currentYear = currentDate.getFullYear() % 100;
       const currentMonth = currentDate.getMonth() + 1;
-      
       if (month < 1 || month > 12) {
         newErrors.expiryDate = 'Invalid month';
-      } else if (
-        (year < currentYear) || 
-        (year === currentYear && month < currentMonth)
-      ) {
+      } else if ((year < currentYear) || (year === currentYear && month < currentMonth)) {
         newErrors.expiryDate = 'Your card has expired';
       }
     }
-    
-    // CVV kontrolü
     if (!formData.cvv.trim()) {
       newErrors.cvv = 'CVV is required';
     } else if (formData.cvv.length !== 3) {
       newErrors.cvv = 'CVV must be 3 digits';
     }
-    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // Ödeme işlemi
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!validateForm()) {
-      return;
-    }
-    
+    if (!validateForm()) return;
     setIsProcessing(true);
     setPaymentError(null);
-    
     try {
-      if (!orderDetails) {
-        throw new Error('Order details not found');
-      }
-      
-      // Ödeme işlemi simülasyonu
+      if (!orderDetails) throw new Error('Order details not found');
       await new Promise((resolve) => setTimeout(resolve, 1500));
-      
-      // Sipariş oluştur
-      const orderData = {
-        orderItems: orderDetails.items.map((item: any) => ({
-          product: item.product._id,
-          quantity: item.quantity,
-          price: item.product.price,
-        })),
-        shippingAddress: {
-          street: orderDetails.shipping.street,
-          city: orderDetails.shipping.city,
-          state: orderDetails.shipping.state,
-          zipCode: orderDetails.shipping.zipCode,
-          country: orderDetails.shipping.country,
-        },
-        billingAddress: {
-          street: orderDetails.shipping.street,
-          city: orderDetails.shipping.city,
-          state: orderDetails.shipping.state,
-          zipCode: orderDetails.shipping.zipCode,
-          country: orderDetails.shipping.country,
-        },
-        paymentMethod: 'Credit Card',
-        paymentResult: {
-          id: `PAY-${Math.random().toString(36).substring(2, 15)}`,
-          status: 'completed',
-          updateTime: new Date().toISOString(),
-        },
-        taxPrice: orderDetails.taxPrice,
-        shippingPrice: orderDetails.shippingPrice,
-        totalPrice: orderDetails.totalPrice + orderDetails.taxPrice + orderDetails.shippingPrice,
-        isPaid: true,
-        paidAt: new Date().toISOString(),
+
+      const orderItems = orderDetails.items.map((item: any) => ({
+        product: item.product._id as string,
+        quantity: item.quantity as number,
+        ...(item.variantOptions ? { variantOptions: item.variantOptions as Record<string, string> } : {}),
+      }));
+
+      const shippingAddress = {
+        type: 'shipping' as const,
+        street: orderDetails.shipping.street as string,
+        city: orderDetails.shipping.city as string,
+        state: orderDetails.shipping.state as string,
+        zipCode: orderDetails.shipping.zipCode as string,
+        country: orderDetails.shipping.country as string,
+        isDefault: true,
       };
-      
-      const response = await orderService.createOrder(orderData);
-      
-      // Ürünleri satın alma olarak izle
-      orderDetails.items.forEach((item: any) => {
-        trackProductActivity(item.product._id, 'purchase');
+
+      const createRes = await orderService.createOrder({
+        orderItems,
+        shippingAddress,
+        paymentMethod: 'Credit Card',
       });
-      
-      // Sepeti temizle
+
+      const createdOrderId = createRes?.data?._id;
+      if (!createdOrderId) {
+        throw new Error(createRes?.message || 'Failed to create order');
+      }
+
+      await orderService.updateOrderToPaid(createdOrderId, {
+        id: `PAY-${Math.random().toString(36).substring(2, 15)}`,
+        status: 'completed',
+        updateTime: new Date().toISOString(),
+      });
+
+      await Promise.all(
+        orderDetails.items.map((item: any) =>
+          activityService.logActivity({ productId: item.product._id, activityType: 'purchase' })
+        )
+      );
+
       dispatch(clearCart());
-      
-      // Teslimat bilgilerini temizle
       localStorage.removeItem('shippingInfo');
-      
-      // Başarı sayfasına yönlendir
-      router.push(`/checkout/success?orderId=${response.data._id}`);
+      router.push(`/checkout/success?orderId=${createdOrderId}`);
     } catch (error: any) {
       console.error('Error during payment:', error);
       setPaymentError(error.message || 'An error occurred during payment');
@@ -254,14 +183,11 @@ export default function CheckoutPaymentPage() {
     }
   };
 
-  // Toplam fiyat hesapla
   const calculateTotal = () => {
     if (!orderDetails) return 0;
-    
     return orderDetails.totalPrice + orderDetails.taxPrice + orderDetails.shippingPrice;
   };
 
-  // Yükleniyor durumu
   if (authLoading || cartLoading || !orderDetails) {
     return (
       <MainLayout>
