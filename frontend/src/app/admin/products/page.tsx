@@ -20,6 +20,7 @@ export default function AdminProductsPage() {
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [bulkLoading, setBulkLoading] = useState(false);
   
@@ -38,6 +39,7 @@ export default function AdminProductsPage() {
       setProducts(list);
       setTotalPages(Math.max(1, Math.ceil(count / 10)));
       setCurrentPage(page);
+      setTotalCount(count);
     } catch (err) {
       setError('Ürünler yüklenirken bir hata oluştu.');
       console.error('Ürünler yüklenirken hata:', err);
@@ -161,15 +163,18 @@ export default function AdminProductsPage() {
 
         {/* Arama ve filtreler */}
         <div className="bg-white rounded-lg shadow-md p-4 mb-6">
-          <form onSubmit={handleSearch} className="flex gap-2">
-            <input
-              type="text"
-              placeholder="Ürün ara..."
-              className="flex-grow px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <Button type="submit">Ara</Button>
+          <form onSubmit={handleSearch} className="flex gap-2 items-center justify-between">
+            <div className="flex gap-2 flex-1">
+              <input
+                type="text"
+                placeholder="Ürün ara..."
+                className="flex-grow px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <Button type="submit">Ara</Button>
+            </div>
+            <span className="text-sm text-gray-500 whitespace-nowrap ml-4">Toplam {totalCount} kayıt</span>
           </form>
         </div>
 

@@ -20,6 +20,7 @@ export default function AdminCategoriesPage() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   
   // Kategorileri getir
@@ -35,6 +36,7 @@ export default function AdminCategoriesPage() {
       setCategories(response.categories || response.data || []);
       const count = response.totalCount ?? response.count ?? (response.categories || response.data || []).length;
       setTotalPages(Math.ceil(count / 10) || 1);
+      setTotalCount(count);
       setCurrentPage(page);
     } catch (err) {
       setError('Kategoriler yüklenirken bir hata oluştu.');
@@ -142,15 +144,18 @@ export default function AdminCategoriesPage() {
 
         {/* Arama */}
         <div className="bg-white rounded-lg shadow-md p-4 mb-6">
-          <form onSubmit={handleSearch} className="flex gap-2">
-            <input
-              type="text"
-              placeholder="Kategori ara..."
-              className="flex-grow px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <Button type="submit">Ara</Button>
+          <form onSubmit={handleSearch} className="flex gap-2 items-center justify-between">
+            <div className="flex gap-2 flex-1">
+              <input
+                type="text"
+                placeholder="Kategori ara..."
+                className="flex-grow px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <Button type="submit">Ara</Button>
+            </div>
+            <span className="text-sm text-gray-500 whitespace-nowrap ml-4">Toplam {totalCount} kayıt</span>
           </form>
         </div>
 
