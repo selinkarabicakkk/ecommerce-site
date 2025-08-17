@@ -1,7 +1,6 @@
 import dotenv from 'dotenv';
 import connectDB from '../config/db';
 import { User } from '../models';
-import { hashPassword } from '../utils/passwordUtils';
 
 dotenv.config();
 
@@ -13,10 +12,9 @@ async function ensureAdmin() {
 
   const existing = await User.findOne({ email });
   if (!existing) {
-    const password = await hashPassword(plainPassword);
     await User.create({
       email,
-      password,
+      password: plainPassword,
       role: 'admin',
       firstName: 'Admin',
       lastName: 'User',
@@ -24,7 +22,7 @@ async function ensureAdmin() {
     });
     console.log(`Admin created: ${email}`);
   } else {
-    existing.password = await hashPassword(plainPassword);
+    existing.password = plainPassword;
     existing.role = 'admin';
     existing.isEmailVerified = true;
     await existing.save();

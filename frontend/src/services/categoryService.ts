@@ -8,20 +8,20 @@ export const categoryService = {
       console.log('Fetching categories with params:', params);
       const response = await api.get<ApiResponse<Category[]>>('/categories', { params });
       console.log('Categories response:', response.data);
-      
-      // Backend'in döndürdüğü yanıt formatını frontend'in beklediği formata dönüştür
-      if (response.data && response.data.categories) {
-        return {
-          success: response.data.success,
-          message: response.data.message || '',
-          data: response.data.categories
-        };
+
+      // Backend yanıtı: { success, count, categories }
+      // Bazı durumlarda { success, data: [...], count } da olabilir
+      const raw: any = response.data;
+      if (raw) {
+        const categories = raw.categories || raw.data || [];
+        const totalCount = raw.count ?? categories.length;
+        return { success: Boolean(raw.success), categories, totalCount } as unknown as ApiResponse<Category[]> & { categories: Category[]; totalCount: number };
       }
-      
-      return response.data;
+
+      return { success: false, categories: [], totalCount: 0 } as any;
     } catch (error) {
       console.error('Error fetching categories:', error);
-      return { success: false, message: 'Kategoriler yüklenirken hata oluştu', data: [] };
+      return { success: false, categories: [], totalCount: 0 } as any;
     }
   },
 
