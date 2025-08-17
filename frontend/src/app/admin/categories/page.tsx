@@ -20,7 +20,9 @@ export default function AdminCategoriesPage() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
   
   // Kategorileri getir
   const fetchCategories = async (page = 1, search = '') => {
@@ -30,11 +32,13 @@ export default function AdminCategoriesPage() {
         page,
         limit: 10,
         search,
+        isActive: statusFilter === 'all' ? 'all' : statusFilter === 'active' ? 'true' : 'false',
       });
 
       setCategories(response.categories || response.data || []);
       const count = response.totalCount ?? response.count ?? (response.categories || response.data || []).length;
       setTotalPages(Math.ceil(count / 10) || 1);
+      setTotalCount(count);
       setCurrentPage(page);
     } catch (err) {
       setError('Kategoriler yüklenirken bir hata oluştu.');
@@ -142,15 +146,28 @@ export default function AdminCategoriesPage() {
 
         {/* Arama */}
         <div className="bg-white rounded-lg shadow-md p-4 mb-6">
-          <form onSubmit={handleSearch} className="flex gap-2">
-            <input
-              type="text"
-              placeholder="Kategori ara..."
-              className="flex-grow px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <Button type="submit">Ara</Button>
+          <form onSubmit={handleSearch} className="flex gap-3 items-center justify-between">
+            <div className="flex gap-2 flex-1">
+              <input
+                type="text"
+                placeholder="Kategori ara..."
+                className="flex-grow px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value as any)}
+                className="px-3 py-2 border rounded-md text-sm"
+                aria-label="Durum filtresi"
+              >
+                <option value="all">Hepsi</option>
+                <option value="active">Aktif</option>
+                <option value="inactive">Pasif</option>
+              </select>
+              <Button type="submit">Ara</Button>
+            </div>
+            <span className="text-sm text-gray-500 whitespace-nowrap ml-4">Toplam {totalCount} kayıt</span>
           </form>
         </div>
 
@@ -242,7 +259,7 @@ export default function AdminCategoriesPage() {
                         {category.slug}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {category.productCount || 0}
+                        {(category as any).productCount ?? 0}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div className="flex justify-end space-x-2">

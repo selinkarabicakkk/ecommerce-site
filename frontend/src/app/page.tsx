@@ -7,7 +7,7 @@ import { getAssetUrl } from '@/lib/utils';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/Button';
 import RecommendedProducts from '@/components/product/RecommendedProducts';
-import { categoryService, productService, emailService } from '@/services';
+import { categoryService, productService, emailService, activityService } from '@/services';
 import { Category, Product } from '@/types';
 
 export default function Home() {
@@ -47,26 +47,18 @@ export default function Home() {
           setFeaturedCategories([]);
         }
         
-        // Öne çıkan ürünleri getir
-        const productsResponse = await productService.getFeaturedProducts(4);
+        // Öne çıkan ürünler: popüler (ziyaret) verisine bağla, boşsa yeni gelenlere düş
+        const popularResp = await activityService.getPopularProducts(4);
         
-        console.log('Products response in page:', productsResponse);
+        console.log('Popular products response in page:', popularResp);
         
-        if (productsResponse.success) {
-          console.log('Products data type:', typeof productsResponse.data);
-          if (productsResponse.products) {
-            console.log('Found products in response:', productsResponse.products);
-            setFeaturedProducts(productsResponse.products);
-          } else if (productsResponse.data) {
-            console.log('Found data in response:', productsResponse.data);
-            setFeaturedProducts(Array.isArray(productsResponse.data) ? productsResponse.data : []);
-          } else {
-            console.warn('Products data is not in expected format:', productsResponse);
-            setFeaturedProducts([]);
-          }
+        let popular = (popularResp as any)?.data || (popularResp as any)?.products || [];
+        if (!popular || popular.length === 0) {
+          const newResp = await productService.getNewArrivals(4);
+          const fallback = (newResp as any)?.data || (newResp as any)?.products || [];
+          setFeaturedProducts(fallback);
         } else {
-          console.warn('Products request was not successful:', productsResponse);
-          setFeaturedProducts([]);
+          setFeaturedProducts(popular);
         }
       } catch (error) {
         console.error('Ana sayfa verileri yüklenirken hata oluştu:', error);

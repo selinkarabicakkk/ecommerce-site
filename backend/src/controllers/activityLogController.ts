@@ -85,7 +85,7 @@ export const getPopularProducts = async (
 
     // Get product details
     const productIds = popularProducts.map((item) => item._id);
-    const products = await Product.find({ _id: { $in: productIds } }).populate(
+    const products = await Product.find({ _id: { $in: productIds }, isActive: true }).populate(
       'category',
       'name slug'
     );

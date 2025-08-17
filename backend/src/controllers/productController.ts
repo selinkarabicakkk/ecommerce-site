@@ -386,7 +386,7 @@ export const bulkUpdateProducts = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { items } = req.body as { items: Array<{ id: string; isActive?: boolean; isFeatured?: boolean }> };
+    const { items } = req.body as { items: Array<{ id: string; isActive?: boolean; isFeatured?: boolean; category?: string }> };
     if (!items || items.length === 0) {
       throw new BadRequestError('No items provided');
     }
@@ -397,6 +397,7 @@ export const bulkUpdateProducts = async (
         update: {
           ...(it.isActive !== undefined ? { isActive: it.isActive } : {}),
           ...(it.isFeatured !== undefined ? { isFeatured: it.isFeatured } : {}),
+          ...(it.category ? { category: it.category } : {}),
         },
       },
     }));
@@ -448,7 +449,7 @@ export const getFeaturedProducts = async (
   try {
     const limit = Number(req.query.limit) || 8;
     
-    const products = await Product.find({ isFeatured: true })
+    const products = await Product.find({ isFeatured: true, isActive: true })
       .sort({ createdAt: -1 })
       .limit(limit)
       .populate('category', 'name slug');

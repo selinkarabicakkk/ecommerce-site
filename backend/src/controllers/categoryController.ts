@@ -13,11 +13,33 @@ export const getCategories = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const categories = await Category.find({ isActive: true }).sort({ sortOrder: 1 });
+    const search = (req.query.search as string) || (req.query.q as string) || '';
+    const page = Math.max(1, Number(req.query.page) || 1);
+    const limit = Math.max(1, Math.min(100, Number(req.query.limit) || 10));
+
+    const filter: any = { isActive: true };
+    const isActiveParam = (req.query.isActive as string) || '';
+    if (isActiveParam === 'false') {
+      filter.isActive = false;
+    } else if (isActiveParam === 'all') {
+      delete filter.isActive; // Hepsi
+    }
+    if (search) {
+      const regex = new RegExp(search, 'i');
+      filter.$or = [{ name: regex }, { slug: regex }, { description: regex }];
+    }
+
+    const count = await Category.countDocuments(filter);
+    const categories = await Category.find(filter)
+      .sort({ sortOrder: 1, name: 1 })
+      .limit(limit)
+      .skip(limit * (page - 1));
 
     res.status(200).json({
       success: true,
-      count: categories.length,
+      count,
+      page,
+      pages: Math.ceil(count / limit) || 1,
       categories,
     });
   } catch (error) {

@@ -18,8 +18,9 @@ export default function CategoriesPage() {
     const fetchCategories = async () => {
       setLoading(true);
       try {
-        const response = await categoryService.getCategories();
-        setCategories(response.data || []);
+        const response = await categoryService.getCategories({ limit: 100 });
+        const list = (response as any)?.categories || (response as any)?.data || [];
+        setCategories(list);
       } catch (error) {
         console.error('Kategoriler yüklenirken hata oluştu:', error);
         setError('Kategoriler yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
