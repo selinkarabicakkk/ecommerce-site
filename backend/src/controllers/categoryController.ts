@@ -18,6 +18,12 @@ export const getCategories = async (
     const limit = Math.max(1, Math.min(100, Number(req.query.limit) || 10));
 
     const filter: any = { isActive: true };
+    const isActiveParam = (req.query.isActive as string) || '';
+    if (isActiveParam === 'false') {
+      filter.isActive = false;
+    } else if (isActiveParam === 'all') {
+      delete filter.isActive; // Hepsi
+    }
     if (search) {
       const regex = new RegExp(search, 'i');
       filter.$or = [{ name: regex }, { slug: regex }, { description: regex }];

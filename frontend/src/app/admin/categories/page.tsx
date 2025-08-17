@@ -22,6 +22,7 @@ export default function AdminCategoriesPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
   
   // Kategorileri getir
   const fetchCategories = async (page = 1, search = '') => {
@@ -31,6 +32,7 @@ export default function AdminCategoriesPage() {
         page,
         limit: 10,
         search,
+        isActive: statusFilter === 'all' ? 'all' : statusFilter === 'active' ? 'true' : 'false',
       });
 
       setCategories(response.categories || response.data || []);
@@ -144,7 +146,7 @@ export default function AdminCategoriesPage() {
 
         {/* Arama */}
         <div className="bg-white rounded-lg shadow-md p-4 mb-6">
-          <form onSubmit={handleSearch} className="flex gap-2 items-center justify-between">
+          <form onSubmit={handleSearch} className="flex gap-3 items-center justify-between">
             <div className="flex gap-2 flex-1">
               <input
                 type="text"
@@ -153,6 +155,16 @@ export default function AdminCategoriesPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value as any)}
+                className="px-3 py-2 border rounded-md text-sm"
+                aria-label="Durum filtresi"
+              >
+                <option value="all">Hepsi</option>
+                <option value="active">Aktif</option>
+                <option value="inactive">Pasif</option>
+              </select>
               <Button type="submit">Ara</Button>
             </div>
             <span className="text-sm text-gray-500 whitespace-nowrap ml-4">Toplam {totalCount} kayıt</span>

@@ -22,6 +22,8 @@ export default function AdminProductsPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
+  const [stockFilter, setStockFilter] = useState<'all' | 'in-stock' | 'out-of-stock'>('all');
+  const [featuredFilter, setFeaturedFilter] = useState<'all' | 'featured' | 'normal'>('all');
   const [bulkLoading, setBulkLoading] = useState(false);
   
   // Ürünleri getir
@@ -32,6 +34,7 @@ export default function AdminProductsPage() {
         page,
         limit: 10,
         search,
+        featured: featuredFilter === 'featured' ? true : featuredFilter === 'normal' ? false : undefined,
       });
       
       const list = (response as any)?.products || (response as any)?.data || [];
@@ -163,7 +166,7 @@ export default function AdminProductsPage() {
 
         {/* Arama ve filtreler */}
         <div className="bg-white rounded-lg shadow-md p-4 mb-6">
-          <form onSubmit={handleSearch} className="flex gap-2 items-center justify-between">
+          <form onSubmit={handleSearch} className="flex gap-3 items-center justify-between">
             <div className="flex gap-2 flex-1">
               <input
                 type="text"
@@ -172,6 +175,26 @@ export default function AdminProductsPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
+              <select
+                value={featuredFilter}
+                onChange={(e) => setFeaturedFilter(e.target.value as any)}
+                className="px-3 py-2 border rounded-md text-sm"
+                aria-label="Öne çıkan filtresi"
+              >
+                <option value="all">Hepsi</option>
+                <option value="featured">Öne Çıkan</option>
+                <option value="normal">Normal</option>
+              </select>
+              <select
+                value={stockFilter}
+                onChange={(e) => setStockFilter(e.target.value as any)}
+                className="px-3 py-2 border rounded-md text-sm"
+                aria-label="Stok filtresi"
+              >
+                <option value="all">Tüm Stoklar</option>
+                <option value="in-stock">Stokta</option>
+                <option value="out-of-stock">Tükendi</option>
+              </select>
               <Button type="submit">Ara</Button>
             </div>
             <span className="text-sm text-gray-500 whitespace-nowrap ml-4">Toplam {totalCount} kayıt</span>
