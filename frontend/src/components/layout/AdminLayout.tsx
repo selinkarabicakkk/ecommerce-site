@@ -115,7 +115,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
           <div className="flex flex-col h-0 flex-1">
             <div className="flex items-center h-16 flex-shrink-0 px-4 bg-white border-b">
               <Link href="/" className="text-xl font-bold text-primary">
-                E-Ticaret Admin
+                <span className="text-[rgb(var(--primary))]">E-Ticaret Admin</span>
               </Link>
             </div>
             <div className="flex-1 flex flex-col overflow-y-auto bg-white">
@@ -126,7 +126,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
                     href={item.href}
                     className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
                       pathname === item.href
-                        ? 'bg-primary text-white'
+                        ? 'bg-[rgb(var(--primary))] text-white'
                         : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                     }`}
                   >

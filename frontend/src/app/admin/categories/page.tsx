@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { useAppSelector } from '@/store';
 import { categoryService } from '@/services';
 import { Category } from '@/types';
+import { getAssetUrl } from '@/lib/utils';
 
 export default function AdminCategoriesPage() {
   const router = useRouter();
@@ -25,14 +26,15 @@ export default function AdminCategoriesPage() {
   const fetchCategories = async (page = 1, search = '') => {
     setIsLoading(true);
     try {
-      const response = await categoryService.getCategories({
+      const response: any = await categoryService.getCategories({
         page,
         limit: 10,
         search,
       });
-      
-      setCategories(response.categories || []);
-      setTotalPages(Math.ceil(response.totalCount / 10) || 1);
+
+      setCategories(response.categories || response.data || []);
+      const count = response.totalCount ?? response.count ?? (response.categories || response.data || []).length;
+      setTotalPages(Math.ceil(count / 10) || 1);
       setCurrentPage(page);
     } catch (err) {
       setError('Kategoriler yüklenirken bir hata oluştu.');
@@ -227,7 +229,7 @@ export default function AdminCategoriesPage() {
                           {category.image && (
                             <div className="h-10 w-10 bg-gray-200 rounded-md mr-3">
                               <img
-                                src={`/uploads/${category.image}`}
+                                src={getAssetUrl(category.image)}
                                 alt={category.name}
                                 className="h-10 w-10 object-cover rounded-md"
                               />

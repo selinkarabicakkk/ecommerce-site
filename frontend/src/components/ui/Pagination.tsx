@@ -15,39 +15,41 @@ const Pagination = ({
   onPageChange,
   showSummary = false,
 }: PaginationProps) => {
-  // Sayfa numaralarını hesapla
+  // Sayfa numaralarını hesapla (her zaman 1 ve son sayfa görünür, aralarda '...' kullanılır)
   const pageNumbers = useMemo(() => {
-    const pages = [];
-    
-    // Her zaman ilk sayfayı göster
-    if (currentPage > 3) {
-      pages.push(1);
+    const pages: (number | string)[] = [];
+    if (totalPages <= 1) return pages;
+
+    // Küçük aralıklarda tüm sayfaları göster
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+      return pages;
     }
-    
-    // Eğer aktif sayfa 4 veya daha büyükse, öncesinde "..." göster
-    if (currentPage > 4) {
+
+    // Her zaman ilk sayfa
+    pages.push(1);
+
+    // Baş taraf (aktif sayfa 4 ve altı ise 2-5'i göster)
+    if (currentPage <= 4) {
+      pages.push(2, 3, 4, 5);
       pages.push('...');
-    }
-    
-    // Aktif sayfanın etrafındaki sayfaları göster
-    for (
-      let i = Math.max(2, currentPage - 1);
-      i <= Math.min(totalPages - 1, currentPage + 1);
-      i++
-    ) {
-      pages.push(i);
-    }
-    
-    // Eğer aktif sayfa son sayfadan 3 veya daha fazla küçükse, sonrasında "..." göster
-    if (currentPage < totalPages - 3) {
-      pages.push('...');
-    }
-    
-    // Her zaman son sayfayı göster
-    if (currentPage < totalPages - 1 && totalPages > 1) {
       pages.push(totalPages);
+      return pages;
     }
-    
+
+    // Son taraf (aktif sayfa sondan 3 içinde ise sondan 4 sayfayı göster)
+    if (currentPage >= totalPages - 3) {
+      pages.push('...');
+      pages.push(totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+      return pages;
+    }
+
+    // Orta kısım (her iki yanda ... ve aktif sayfanın komşuları)
+    pages.push('...');
+    pages.push(currentPage - 1, currentPage, currentPage + 1);
+    pages.push('...');
+    pages.push(totalPages);
+
     return pages;
   }, [currentPage, totalPages]);
 
