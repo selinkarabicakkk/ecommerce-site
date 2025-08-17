@@ -44,14 +44,14 @@ export default function CartPage() {
 
   // Ürünü sepetten kaldır
   const handleRemoveItem = (itemId: string) => {
-    if (window.confirm('Are you sure you want to remove this item from the cart?')) {
+    if (window.confirm('Bu ürünü sepetten kaldırmak istediğinize emin misiniz?')) {
       dispatch(removeCartItem(itemId));
     }
   };
 
   // Sepeti temizle
   const handleClearCart = () => {
-    if (window.confirm('Are you sure you want to clear your cart?')) {
+    if (window.confirm('Sepetinizi tamamen temizlemek istediğinize emin misiniz?')) {
       dispatch(clearCart());
     }
   };
@@ -72,7 +72,7 @@ export default function CartPage() {
     return (
       <MainLayout>
         <div className="container mx-auto px-4 py-8">
-          <h1 className="text-3xl font-bold mb-6">Shopping Cart</h1>
+          <h1 className="text-3xl font-bold mb-6">Alışveriş Sepeti</h1>
           <div className="bg-white rounded-lg shadow-md p-6 text-center">
             <div className="mb-6">
               <svg
@@ -90,12 +90,12 @@ export default function CartPage() {
                 />
               </svg>
             </div>
-            <h2 className="text-lg font-medium text-gray-900 mb-2">Your cart is empty</h2>
+            <h2 className="text-lg font-medium text-gray-900 mb-2">Sepetiniz boş</h2>
             <p className="text-gray-500 mb-6">
-              You have not added any items yet. Start exploring products to add to your cart.
+              Henüz sepetinize ürün eklemediniz. Alışverişe başlamak için ürünleri keşfedin.
             </p>
             <Link href="/products">
-              <Button>Start Shopping</Button>
+              <Button>Alışverişe Başla</Button>
             </Link>
           </div>
         </div>
@@ -106,7 +106,7 @@ export default function CartPage() {
   return (
     <MainLayout>
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-6">Shopping Cart</h1>
+        <h1 className="text-3xl font-bold mb-6">Alışveriş Sepeti</h1>
 
         {loading ? (
           <div className="flex justify-center items-center h-64">
@@ -128,28 +128,28 @@ export default function CartPage() {
                         scope="col"
                         className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                       >
-                        Product
+                        Ürün
                       </th>
                       <th
                         scope="col"
                         className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                       >
-                        Price
+                        Fiyat
                       </th>
                       <th
                         scope="col"
                         className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                       >
-                        Quantity
+                        Adet
                       </th>
                       <th
                         scope="col"
                         className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                       >
-                        Total
+                        Toplam
                       </th>
                       <th scope="col" className="relative px-6 py-3">
-                        <span className="sr-only">Actions</span>
+                        <span className="sr-only">İşlemler</span>
                       </th>
                     </tr>
                   </thead>
@@ -173,7 +173,7 @@ export default function CartPage() {
                                   </div>
                                 ) : (
                                   <div className="h-16 w-16 bg-gray-200 rounded flex items-center justify-center">
-                                    <span className="text-gray-500 text-xs">No image</span>
+                                    <span className="text-gray-500 text-xs">Görsel yok</span>
                                   </div>
                                 )}
                               </div>
@@ -197,7 +197,7 @@ export default function CartPage() {
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {item.price.toLocaleString('en-US')} ₺
+                            {item.price.toLocaleString('tr-TR')} ₺
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
@@ -235,7 +235,7 @@ export default function CartPage() {
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {(item.price * item.quantity).toLocaleString('en-US')} ₺
+                            {(item.price * item.quantity).toLocaleString('tr-TR')} ₺
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <button
@@ -267,10 +267,10 @@ export default function CartPage() {
 
               <div className="flex justify-between mt-6">
                 <Link href="/products">
-                  <Button variant="outline">Continue Shopping</Button>
+                  <Button variant="outline">Alışverişe Devam Et</Button>
                 </Link>
                 <Button variant="destructive" onClick={handleClearCart}>
-                  Clear Cart
+                  Sepeti Temizle
                 </Button>
               </div>
             </div>
@@ -278,53 +278,53 @@ export default function CartPage() {
             {/* Sipariş özeti */}
             <div className="lg:w-1/3">
               <div className="bg-white rounded-lg shadow-md p-6">
-                <h2 className="text-lg font-semibold mb-4">Order Summary</h2>
+                <h2 className="text-lg font-semibold mb-4">Sipariş Özeti</h2>
                 <div className="space-y-3 mb-6">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Subtotal</span>
-                    <span className="font-medium">{totalPrice.toLocaleString('en-US')} ₺</span>
+                    <span className="text-gray-600">Ara Toplam</span>
+                    <span className="font-medium">{totalPrice.toLocaleString('tr-TR')} ₺</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">VAT (18%)</span>
+                    <span className="text-gray-600">KDV (%18)</span>
                     <span className="font-medium">
-                      {(totalPrice * 0.18).toLocaleString('en-US')} ₺
+                      {(totalPrice * 0.18).toLocaleString('tr-TR')} ₺
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Shipping</span>
+                    <span className="text-gray-600">Kargo</span>
                     <span className="font-medium">
-                      {totalPrice >= 500 ? 'Free' : '29.90 ₺'}
+                      {totalPrice >= 500 ? 'Ücretsiz' : '29.90 ₺'}
                     </span>
                   </div>
                   <div className="border-t pt-3 mt-3">
                     <div className="flex justify-between">
-                      <span className="text-lg font-semibold">Total</span>
+                      <span className="text-lg font-semibold">Toplam</span>
                       <span className="text-lg font-semibold text-primary">
                         {(
                           totalPrice +
                           totalPrice * 0.18 +
                           (totalPrice >= 500 ? 0 : 29.9)
-                        ).toLocaleString('en-US')}{' '}
+                        ).toLocaleString('tr-TR')}{' '}
                         ₺
                       </span>
                     </div>
                   </div>
                 </div>
                 <Button onClick={handleCheckout} size="lg" className="w-full">
-                  {isAuthenticated ? 'Proceed to Payment' : 'Log In to Checkout'}
+                  {isAuthenticated ? 'Ödemeye Geç' : 'Giriş Yap ve Ödemeye Geç'}
                 </Button>
               </div>
 
               {/* Kupon kodu */}
               <div className="bg-white rounded-lg shadow-md p-6 mt-6">
-                <h3 className="text-md font-semibold mb-3">Coupon Code</h3>
+                <h3 className="text-md font-semibold mb-3">Kupon Kodu</h3>
                 <div className="flex">
                   <input
                     type="text"
-                    placeholder="Your coupon code"
+                    placeholder="Kupon kodunuz"
                     className="flex-grow px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                   />
-                  <Button className="rounded-l-none">Apply</Button>
+                  <Button className="rounded-l-none">Uygula</Button>
                 </div>
               </div>
             </div>

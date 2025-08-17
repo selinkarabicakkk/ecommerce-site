@@ -69,7 +69,7 @@ export default function Home() {
           setFeaturedProducts([]);
         }
       } catch (error) {
-        console.error('Error while loading homepage data:', error);
+        console.error('Ana sayfa verileri yüklenirken hata oluştu:', error);
       } finally {
         setLoading(false);
       }
@@ -85,17 +85,17 @@ export default function Home() {
         <div className="container mx-auto px-4 pt-0 pb-16 md:pb-24 lg:pb-32 flex flex-col md:flex-row items-center">
           <div className="md:w-1/2 md:pr-8">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-[rgb(var(--foreground))]">
-              Your New Shopping Destination
+              Alışverişin Yeni Adresi
             </h1>
             <p className="text-lg md:text-xl mb-8 text-gray-600">
-              Enjoy online shopping with thousands of products, great prices and fast delivery.
+              Binlerce ürün, uygun fiyatlar ve hızlı teslimat ile online alışverişin keyfini çıkarın.
             </p>
             <div className="flex flex-wrap gap-4">
               <Button size="lg">
-                <Link href="/products">Start Shopping</Link>
+                <Link href="/products">Alışverişe Başla</Link>
               </Button>
               <Button variant="outline" size="lg">
-                <Link href="/categories">Explore Categories</Link>
+                <Link href="/categories">Kategorileri Keşfet</Link>
               </Button>
             </div>
           </div>
@@ -117,7 +117,7 @@ export default function Home() {
       {/* Featured Categories */}
       <section className="py-12 md:py-16 bg-gray-50">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-8 text-center">Popular Categories</h2>
+          <h2 className="text-3xl font-bold mb-8 text-center">Popüler Kategoriler</h2>
           
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -167,7 +167,7 @@ export default function Home() {
           <div className="text-center mt-8">
             <Link href="/categories">
               <Button variant="outline" className="border-[rgb(var(--primary))] text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary)/0.05)]">
-                All Categories
+                Tüm Kategoriler
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
@@ -180,7 +180,7 @@ export default function Home() {
       {/* Featured Products */}
       <section className="py-12 md:py-16">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-8 text-center">Featured Products</h2>
+          <h2 className="text-3xl font-bold mb-8 text-center">Öne Çıkan Ürünler</h2>
           
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -222,13 +222,13 @@ export default function Home() {
                       <div className="absolute top-0 left-0 w-full p-2 flex justify-between items-start">
                         {product.isFeatured && (
                           <span className="bg-[rgb(var(--primary))] text-white text-xs px-2 py-1 rounded-sm">
-                            Featured
+                            Öne Çıkan
                           </span>
                         )}
                         
                         {product.discount > 0 && (
                           <span className="bg-[rgb(var(--destructive))] text-white text-xs px-2 py-1 rounded-sm ml-auto">
-                            %{product.discount} Off
+                            %{product.discount} İndirim
                           </span>
                         )}
                       </div>
@@ -273,13 +273,13 @@ export default function Home() {
                       </div>
                       
                       {product.stock <= 5 && product.stock > 0 && (
-                        <span className="ml-auto text-xs text-orange-500">Only {product.stock} left</span>
+                        <span className="ml-auto text-xs text-orange-500">Son {product.stock} ürün</span>
                       )}
                     </div>
                     
                     <div className="flex items-center justify-between mt-3">
                       <p className="text-lg font-bold text-[rgb(var(--primary))]">
-                        {product.price.toLocaleString('en-US')} ₺
+                        {product.price.toLocaleString('tr-TR')} ₺
                       </p>
                       
                       <Button 
@@ -290,7 +290,7 @@ export default function Home() {
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                           </svg>
-                          Add to Cart
+                          Sepete Ekle
                         </span>
                       </Button>
                     </div>
@@ -303,7 +303,7 @@ export default function Home() {
           <div className="text-center mt-8">
             <Link href="/products">
               <Button variant="outline" className="border-[rgb(var(--primary))] text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary)/0.05)]">
-                All Products
+                Tüm Ürünler
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
@@ -317,7 +317,7 @@ export default function Home() {
       <section className="py-12 md:py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <RecommendedProducts 
-            title="Popular Products" 
+            title="Popüler Ürünler" 
             type="popular" 
             limit={4} 
           />
@@ -343,11 +343,11 @@ function NewsletterSection() {
     try {
       await emailService.newsletter(email);
       setStatus('success');
-      setMessage('Subscription successful.');
+      setMessage('Abonelik başarılı.');
       setEmail('');
     } catch (err: any) {
       setStatus('error');
-      setMessage(err?.message || 'An error occurred');
+      setMessage(err?.message || 'Bir hata oluştu');
     }
   };
 
@@ -355,19 +355,19 @@ function NewsletterSection() {
     <section className="py-12 md:py-16">
       <div className="container mx-auto px-4">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-4">Subscribe to our Newsletter</h2>
+          <h2 className="text-3xl font-bold mb-4">Bültenimize Abone Olun</h2>
           <p className="text-lg text-gray-600 mb-8">
-            Stay informed about the latest products, discounts and campaigns by subscribing to our newsletter.
+            En son ürünler, indirimler ve kampanyalardan haberdar olmak için bültenimize abone olun.
           </p>
           <form onSubmit={onSubmit} className="flex flex-col sm:flex-row gap-4">
             <input
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               type="email"
-              placeholder="Your email address"
+              placeholder="E-posta adresiniz"
               className="flex-grow px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             />
-            <Button disabled={status === 'sending'} type="submit">{status === 'sending' ? 'Sending...' : 'Subscribe'}</Button>
+            <Button disabled={status === 'sending'} type="submit">{status === 'sending' ? 'Gönderiliyor...' : 'Abone Ol'}</Button>
           </form>
           {status === 'success' && <p className="text-green-600 mt-3">{message}</p>}
           {status === 'error' && <p className="text-red-600 mt-3">{message}</p>}

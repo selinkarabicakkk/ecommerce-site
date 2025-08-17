@@ -61,7 +61,7 @@ export default function WishlistPage() {
 
   // İstek listesini temizle
   const handleClearWishlist = async () => {
-    if (window.confirm('Are you sure you want to clear your wishlist?')) {
+    if (window.confirm('İstek listenizi temizlemek istediğinize emin misiniz?')) {
       setIsClearingWishlist(true);
       try {
         await dispatch(clearWishlist()).unwrap();
@@ -87,7 +87,7 @@ export default function WishlistPage() {
   return (
     <MainLayout>
       <div className="container mx-auto py-8 px-4">
-        <h1 className="text-2xl font-bold mb-6">My Wishlist</h1>
+        <h1 className="text-2xl font-bold mb-6">İstek Listem</h1>
 
         {/* Hata mesajı */}
         {error && (
@@ -100,10 +100,10 @@ export default function WishlistPage() {
         {!loading && items.length === 0 && (
           <div className="bg-white rounded-lg shadow-md p-8 text-center">
             <div className="text-gray-500 mb-4">
-              Your wishlist is empty.
+              İstek listenizde henüz ürün bulunmuyor.
             </div>
             <Link href="/products">
-              <Button>Start Shopping</Button>
+              <Button>Alışverişe Başla</Button>
             </Link>
           </div>
         )}
@@ -120,7 +120,7 @@ export default function WishlistPage() {
           <div>
             <div className="flex justify-between items-center mb-4">
               <div className="text-gray-600">
-                {totalCount} items found
+                {totalCount} ürün bulundu
               </div>
               <Button
                 variant="outline"
@@ -130,10 +130,10 @@ export default function WishlistPage() {
                 {isClearingWishlist ? (
                   <div className="flex items-center">
                     <div className="animate-spin mr-2 h-4 w-4 border-t-2 border-b-2 border-primary rounded-full"></div>
-                    Clearing...
+                    Temizleniyor...
                   </div>
                 ) : (
-                  'Clear List'
+                  'Listeyi Temizle'
                 )}
               </Button>
             </div>
@@ -166,7 +166,7 @@ export default function WishlistPage() {
                       </h2>
                     </Link>
                     <div className="text-xl font-bold text-primary mb-4">
-                      {item.product.price.toLocaleString('en-US')} ₺
+                      {item.product.price.toLocaleString('tr-TR')} ₺
                     </div>
 
                     <div className="flex flex-col space-y-2">
@@ -178,10 +178,10 @@ export default function WishlistPage() {
                         {isAddingToCart[item._id] ? (
                           <div className="flex items-center justify-center">
                             <div className="animate-spin mr-2 h-4 w-4 border-t-2 border-b-2 border-white rounded-full"></div>
-                            Adding...
+                            Ekleniyor...
                           </div>
                         ) : (
-                          'Add to Cart'
+                          'Sepete Ekle'
                         )}
                       </Button>
                       <Button
@@ -193,10 +193,10 @@ export default function WishlistPage() {
                         {isRemoving[item._id] ? (
                           <div className="flex items-center justify-center">
                             <div className="animate-spin mr-2 h-4 w-4 border-t-2 border-b-2 border-primary rounded-full"></div>
-                            Removing...
+                            Kaldırılıyor...
                           </div>
                         ) : (
-                          'Remove'
+                          'Kaldır'
                         )}
                       </Button>
                     </div>

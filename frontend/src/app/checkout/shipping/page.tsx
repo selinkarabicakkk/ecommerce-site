@@ -30,7 +30,7 @@ export default function CheckoutShippingPage() {
     city: '',
     state: '',
     zipCode: '',
-    country: 'Turkey',
+    country: 'Türkiye',
     phone: '',
   });
   const [errors, setErrors] = useState<Partial<ShippingFormData>>({});
@@ -50,7 +50,7 @@ export default function CheckoutShippingPage() {
             const parsedInfo = JSON.parse(savedShippingInfo);
             setFormData(parsedInfo);
           } catch (error) {
-            console.error('Error while loading saved shipping info:', error);
+            console.error('Kaydedilmiş teslimat bilgileri yüklenirken hata:', error);
           }
         } else if (user) {
           // Kullanıcı bilgilerinden form alanlarını doldur
@@ -88,44 +88,44 @@ export default function CheckoutShippingPage() {
     
     // Ad kontrolü
     if (!formData.firstName.trim()) {
-      newErrors.firstName = 'First name is required';
+      newErrors.firstName = 'Ad gereklidir';
     }
     
     // Soyad kontrolü
     if (!formData.lastName.trim()) {
-      newErrors.lastName = 'Last name is required';
+      newErrors.lastName = 'Soyad gereklidir';
     }
     
     // Adres kontrolü
     if (!formData.street.trim()) {
-      newErrors.street = 'Address is required';
+      newErrors.street = 'Adres gereklidir';
     }
     
     // Şehir kontrolü
     if (!formData.city.trim()) {
-      newErrors.city = 'City is required';
+      newErrors.city = 'Şehir gereklidir';
     }
     
     // İlçe kontrolü
     if (!formData.state.trim()) {
-      newErrors.state = 'State/District is required';
+      newErrors.state = 'İlçe gereklidir';
     }
     
     // Posta kodu kontrolü
     if (!formData.zipCode.trim()) {
-      newErrors.zipCode = 'ZIP code is required';
+      newErrors.zipCode = 'Posta kodu gereklidir';
     }
     
     // Ülke kontrolü
     if (!formData.country.trim()) {
-      newErrors.country = 'Country is required';
+      newErrors.country = 'Ülke gereklidir';
     }
     
     // Telefon kontrolü
     if (!formData.phone.trim()) {
-      newErrors.phone = 'Phone number is required';
+      newErrors.phone = 'Telefon numarası gereklidir';
     } else if (!/^\d{10}$/.test(formData.phone.replace(/\D/g, ''))) {
-      newErrors.phone = 'Please enter a valid phone number';
+      newErrors.phone = 'Geçerli bir telefon numarası giriniz';
     }
     
     setErrors(newErrors);
@@ -165,23 +165,29 @@ export default function CheckoutShippingPage() {
       <div className="container mx-auto py-8 px-4">
         <div className="max-w-3xl mx-auto">
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h1 className="text-2xl font-bold mb-6">Shipping Information</h1>
+            <h1 className="text-2xl font-bold mb-6">Teslimat Bilgileri</h1>
             
             {/* Adım göstergesi */}
             <div className="flex items-center mb-8">
               <div className="flex items-center">
-                <div className="bg-primary text-white w-8 h-8 rounded-full flex items-center justify-center">1</div>
-                <span className="ml-2 text-primary font-medium">Shipping</span>
+                <div className="bg-primary text-white w-8 h-8 rounded-full flex items-center justify-center">
+                  1
+                </div>
+                <span className="ml-2 text-primary font-medium">Teslimat</span>
               </div>
               <div className="h-1 w-12 bg-gray-300 mx-2"></div>
               <div className="flex items-center">
-                <div className="bg-gray-300 text-gray-600 w-8 h-8 rounded-full flex items-center justify-center">2</div>
-                <span className="ml-2 text-gray-600">Payment</span>
+                <div className="bg-gray-300 text-gray-600 w-8 h-8 rounded-full flex items-center justify-center">
+                  2
+                </div>
+                <span className="ml-2 text-gray-600">Ödeme</span>
               </div>
               <div className="h-1 w-12 bg-gray-300 mx-2"></div>
               <div className="flex items-center">
-                <div className="bg-gray-300 text-gray-600 w-8 h-8 rounded-full flex items-center justify-center">3</div>
-                <span className="ml-2 text-gray-600">Confirmation</span>
+                <div className="bg-gray-300 text-gray-600 w-8 h-8 rounded-full flex items-center justify-center">
+                  3
+                </div>
+                <span className="ml-2 text-gray-600">Onay</span>
               </div>
             </div>
 
@@ -190,70 +196,166 @@ export default function CheckoutShippingPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Ad */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">First Name <span className="text-red-500">*</span></label>
-                  <input type="text" name="firstName" value={formData.firstName} onChange={handleChange} className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${errors.firstName ? 'border-red-500' : 'border-gray-300'}`} />
-                  {errors.firstName && (<p className="mt-1 text-sm text-red-600">{errors.firstName}</p>)}
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Ad <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
+                      errors.firstName ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                  />
+                  {errors.firstName && (
+                    <p className="mt-1 text-sm text-red-600">{errors.firstName}</p>
+                  )}
                 </div>
 
                 {/* Soyad */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Last Name <span className="text-red-500">*</span></label>
-                  <input type="text" name="lastName" value={formData.lastName} onChange={handleChange} className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${errors.lastName ? 'border-red-500' : 'border-gray-300'}`} />
-                  {errors.lastName && (<p className="mt-1 text-sm text-red-600">{errors.lastName}</p>)}
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Soyad <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
+                      errors.lastName ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                  />
+                  {errors.lastName && (
+                    <p className="mt-1 text-sm text-red-600">{errors.lastName}</p>
+                  )}
                 </div>
 
                 {/* Adres */}
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Address <span className="text-red-500">*</span></label>
-                  <input type="text" name="street" value={formData.street} onChange={handleChange} className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${errors.street ? 'border-red-500' : 'border-gray-300'}`} />
-                  {errors.street && (<p className="mt-1 text-sm text-red-600">{errors.street}</p>)}
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Adres <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="street"
+                    value={formData.street}
+                    onChange={handleChange}
+                    className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
+                      errors.street ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                  />
+                  {errors.street && (
+                    <p className="mt-1 text-sm text-red-600">{errors.street}</p>
+                  )}
                 </div>
 
                 {/* Şehir */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">City <span className="text-red-500">*</span></label>
-                  <input type="text" name="city" value={formData.city} onChange={handleChange} className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${errors.city ? 'border-red-500' : 'border-gray-300'}`} />
-                  {errors.city && (<p className="mt-1 text-sm text-red-600">{errors.city}</p>)}
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Şehir <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="city"
+                    value={formData.city}
+                    onChange={handleChange}
+                    className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
+                      errors.city ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                  />
+                  {errors.city && (
+                    <p className="mt-1 text-sm text-red-600">{errors.city}</p>
+                  )}
                 </div>
 
                 {/* İlçe */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">State/District <span className="text-red-500">*</span></label>
-                  <input type="text" name="state" value={formData.state} onChange={handleChange} className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${errors.state ? 'border-red-500' : 'border-gray-300'}`} />
-                  {errors.state && (<p className="mt-1 text-sm text-red-600">{errors.state}</p>)}
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    İlçe <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="state"
+                    value={formData.state}
+                    onChange={handleChange}
+                    className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
+                      errors.state ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                  />
+                  {errors.state && (
+                    <p className="mt-1 text-sm text-red-600">{errors.state}</p>
+                  )}
                 </div>
 
                 {/* Posta kodu */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">ZIP Code <span className="text-red-500">*</span></label>
-                  <input type="text" name="zipCode" value={formData.zipCode} onChange={handleChange} className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${errors.zipCode ? 'border-red-500' : 'border-gray-300'}`} />
-                  {errors.zipCode && (<p className="mt-1 text-sm text-red-600">{errors.zipCode}</p>)}
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Posta Kodu <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="zipCode"
+                    value={formData.zipCode}
+                    onChange={handleChange}
+                    className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
+                      errors.zipCode ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                  />
+                  {errors.zipCode && (
+                    <p className="mt-1 text-sm text-red-600">{errors.zipCode}</p>
+                  )}
                 </div>
 
                 {/* Ülke */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Country <span className="text-red-500">*</span></label>
-                  <select name="country" value={formData.country} onChange={handleChange} className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${errors.country ? 'border-red-500' : 'border-gray-300'}`}>
-                    <option value="Turkey">Turkey</option>
-                    <option value="Cyprus">Cyprus</option>
-                    <option value="Azerbaijan">Azerbaijan</option>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Ülke <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    name="country"
+                    value={formData.country}
+                    onChange={handleChange}
+                    className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
+                      errors.country ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                  >
+                    <option value="Türkiye">Türkiye</option>
+                    <option value="Kıbrıs">Kıbrıs</option>
+                    <option value="Azerbaycan">Azerbaycan</option>
                   </select>
-                  {errors.country && (<p className="mt-1 text-sm text-red-600">{errors.country}</p>)}
+                  {errors.country && (
+                    <p className="mt-1 text-sm text-red-600">{errors.country}</p>
+                  )}
                 </div>
 
                 {/* Telefon */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone <span className="text-red-500">*</span></label>
-                  <input type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder="5XX XXX XX XX" className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${errors.phone ? 'border-red-500' : 'border-gray-300'}`} />
-                  {errors.phone && (<p className="mt-1 text-sm text-red-600">{errors.phone}</p>)}
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Telefon <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    placeholder="5XX XXX XX XX"
+                    className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
+                      errors.phone ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                  />
+                  {errors.phone && (
+                    <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
+                  )}
                 </div>
               </div>
 
               <div className="flex justify-between mt-8">
                 <Link href="/cart">
-                  <Button variant="outline">Back to Cart</Button>
+                  <Button variant="outline">Sepete Dön</Button>
                 </Link>
-                <Button type="submit">Continue to Payment</Button>
+                <Button type="submit">Ödemeye Geç</Button>
               </div>
             </form>
           </div>

@@ -11,9 +11,10 @@ import { Button } from '@/components/ui/Button';
 import { useAppDispatch, useAppSelector } from '@/store';
 import { login, clearError } from '@/store/slices/authSlice';
 
+// Form şeması
 const loginSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  email: z.string().email('Geçerli bir e-posta adresi giriniz'),
+  password: z.string().min(6, 'Parola en az 6 karakter olmalıdır'),
   rememberMe: z.boolean().optional(),
 });
 
@@ -27,12 +28,14 @@ export default function LoginPage() {
   const { loading, error, isAuthenticated } = useAppSelector((state) => state.auth);
   const [showPassword, setShowPassword] = useState(false);
 
+  // Giriş yaptıysa yönlendir (render sırasında değil, effect içinde)
   useEffect(() => {
     if (isAuthenticated) {
       router.replace(redirect);
     }
   }, [isAuthenticated, redirect, router]);
 
+  // Form hook'u
   const {
     register,
     handleSubmit,
@@ -46,25 +49,29 @@ export default function LoginPage() {
     },
   });
 
+  // Form gönderildiğinde
   const onSubmit = async (data: LoginFormData) => {
     try {
       await dispatch(login(data)).unwrap();
       router.push(redirect);
     } catch (error) {
-      console.error('Error while logging in:', error);
+      console.error('Giriş yapılırken hata oluştu:', error);
     }
   };
 
+  // Hata mesajını temizle
   const handleClearError = () => {
     dispatch(clearError());
   };
+
+  // isAuthenticated ise efekt yönlendirecek
 
   return (
     <MainLayout>
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-md mx-auto card overflow-hidden">
           <div className="p-6">
-            <h1 className="text-2xl font-bold text-center mb-6">Log In</h1>
+            <h1 className="text-2xl font-bold text-center mb-6">Giriş Yap</h1>
 
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4 relative">
@@ -92,9 +99,10 @@ export default function LoginPage() {
             )}
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+              {/* E-posta */}
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                  Email
+                  E-posta
                 </label>
                 <input
                   id="email"
@@ -110,9 +118,10 @@ export default function LoginPage() {
                 )}
               </div>
 
+              {/* Parola */}
               <div>
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                  Password
+                  Parola
                 </label>
                 <div className="relative">
                   <input
@@ -171,6 +180,7 @@ export default function LoginPage() {
                 )}
               </div>
 
+              {/* Beni Hatırla ve Şifremi Unuttum */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   <input
@@ -180,7 +190,7 @@ export default function LoginPage() {
                     className="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary"
                   />
                   <label htmlFor="rememberMe" className="ml-2 block text-sm text-gray-700">
-                    Remember me
+                    Beni Hatırla
                   </label>
                 </div>
                 <div className="text-sm">
@@ -188,26 +198,28 @@ export default function LoginPage() {
                     href="/auth/forgot-password"
                     className="font-medium text-primary hover:text-primary/80"
                   >
-                    Forgot Password
+                    Şifremi Unuttum
                   </Link>
                 </div>
               </div>
 
+              {/* Giriş Yap Butonu */}
               <div>
                 <Button type="submit" isLoading={loading} className="w-full">
-                  Log In
+                  Giriş Yap
                 </Button>
               </div>
             </form>
 
+            {/* Kayıt Ol Yönlendirmesi */}
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
-                Don't have an account?{' '}
+                Hesabınız yok mu?{' '}
                 <Link
                   href={`/auth/register${redirect !== '/' ? `?redirect=${redirect}` : ''}`}
                   className="font-medium text-primary hover:text-primary/80"
                 >
-                  Register
+                  Kayıt Ol
                 </Link>
               </p>
             </div>

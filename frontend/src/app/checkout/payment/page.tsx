@@ -7,7 +7,8 @@ import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/Button';
 import { useAppDispatch, useAppSelector } from '@/store';
 import { clearCart } from '@/store/slices/cartSlice';
-import { orderService, activityService } from '@/services';
+import { orderService } from '@/services';
+import useProductTracking from '@/hooks/useProductTracking';
 
 interface PaymentFormData {
   cardNumber: string;
@@ -19,6 +20,7 @@ interface PaymentFormData {
 export default function CheckoutPaymentPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const { trackProductActivity } = useProductTracking();
   
   const { user, isAuthenticated, loading: authLoading } = useAppSelector((state) => state.auth);
   const { items, totalPrice, loading: cartLoading } = useAppSelector((state) => state.cart);
@@ -34,6 +36,7 @@ export default function CheckoutPaymentPage() {
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [orderDetails, setOrderDetails] = useState<any>(null);
 
+  // Ödeme sayfası yüklendiğinde sipariş detaylarını kontrol et
   useEffect(() => {
     if (!authLoading) {
       if (!isAuthenticated) {
@@ -41,6 +44,7 @@ export default function CheckoutPaymentPage() {
       } else if (!cartLoading && items.length === 0) {
         router.push('/cart');
       } else {
+        // Sepet ve teslimat bilgilerini localStorage'dan al
         const shippingInfo = localStorage.getItem('shippingInfo');
         if (!shippingInfo) {
           router.push('/checkout/shipping');
@@ -51,11 +55,11 @@ export default function CheckoutPaymentPage() {
               items,
               totalPrice,
               shipping: parsedShippingInfo,
-              taxPrice: totalPrice * 0.18,
-              shippingPrice: totalPrice > 500 ? 0 : 29.99,
+              taxPrice: totalPrice * 0.18, // %18 KDV
+              shippingPrice: totalPrice > 500 ? 0 : 29.99, // 500 TL üzeri kargo bedava
             });
           } catch (error) {
-            console.error('Error while loading shipping info:', error);
+            console.error('Teslimat bilgileri yüklenirken hata:', error);
             router.push('/checkout/shipping');
           }
         }
@@ -63,131 +67,201 @@ export default function CheckoutPaymentPage() {
     }
   }, [authLoading, isAuthenticated, cartLoading, items, totalPrice, router]);
 
+  // Form değişikliklerini izle
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    
+    // Kart numarası formatlaması
     if (name === 'cardNumber') {
+      // Sadece rakamları al
       const cleaned = value.replace(/\D/g, '');
+      // 16 karakterle sınırla
       const limited = cleaned.substring(0, 16);
+      // Her 4 rakamdan sonra boşluk ekle
       const formatted = limited.replace(/(\d{4})(?=\d)/g, '$1 ');
-      setFormData((prev) => ({ ...prev, [name]: formatted }));
-    } else if (name === 'expiryDate') {
+      
+      setFormData((prev) => ({
+        ...prev,
+        [name]: formatted,
+      }));
+    }
+    // Son kullanma tarihi formatlaması
+    else if (name === 'expiryDate') {
+      // Sadece rakamları al
       const cleaned = value.replace(/\D/g, '');
+      // 4 karakterle sınırla
       const limited = cleaned.substring(0, 4);
+      
+      // Ay ve yıl formatı (MM/YY)
       let formatted = limited;
       if (limited.length > 2) {
         formatted = `${limited.substring(0, 2)}/${limited.substring(2)}`;
       }
-      setFormData((prev) => ({ ...prev, [name]: formatted }));
-    } else if (name === 'cvv') {
-      const formatted = value.replace(/\D/g, '').substring(0, 3);
-      setFormData((prev) => ({ ...prev, [name]: formatted }));
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
+      
+      setFormData((prev) => ({
+        ...prev,
+        [name]: formatted,
+      }));
     }
-
+    // CVV formatlaması
+    else if (name === 'cvv') {
+      // Sadece rakamları al ve 3 karakterle sınırla
+      const formatted = value.replace(/\D/g, '').substring(0, 3);
+      
+      setFormData((prev) => ({
+        ...prev,
+        [name]: formatted,
+      }));
+    }
+    // Diğer alanlar
+    else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
+    
+    // Hata mesajını temizle
     if (errors[name as keyof PaymentFormData]) {
-      setErrors((prev) => ({ ...prev, [name]: undefined }));
+      setErrors((prev) => ({
+        ...prev,
+        [name]: undefined,
+      }));
     }
   };
 
+  // Form doğrulama
   const validateForm = (): boolean => {
     const newErrors: Partial<PaymentFormData> = {};
+    
+    // Kart numarası kontrolü
     if (!formData.cardNumber.trim()) {
-      newErrors.cardNumber = 'Card number is required';
+      newErrors.cardNumber = 'Kart numarası gereklidir';
     } else if (formData.cardNumber.replace(/\s/g, '').length !== 16) {
-      newErrors.cardNumber = 'Card number must be 16 digits';
+      newErrors.cardNumber = 'Kart numarası 16 haneli olmalıdır';
     }
+    
+    // Kart sahibi kontrolü
     if (!formData.cardName.trim()) {
-      newErrors.cardName = 'Cardholder name is required';
+      newErrors.cardName = 'Kart sahibinin adı gereklidir';
     }
+    
+    // Son kullanma tarihi kontrolü
     if (!formData.expiryDate.trim()) {
-      newErrors.expiryDate = 'Expiry date is required';
+      newErrors.expiryDate = 'Son kullanma tarihi gereklidir';
     } else if (!/^\d{2}\/\d{2}$/.test(formData.expiryDate)) {
-      newErrors.expiryDate = 'Invalid format (MM/YY)';
+      newErrors.expiryDate = 'Geçersiz format (AA/YY)';
     } else {
       const [month, year] = formData.expiryDate.split('/').map(Number);
       const currentDate = new Date();
-      const currentYear = currentDate.getFullYear() % 100;
+      const currentYear = currentDate.getFullYear() % 100; // Son iki hane
       const currentMonth = currentDate.getMonth() + 1;
+      
       if (month < 1 || month > 12) {
-        newErrors.expiryDate = 'Invalid month';
-      } else if ((year < currentYear) || (year === currentYear && month < currentMonth)) {
-        newErrors.expiryDate = 'Your card has expired';
+        newErrors.expiryDate = 'Geçersiz ay';
+      } else if (
+        (year < currentYear) || 
+        (year === currentYear && month < currentMonth)
+      ) {
+        newErrors.expiryDate = 'Kartınızın süresi dolmuş';
       }
     }
+    
+    // CVV kontrolü
     if (!formData.cvv.trim()) {
-      newErrors.cvv = 'CVV is required';
+      newErrors.cvv = 'CVV gereklidir';
     } else if (formData.cvv.length !== 3) {
-      newErrors.cvv = 'CVV must be 3 digits';
+      newErrors.cvv = 'CVV 3 haneli olmalıdır';
     }
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+  // Ödeme işlemi
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateForm()) return;
+    
+    if (!validateForm()) {
+      return;
+    }
+    
     setIsProcessing(true);
     setPaymentError(null);
+    
     try {
-      if (!orderDetails) throw new Error('Order details not found');
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      const orderItems = orderDetails.items.map((item: any) => ({
-        product: item.product._id as string,
-        quantity: item.quantity as number,
-        ...(item.variantOptions ? { variantOptions: item.variantOptions as Record<string, string> } : {}),
-      }));
-
-      const shippingAddress = {
-        type: 'shipping' as const,
-        street: orderDetails.shipping.street as string,
-        city: orderDetails.shipping.city as string,
-        state: orderDetails.shipping.state as string,
-        zipCode: orderDetails.shipping.zipCode as string,
-        country: orderDetails.shipping.country as string,
-        isDefault: true,
-      };
-
-      const createRes = await orderService.createOrder({
-        orderItems,
-        shippingAddress,
-        paymentMethod: 'Credit Card',
-      });
-
-      const createdOrderId = createRes?.data?._id;
-      if (!createdOrderId) {
-        throw new Error(createRes?.message || 'Failed to create order');
+      if (!orderDetails) {
+        throw new Error('Sipariş bilgileri bulunamadı');
       }
-
-      await orderService.updateOrderToPaid(createdOrderId, {
-        id: `PAY-${Math.random().toString(36).substring(2, 15)}`,
-        status: 'completed',
-        updateTime: new Date().toISOString(),
+      
+      // Ödeme işlemi simülasyonu
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      
+      // Sipariş oluştur
+      const orderData = {
+        orderItems: orderDetails.items.map((item: any) => ({
+          product: item.product._id,
+          quantity: item.quantity,
+          price: item.product.price,
+        })),
+        shippingAddress: {
+          street: orderDetails.shipping.street,
+          city: orderDetails.shipping.city,
+          state: orderDetails.shipping.state,
+          zipCode: orderDetails.shipping.zipCode,
+          country: orderDetails.shipping.country,
+        },
+        billingAddress: {
+          street: orderDetails.shipping.street,
+          city: orderDetails.shipping.city,
+          state: orderDetails.shipping.state,
+          zipCode: orderDetails.shipping.zipCode,
+          country: orderDetails.shipping.country,
+        },
+        paymentMethod: 'Credit Card',
+        paymentResult: {
+          id: `PAY-${Math.random().toString(36).substring(2, 15)}`,
+          status: 'completed',
+          updateTime: new Date().toISOString(),
+        },
+        taxPrice: orderDetails.taxPrice,
+        shippingPrice: orderDetails.shippingPrice,
+        totalPrice: orderDetails.totalPrice + orderDetails.taxPrice + orderDetails.shippingPrice,
+        isPaid: true,
+        paidAt: new Date().toISOString(),
+      };
+      
+      const response = await orderService.createOrder(orderData);
+      
+      // Ürünleri satın alma olarak izle
+      orderDetails.items.forEach((item: any) => {
+        trackProductActivity(item.product._id, 'purchase');
       });
-
-      await Promise.all(
-        orderDetails.items.map((item: any) =>
-          activityService.logActivity({ productId: item.product._id, activityType: 'purchase' })
-        )
-      );
-
+      
+      // Sepeti temizle
       dispatch(clearCart());
+      
+      // Teslimat bilgilerini temizle
       localStorage.removeItem('shippingInfo');
-      router.push(`/checkout/success?orderId=${createdOrderId}`);
+      
+      // Başarı sayfasına yönlendir
+      router.push(`/checkout/success?orderId=${response.data._id}`);
     } catch (error: any) {
-      console.error('Error during payment:', error);
-      setPaymentError(error.message || 'An error occurred during payment');
+      console.error('Ödeme işlemi sırasında hata:', error);
+      setPaymentError(error.message || 'Ödeme işlemi sırasında bir hata oluştu');
     } finally {
       setIsProcessing(false);
     }
   };
 
+  // Toplam fiyat hesapla
   const calculateTotal = () => {
     if (!orderDetails) return 0;
+    
     return orderDetails.totalPrice + orderDetails.taxPrice + orderDetails.shippingPrice;
   };
 
+  // Yükleniyor durumu
   if (authLoading || cartLoading || !orderDetails) {
     return (
       <MainLayout>
@@ -207,7 +281,7 @@ export default function CheckoutPaymentPage() {
           {/* Ödeme formu */}
           <div className="w-full md:w-2/3">
             <div className="bg-white rounded-lg shadow-md p-6">
-              <h1 className="text-2xl font-bold mb-6">Payment Information</h1>
+              <h1 className="text-2xl font-bold mb-6">Ödeme Bilgileri</h1>
               
               {/* Adım göstergesi */}
               <div className="flex items-center mb-8">
@@ -215,21 +289,21 @@ export default function CheckoutPaymentPage() {
                   <div className="bg-primary text-white w-8 h-8 rounded-full flex items-center justify-center">
                     1
                   </div>
-                  <span className="ml-2 text-primary font-medium">Shipping</span>
+                  <span className="ml-2 text-primary font-medium">Teslimat</span>
                 </div>
                 <div className="h-1 w-12 bg-primary mx-2"></div>
                 <div className="flex items-center">
                   <div className="bg-primary text-white w-8 h-8 rounded-full flex items-center justify-center">
                     2
                   </div>
-                  <span className="ml-2 text-primary font-medium">Payment</span>
+                  <span className="ml-2 text-primary font-medium">Ödeme</span>
                 </div>
                 <div className="h-1 w-12 bg-gray-300 mx-2"></div>
                 <div className="flex items-center">
                   <div className="bg-gray-300 text-gray-600 w-8 h-8 rounded-full flex items-center justify-center">
                     3
                   </div>
-                  <span className="ml-2 text-gray-600">Confirmation</span>
+                  <span className="ml-2 text-gray-600">Onay</span>
                 </div>
               </div>
 
@@ -246,7 +320,7 @@ export default function CheckoutPaymentPage() {
                   {/* Kart numarası */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Card Number <span className="text-red-500">*</span>
+                      Kart Numarası <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -266,14 +340,14 @@ export default function CheckoutPaymentPage() {
                   {/* Kart sahibi */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Cardholder Name <span className="text-red-500">*</span>
+                      Kart Sahibinin Adı <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
                       name="cardName"
                       value={formData.cardName}
                       onChange={handleChange}
-                      placeholder="Name Surname"
+                      placeholder="Ad Soyad"
                       className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
                         errors.cardName ? 'border-red-500' : 'border-gray-300'
                       }`}
@@ -287,14 +361,14 @@ export default function CheckoutPaymentPage() {
                     {/* Son kullanma tarihi */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Expiry Date <span className="text-red-500">*</span>
+                        Son Kullanma Tarihi <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
                         name="expiryDate"
                         value={formData.expiryDate}
                         onChange={handleChange}
-                        placeholder="MM/YY"
+                        placeholder="AA/YY"
                         className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
                           errors.expiryDate ? 'border-red-500' : 'border-gray-300'
                         }`}
@@ -327,7 +401,7 @@ export default function CheckoutPaymentPage() {
 
                   <div className="flex justify-between mt-8">
                     <Link href="/checkout/shipping">
-                      <Button variant="outline">Back</Button>
+                      <Button variant="outline">Geri</Button>
                     </Link>
                     <Button
                       type="submit"
@@ -336,10 +410,10 @@ export default function CheckoutPaymentPage() {
                       {isProcessing ? (
                         <div className="flex items-center">
                           <div className="animate-spin mr-2 h-4 w-4 border-t-2 border-b-2 border-white rounded-full"></div>
-                          Processing Payment...
+                          Ödeme İşleniyor...
                         </div>
                       ) : (
-                        'Complete Payment'
+                        'Ödemeyi Tamamla'
                       )}
                     </Button>
                   </div>
@@ -351,46 +425,48 @@ export default function CheckoutPaymentPage() {
           {/* Sipariş özeti */}
           <div className="w-full md:w-1/3">
             <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-lg font-bold mb-4">Order Summary</h2>
+              <h2 className="text-lg font-bold mb-4">Sipariş Özeti</h2>
               
               <div className="divide-y divide-gray-200">
                 {orderDetails.items.map((item: any) => (
                   <div key={item._id} className="py-3 flex justify-between">
                     <div>
                       <p className="font-medium">{item.product.name}</p>
-                      <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
+                      <p className="text-sm text-gray-600">Adet: {item.quantity}</p>
                     </div>
-                    <p className="font-medium">{(item.product.price * item.quantity).toLocaleString('en-US')} ₺</p>
+                    <p className="font-medium">
+                      {(item.product.price * item.quantity).toLocaleString('tr-TR')} ₺
+                    </p>
                   </div>
                 ))}
               </div>
               
               <div className="mt-4 pt-4 border-t border-gray-200">
                 <div className="flex justify-between py-1">
-                  <p className="text-gray-600">Subtotal</p>
-                  <p className="font-medium">{orderDetails.totalPrice.toLocaleString('en-US')} ₺</p>
+                  <p className="text-gray-600">Ara Toplam</p>
+                  <p className="font-medium">{orderDetails.totalPrice.toLocaleString('tr-TR')} ₺</p>
                 </div>
                 <div className="flex justify-between py-1">
-                  <p className="text-gray-600">VAT (18%)</p>
-                  <p className="font-medium">{orderDetails.taxPrice.toLocaleString('en-US')} ₺</p>
+                  <p className="text-gray-600">KDV (%18)</p>
+                  <p className="font-medium">{orderDetails.taxPrice.toLocaleString('tr-TR')} ₺</p>
                 </div>
                 <div className="flex justify-between py-1">
-                  <p className="text-gray-600">Shipping</p>
+                  <p className="text-gray-600">Kargo</p>
                   <p className="font-medium">
                     {orderDetails.shippingPrice === 0 
-                      ? 'Free' 
-                      : `${orderDetails.shippingPrice.toLocaleString('en-US')} ₺`}
+                      ? 'Ücretsiz' 
+                      : `${orderDetails.shippingPrice.toLocaleString('tr-TR')} ₺`}
                   </p>
                 </div>
                 <div className="flex justify-between py-3 font-bold text-lg border-t border-gray-200 mt-2">
-                  <p>Total</p>
-                  <p>{calculateTotal().toLocaleString('en-US')} ₺</p>
+                  <p>Toplam</p>
+                  <p>{calculateTotal().toLocaleString('tr-TR')} ₺</p>
                 </div>
               </div>
 
               <div className="mt-6">
                 <div className="bg-gray-100 p-4 rounded-md">
-                  <h3 className="font-medium mb-2">Shipping Address</h3>
+                  <h3 className="font-medium mb-2">Teslimat Adresi</h3>
                   <p>{orderDetails.shipping.street}</p>
                   <p>
                     {orderDetails.shipping.city}, {orderDetails.shipping.state}{' '}

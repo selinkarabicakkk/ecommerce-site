@@ -37,10 +37,12 @@ export default function CategoryPage() {
       setLoading(true);
       try {
         if (typeof slug === 'string') {
+          // Kategori detaylarını getir
           const categoryResponse = await categoryService.getCategoryBySlug(slug);
           setCategory(categoryResponse.data || null);
 
           if (categoryResponse.data?._id) {
+            // Kategoriye ait ürünleri getir
             const productResponse = await productService.getProducts({
               ...filters,
               category: categoryResponse.data._id,
@@ -52,8 +54,8 @@ export default function CategoryPage() {
           }
         }
       } catch (error) {
-        console.error('Error while loading category or products:', error);
-        setError('An error occurred while loading the category or products. Please try again later.');
+        console.error('Kategori veya ürünler yüklenirken hata oluştu:', error);
+        setError('Kategori veya ürünler yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
       } finally {
         setLoading(false);
       }
@@ -83,11 +85,11 @@ export default function CategoryPage() {
       <MainLayout>
         <div className="container mx-auto px-4 py-8">
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-            {error || 'Category not found.'}
+            {error || 'Kategori bulunamadı.'}
           </div>
           <div className="mt-6">
             <Link href="/categories">
-              <Button>Back to Categories</Button>
+              <Button>Kategorilere Geri Dön</Button>
             </Link>
           </div>
         </div>
@@ -101,14 +103,14 @@ export default function CategoryPage() {
         {/* Breadcrumb */}
         <nav className="flex mb-6 text-sm">
           <Link href="/" className="text-gray-500 hover:text-gray-700">
-            Home
+            Ana Sayfa
           </Link>
           <span className="mx-2 text-gray-500">/</span>
           <Link href="/categories" className="text-gray-500 hover:text-gray-700">
-            Categories
+            Kategoriler
           </Link>
           <span className="mx-2 text-gray-500">/</span>
-          <span className="text-gray-900">{category?.name || 'Loading...'}</span>
+          <span className="text-gray-900">{category?.name || 'Yükleniyor...'}</span>
         </nav>
 
         {/* Kategori başlığı ve görseli */}
@@ -141,7 +143,7 @@ export default function CategoryPage() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
           <div className="mb-4 md:mb-0">
             <p className="text-gray-600">
-              {loading ? 'Loading...' : `${totalProducts} products found`}
+              {loading ? 'Yükleniyor...' : `${totalProducts} ürün bulundu`}
             </p>
           </div>
 
@@ -153,7 +155,7 @@ export default function CategoryPage() {
                 className={`p-1 rounded ${
                   viewMode === 'grid' ? 'bg-gray-200' : 'hover:bg-gray-100'
                 }`}
-                aria-label="Grid view"
+                aria-label="Grid görünümü"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -175,7 +177,7 @@ export default function CategoryPage() {
                 className={`p-1 rounded ${
                   viewMode === 'list' ? 'bg-gray-200' : 'hover:bg-gray-100'
                 }`}
-                aria-label="List view"
+                aria-label="Liste görünümü"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -200,10 +202,10 @@ export default function CategoryPage() {
               onChange={(e) => handleSortChange(e.target.value as ProductFilters['sort'])}
               className="border rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary"
             >
-              <option value="newest">Newest</option>
-              <option value="price">Price (Low to High)</option>
-              <option value="price-desc">Price (High to Low)</option>
-              <option value="rating">Top Rated</option>
+              <option value="newest">En Yeniler</option>
+              <option value="price">Fiyat (Artan)</option>
+              <option value="price-desc">Fiyat (Azalan)</option>
+              <option value="rating">Puana Göre</option>
             </select>
           </div>
         </div>
@@ -234,9 +236,9 @@ export default function CategoryPage() {
               </div>
             ) : products.length === 0 ? (
               <div className="text-center py-12">
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No products found</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Ürün bulunamadı</h3>
                 <p className="text-gray-500 mb-6">
-                  There are no products in this category yet.
+                  Bu kategoride henüz ürün bulunmamaktadır.
                 </p>
               </div>
             ) : (

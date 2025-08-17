@@ -23,7 +23,8 @@ export default function AdminCategoriesPage() {
   const [totalCount, setTotalCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
-
+  
+  // Kategorileri getir
   const fetchCategories = async (page = 1, search = '') => {
     setIsLoading(true);
     try {
@@ -40,13 +41,14 @@ export default function AdminCategoriesPage() {
       setTotalCount(count);
       setCurrentPage(page);
     } catch (err) {
-      setError('An error occurred while loading categories.');
-      console.error('Categories load error:', err);
+      setError('Kategoriler yüklenirken bir hata oluştu.');
+      console.error('Kategoriler yüklenirken hata:', err);
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Sayfa yüklendiğinde kategorileri getir
   useEffect(() => {
     if (!loading) {
       if (!isAuthenticated) {
@@ -59,15 +61,18 @@ export default function AdminCategoriesPage() {
     }
   }, [isAuthenticated, loading, router, user]);
 
+  // Arama işlemi
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     fetchCategories(1, searchQuery);
   };
 
+  // Sayfa değiştirme
   const handlePageChange = (page: number) => {
     fetchCategories(page, searchQuery);
   };
 
+  // Kategori seçme
   const handleSelectCategory = (categoryId: string) => {
     setSelectedCategories((prev) => {
       if (prev.includes(categoryId)) {
@@ -78,6 +83,7 @@ export default function AdminCategoriesPage() {
     });
   };
 
+  // Tüm kategorileri seç/kaldır
   const handleSelectAll = () => {
     if (selectedCategories.length === categories.length) {
       setSelectedCategories([]);
@@ -86,31 +92,35 @@ export default function AdminCategoriesPage() {
     }
   };
 
+  // Kategori silme
   const handleDeleteCategory = async (categoryId: string) => {
-    if (window.confirm('Are you sure you want to delete this category?')) {
+    if (window.confirm('Bu kategoriyi silmek istediğinize emin misiniz?')) {
       try {
         await categoryService.deleteCategory(categoryId);
         fetchCategories(currentPage, searchQuery);
       } catch (err) {
-        setError('An error occurred while deleting the category.');
-        console.error('Category delete error:', err);
+        setError('Kategori silinirken bir hata oluştu.');
+        console.error('Kategori silme hatası:', err);
       }
     }
   };
 
+  // Seçili kategorileri toplu silme
   const handleBulkDelete = async () => {
     if (selectedCategories.length === 0) return;
     
-    if (window.confirm(`Are you sure you want to delete ${selectedCategories.length} categories?`)) {
+    if (window.confirm(`${selectedCategories.length} kategoriyi silmek istediğinize emin misiniz?`)) {
       try {
+        // Burada normalde bir bulk delete API çağrısı olabilir
+        // Şimdilik her kategoriyi tek tek siliyoruz
         for (const categoryId of selectedCategories) {
           await categoryService.deleteCategory(categoryId);
         }
         setSelectedCategories([]);
         fetchCategories(currentPage, searchQuery);
       } catch (err) {
-        setError('An error occurred while deleting categories.');
-        console.error('Bulk delete error:', err);
+        setError('Kategoriler silinirken bir hata oluştu.');
+        console.error('Toplu silme hatası:', err);
       }
     }
   };
@@ -128,18 +138,19 @@ export default function AdminCategoriesPage() {
     <AdminLayout>
       <div className="p-6">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Category Management</h1>
+          <h1 className="text-2xl font-bold">Kategori Yönetimi</h1>
           <Button>
-            <Link href="/admin/categories/new">Add New Category</Link>
+            <Link href="/admin/categories/new">Yeni Kategori Ekle</Link>
           </Button>
         </div>
 
+        {/* Arama */}
         <div className="bg-white rounded-lg shadow-md p-4 mb-6">
           <form onSubmit={handleSearch} className="flex gap-3 items-center justify-between">
             <div className="flex gap-2 flex-1">
               <input
                 type="text"
-                placeholder="Search categories..."
+                placeholder="Kategori ara..."
                 className="flex-grow px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -148,38 +159,41 @@ export default function AdminCategoriesPage() {
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value as any)}
                 className="px-3 py-2 border rounded-md text-sm"
-                aria-label="Status filter"
+                aria-label="Durum filtresi"
               >
-                <option value="all">All</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
+                <option value="all">Hepsi</option>
+                <option value="active">Aktif</option>
+                <option value="inactive">Pasif</option>
               </select>
-              <Button type="submit">Search</Button>
+              <Button type="submit">Ara</Button>
             </div>
-            <span className="text-sm text-gray-500 whitespace-nowrap ml-4">Total {totalCount} records</span>
+            <span className="text-sm text-gray-500 whitespace-nowrap ml-4">Toplam {totalCount} kayıt</span>
           </form>
         </div>
 
+        {/* Toplu işlemler */}
         {selectedCategories.length > 0 && (
           <div className="bg-gray-100 rounded-lg p-4 mb-6 flex justify-between items-center">
-            <span>{selectedCategories.length} selected</span>
+            <span>{selectedCategories.length} kategori seçildi</span>
             <div className="flex gap-2">
               <Button variant="outline" onClick={() => setSelectedCategories([])}>
-                Clear Selection
+                Seçimi Temizle
               </Button>
               <Button variant="destructive" onClick={handleBulkDelete}>
-                Delete Selected
+                Seçilenleri Sil
               </Button>
             </div>
           </div>
         )}
 
+        {/* Hata mesajı */}
         {error && (
           <div className="bg-red-100 text-red-700 p-4 rounded-lg mb-6">
             {error}
           </div>
         )}
 
+        {/* Kategori tablosu */}
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
           {isLoading ? (
             <div className="flex justify-center items-center h-64">
@@ -187,7 +201,7 @@ export default function AdminCategoriesPage() {
             </div>
           ) : categories.length === 0 ? (
             <div className="p-8 text-center text-gray-500">
-              No categories found.
+              Kategori bulunamadı.
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -203,16 +217,16 @@ export default function AdminCategoriesPage() {
                       />
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Category
+                      Kategori
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Slug
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Product Count
+                      Ürün Sayısı
                     </th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
+                      İşlemler
                     </th>
                   </tr>
                 </thead>
@@ -245,7 +259,7 @@ export default function AdminCategoriesPage() {
                         {category.slug}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {(category as any).productCount || 0}
+                        {category.productCount || 0}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div className="flex justify-end space-x-2">
@@ -253,13 +267,13 @@ export default function AdminCategoriesPage() {
                             href={`/admin/categories/${category._id}/edit`}
                             className="text-indigo-600 hover:text-indigo-900"
                           >
-                            Edit
+                            Düzenle
                           </Link>
                           <button
                             onClick={() => handleDeleteCategory(category._id)}
                             className="text-red-600 hover:text-red-900"
                           >
-                            Delete
+                            Sil
                           </button>
                         </div>
                       </td>
@@ -271,6 +285,7 @@ export default function AdminCategoriesPage() {
           )}
         </div>
 
+        {/* Sayfalama */}
         {totalPages > 1 && (
           <div className="flex justify-center mt-6">
             <div className="flex space-x-1">
@@ -283,7 +298,7 @@ export default function AdminCategoriesPage() {
                     : 'bg-white text-gray-700 hover:bg-gray-50'
                 }`}
               >
-                Previous
+                Önceki
               </button>
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                 <button
@@ -307,7 +322,7 @@ export default function AdminCategoriesPage() {
                     : 'bg-white text-gray-700 hover:bg-gray-50'
                 }`}
               >
-                Next
+                Sonraki
               </button>
             </div>
           </div>

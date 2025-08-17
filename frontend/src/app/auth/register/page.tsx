@@ -11,23 +11,24 @@ import { Button } from '@/components/ui/Button';
 import { useAppDispatch, useAppSelector } from '@/store';
 import { register as registerUser, clearError } from '@/store/slices/authSlice';
 
+// Form şeması
 const registerSchema = z
   .object({
-    firstName: z.string().min(2, 'First name must be at least 2 characters'),
-    lastName: z.string().min(2, 'Last name must be at least 2 characters'),
-    email: z.string().email('Please enter a valid email address'),
-    password: z.string().min(6, 'Password must be at least 6 characters'),
-    confirmPassword: z.string().min(6, 'Password must be at least 6 characters'),
+    firstName: z.string().min(2, 'Ad en az 2 karakter olmalıdır'),
+    lastName: z.string().min(2, 'Soyad en az 2 karakter olmalıdır'),
+    email: z.string().email('Geçerli bir e-posta adresi giriniz'),
+    password: z.string().min(6, 'Parola en az 6 karakter olmalıdır'),
+    confirmPassword: z.string().min(6, 'Parola en az 6 karakter olmalıdır'),
     phoneNumber: z
       .string()
-      .min(10, 'Phone number must be at least 10 characters')
+      .min(10, 'Telefon numarası en az 10 karakter olmalıdır')
       .optional(),
     terms: z.boolean().refine((val) => val === true, {
-      message: 'You must accept the terms of service',
+      message: 'Kullanım şartlarını kabul etmelisiniz',
     }),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: 'Passwords do not match',
+    message: 'Parolalar eşleşmiyor',
     path: ['confirmPassword'],
   });
 
@@ -43,6 +44,7 @@ export default function RegisterPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [registerSuccess, setRegisterSuccess] = useState(false);
 
+  // Form hook'u
   const {
     register,
     handleSubmit,
@@ -60,20 +62,23 @@ export default function RegisterPage() {
     },
   });
 
+  // Form gönderildiğinde
   const onSubmit = async (data: RegisterFormData) => {
     try {
       const { confirmPassword, terms, ...userData } = data;
       await dispatch(registerUser(userData)).unwrap();
       setRegisterSuccess(true);
     } catch (error) {
-      console.error('Error while registering:', error);
+      console.error('Kayıt olurken hata oluştu:', error);
     }
   };
 
+  // Hata mesajını temizle
   const handleClearError = () => {
     dispatch(clearError());
   };
 
+  // Kayıt başarılı mesajı
   if (registerSuccess) {
     return (
       <MainLayout>
@@ -94,12 +99,13 @@ export default function RegisterPage() {
                   d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
-              <h1 className="text-2xl font-bold mt-4 mb-2">Registration Successful!</h1>
+              <h1 className="text-2xl font-bold mt-4 mb-2">Kayıt Başarılı!</h1>
               <p className="text-gray-600 mb-6">
-                Your account has been created. Please verify your email to activate your account.
+                Hesabınız başarıyla oluşturuldu. Lütfen e-posta adresinize gönderilen doğrulama
+                bağlantısını tıklayarak hesabınızı aktifleştirin.
               </p>
               <Link href="/auth/login">
-                <Button>Log In</Button>
+                <Button>Giriş Yap</Button>
               </Link>
             </div>
           </div>
@@ -113,7 +119,7 @@ export default function RegisterPage() {
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-md mx-auto card overflow-hidden">
           <div className="p-6">
-            <h1 className="text-2xl font-bold text-center mb-6">Register</h1>
+            <h1 className="text-2xl font-bold text-center mb-6">Kayıt Ol</h1>
 
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4 relative">
@@ -141,10 +147,11 @@ export default function RegisterPage() {
             )}
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+              {/* Ad ve Soyad */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
-                    First Name
+                    Ad
                   </label>
                   <input
                     id="firstName"
@@ -161,7 +168,7 @@ export default function RegisterPage() {
                 </div>
                 <div>
                   <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
-                    Last Name
+                    Soyad
                   </label>
                   <input
                     id="lastName"
@@ -178,9 +185,10 @@ export default function RegisterPage() {
                 </div>
               </div>
 
+              {/* E-posta */}
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                  Email
+                  E-posta
                 </label>
                 <input
                   id="email"
@@ -196,9 +204,10 @@ export default function RegisterPage() {
                 )}
               </div>
 
+              {/* Telefon */}
               <div>
                 <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700 mb-1">
-                  Phone
+                  Telefon
                 </label>
                 <input
                   id="phoneNumber"
@@ -214,9 +223,10 @@ export default function RegisterPage() {
                 )}
               </div>
 
+              {/* Parola */}
               <div>
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                  Password
+                  Parola
                 </label>
                 <div className="relative">
                   <input
@@ -233,7 +243,43 @@ export default function RegisterPage() {
                     className="absolute inset-y-0 right-0 pr-3 flex items-center"
                     onClick={() => setShowPassword(!showPassword)}
                   >
-                    {/* eye icon toggled above */}
+                    {showPassword ? (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 text-gray-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
+                        />
+                      </svg>
+                    ) : (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 text-gray-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                        />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                        />
+                      </svg>
+                    )}
                   </button>
                 </div>
                 {errors.password && (
@@ -241,12 +287,13 @@ export default function RegisterPage() {
                 )}
               </div>
 
+              {/* Parola Tekrar */}
               <div>
                 <label
                   htmlFor="confirmPassword"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
-                  Confirm Password
+                  Parola Tekrar
                 </label>
                 <div className="relative">
                   <input
@@ -263,7 +310,43 @@ export default function RegisterPage() {
                     className="absolute inset-y-0 right-0 pr-3 flex items-center"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   >
-                    {/* eye icon toggled above */}
+                    {showConfirmPassword ? (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 text-gray-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
+                        />
+                      </svg>
+                    ) : (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 text-gray-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                        />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                        />
+                      </svg>
+                    )}
                   </button>
                 </div>
                 {errors.confirmPassword && (
@@ -271,6 +354,7 @@ export default function RegisterPage() {
                 )}
               </div>
 
+              {/* Kullanım Şartları */}
               <div className="flex items-center">
                 <input
                   id="terms"
@@ -280,22 +364,22 @@ export default function RegisterPage() {
                 />
                 <label htmlFor="terms" className="ml-2 block text-sm text-gray-700">
                   <span>
-                    I accept the{' '}
                     <Link
                       href="/terms"
                       target="_blank"
                       className="font-medium text-primary hover:text-primary/80"
                     >
-                      terms of service
+                      Kullanım şartlarını
                     </Link>{' '}
-                    and{' '}
+                    ve{' '}
                     <Link
                       href="/privacy"
                       target="_blank"
                       className="font-medium text-primary hover:text-primary/80"
                     >
-                      privacy policy
-                    </Link>
+                      gizlilik politikasını
+                    </Link>{' '}
+                    kabul ediyorum
                   </span>
                 </label>
               </div>
@@ -303,21 +387,23 @@ export default function RegisterPage() {
                 <p className="mt-1 text-sm text-red-600">{errors.terms.message}</p>
               )}
 
+              {/* Kayıt Ol Butonu */}
               <div>
                 <Button type="submit" isLoading={loading} className="w-full">
-                  Register
+                  Kayıt Ol
                 </Button>
               </div>
             </form>
 
+            {/* Giriş Yap Yönlendirmesi */}
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
-                Already have an account?{' '}
+                Zaten bir hesabınız var mı?{' '}
                 <Link
                   href={`/auth/login${redirect !== '/' ? `?redirect=${redirect}` : ''}`}
                   className="font-medium text-primary hover:text-primary/80"
                 >
-                  Log In
+                  Giriş Yap
                 </Link>
               </p>
             </div>

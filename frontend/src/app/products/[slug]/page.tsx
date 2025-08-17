@@ -26,6 +26,7 @@ export default function ProductDetailPage() {
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
 
+  // Ürün detaylarını getir
   useEffect(() => {
     const fetchProductDetails = async () => {
       setLoading(true);
@@ -35,8 +36,8 @@ export default function ProductDetailPage() {
           setProduct(response.data || null);
         }
       } catch (error) {
-        console.error('Error while loading product details:', error);
-        setError('An error occurred while loading product details. Please try again later.');
+        console.error('Ürün detayları yüklenirken hata oluştu:', error);
+        setError('Ürün detayları yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
       } finally {
         setLoading(false);
       }
@@ -64,6 +65,7 @@ export default function ProductDetailPage() {
     }
   };
 
+  // Miktar değiştirme
   const handleQuantityChange = (value: number) => {
     if (value >= 1 && value <= (product?.stock || 10)) {
       setQuantity(value);
@@ -85,11 +87,11 @@ export default function ProductDetailPage() {
       <MainLayout>
         <div className="container mx-auto px-4 py-8">
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-            {error || 'Product not found.'}
+            {error || 'Ürün bulunamadı.'}
           </div>
           <div className="mt-6">
             <Link href="/products">
-              <Button>Back to Products</Button>
+              <Button>Ürünlere Geri Dön</Button>
             </Link>
           </div>
         </div>
@@ -100,13 +102,14 @@ export default function ProductDetailPage() {
   return (
     <MainLayout>
       <div className="container mx-auto px-4 py-8">
+        {/* Breadcrumb */}
         <nav className="flex mb-6 text-sm">
           <Link href="/" className="text-gray-500 hover:text-gray-700">
-            Home
+            Ana Sayfa
           </Link>
           <span className="mx-2 text-gray-500">/</span>
           <Link href="/products" className="text-gray-500 hover:text-gray-700">
-            Products
+            Ürünler
           </Link>
           <span className="mx-2 text-gray-500">/</span>
           <Link
@@ -120,6 +123,7 @@ export default function ProductDetailPage() {
         </nav>
 
         <div className="flex flex-col md:flex-row gap-8">
+          {/* Ürün görselleri */}
           <div className="md:w-1/2">
             <div className="relative h-80 md:h-96 w-full mb-4 bg-gray-100 rounded-lg overflow-hidden">
               {product.images && product.images.length > 0 ? (
@@ -132,11 +136,12 @@ export default function ProductDetailPage() {
                 />
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-gray-500">No product image</span>
+                  <span className="text-gray-500">Ürün görseli bulunamadı</span>
                 </div>
               )}
             </div>
 
+            {/* Küçük görseller */}
             {product.images && product.images.length > 1 && (
               <div className="grid grid-cols-5 gap-2">
                 {product.images.map((image, index) => (
@@ -151,7 +156,7 @@ export default function ProductDetailPage() {
                   >
                     <Image
                       src={getAssetUrl(image)}
-                      alt={`${product.name} - Image ${index + 1}`}
+                      alt={`${product.name} - Görsel ${index + 1}`}
                       fill
                       sizes="(max-width: 768px) 20vw, 10vw"
                       className="object-cover"
@@ -162,9 +167,11 @@ export default function ProductDetailPage() {
             )}
           </div>
 
+          {/* Ürün bilgileri */}
           <div className="md:w-1/2">
             <h1 className="text-3xl font-bold tracking-tight mb-2 text-[rgb(var(--foreground))]">{product.name}</h1>
 
+            {/* Puan */}
             <div className="flex items-center mb-4">
               <div className="flex">
                 {[...Array(5)].map((_, i) => (
@@ -183,43 +190,46 @@ export default function ProductDetailPage() {
                 ))}
               </div>
               <span className="ml-2 text-gray-600">
-                {product.averageRating.toFixed(1)} ({product.numReviews} reviews)
+                {product.averageRating.toFixed(1)} ({product.numReviews} değerlendirme)
               </span>
             </div>
 
+            {/* Fiyat */}
             <div className="mb-6 flex items-center gap-3">
               <span className="text-3xl font-bold text-[rgb(var(--primary))]">
-                {product.price.toLocaleString('en-US')} ₺
+                {product.price.toLocaleString('tr-TR')} ₺
               </span>
               {product.discount > 0 && (
                 <span className="text-base text-gray-500 line-through">
-                  {Math.round(product.price / (1 - product.discount / 100)).toLocaleString('en-US')} ₺
+                  {Math.round(product.price / (1 - product.discount / 100)).toLocaleString('tr-TR')} ₺
                 </span>
               )}
               {product.discount > 0 && (
                 <span className="text-xs bg-[rgb(var(--destructive))] text-white px-2 py-0.5 rounded-full">
-                  %{product.discount} off
+                  %{product.discount} indirim
                 </span>
               )}
               {product.stock > 0 ? (
                 <span className="ml-2 inline-block bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full">
-                  In Stock
+                  Stokta
                 </span>
               ) : (
                 <span className="ml-2 inline-block bg-red-100 text-red-800 text-xs px-2 py-0.5 rounded-full">
-                  Out of Stock
+                  Tükendi
                 </span>
               )}
             </div>
 
+            {/* Açıklama */}
             <div className="mb-6">
-              <h2 className="text-lg font-semibold mb-2">Product Description</h2>
+              <h2 className="text-lg font-semibold mb-2">Ürün Açıklaması</h2>
               <p className="text-gray-600">{product.description}</p>
             </div>
 
+            {/* Özellikler */}
             {product.specifications && Object.keys(product.specifications).length > 0 && (
               <div className="mb-6">
-                <h2 className="text-lg font-semibold mb-2">Specifications</h2>
+                <h2 className="text-lg font-semibold mb-2">Teknik Özellikler</h2>
                 <div className="bg-gray-50 rounded-lg p-4">
                   <dl className="grid grid-cols-1 gap-x-4 gap-y-2">
                     {Object.entries(product.specifications).map(([key, value]) => (
@@ -233,10 +243,11 @@ export default function ProductDetailPage() {
               </div>
             )}
 
+            {/* Sepete ekle */}
             <div className="mb-6">
               <div className="flex items-center mb-4">
                 <button
-                  aria-label="Decrease"
+                  aria-label="Azalt"
                   onClick={() => handleQuantityChange(quantity - 1)}
                   disabled={quantity <= 1}
                   className="w-10 h-10 rounded-l-md border border-gray-300 flex items-center justify-center bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50"
@@ -252,7 +263,7 @@ export default function ProductDetailPage() {
                   className="w-16 h-10 text-sm border-t border-b border-gray-300 text-center [-moz-appearance:_textfield] [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none"
                 />
                 <button
-                  aria-label="Increase"
+                  aria-label="Arttır"
                   onClick={() => handleQuantityChange(quantity + 1)}
                   disabled={quantity >= product.stock}
                   className="w-10 h-10 rounded-r-md border border-gray-300 flex items-center justify-center bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50"
@@ -267,13 +278,14 @@ export default function ProductDetailPage() {
                 className="w-full md:w-auto"
                 size="lg"
               >
-                {product.stock > 0 ? 'Add to Cart' : 'Out of Stock'}
+                {product.stock > 0 ? 'Sepete Ekle' : 'Stokta Yok'}
               </Button>
             </div>
 
+            {/* Etiketler */}
             {product.tags && product.tags.length > 0 && (
               <div className="mb-6">
-                <h2 className="text-sm font-semibold mb-2">Tags</h2>
+                <h2 className="text-sm font-semibold mb-2">Etiketler</h2>
                 <div className="flex flex-wrap gap-2">
                   {product.tags.map((tag) => (
                     <Link
@@ -290,9 +302,13 @@ export default function ProductDetailPage() {
           </div>
         </div>
 
-        {product && <RecommendedProducts title="Related Products" type="related" productId={product._id} limit={4} />}
-        {product && <RecommendedProducts title="Frequently Bought Together" type="frequently-bought-together" productId={product._id} limit={4} />}
+        {/* İlgili ürünler */}
+        {product && <RecommendedProducts title="İlgili Ürünler" type="related" productId={product._id} limit={4} />}
         
+        {/* Sık Birlikte Alınanlar */}
+        {product && <RecommendedProducts title="Sık Birlikte Alınanlar" type="frequently-bought-together" productId={product._id} limit={4} />}
+        
+        {/* Ürün değerlendirmeleri */}
         {product && <ProductReviews productId={product._id} productSlug={product.slug} />}
       </div>
     </MainLayout>

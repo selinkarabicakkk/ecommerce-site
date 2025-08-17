@@ -15,11 +15,11 @@ import { z } from 'zod';
 // Form doğrulama şeması
 const addressSchema = z.object({
   type: z.enum(['shipping', 'billing']),
-  street: z.string().min(3, 'Address must be at least 3 characters'),
-  city: z.string().min(2, 'City must be at least 2 characters'),
-  state: z.string().min(2, 'State/District must be at least 2 characters'),
-  zipCode: z.string().min(4, 'ZIP code must be at least 4 characters'),
-  country: z.string().min(2, 'Country must be at least 2 characters'),
+  street: z.string().min(3, 'Adres en az 3 karakter olmalıdır'),
+  city: z.string().min(2, 'Şehir en az 2 karakter olmalıdır'),
+  state: z.string().min(2, 'İlçe/Eyalet en az 2 karakter olmalıdır'),
+  zipCode: z.string().min(4, 'Posta kodu en az 4 karakter olmalıdır'),
+  country: z.string().min(2, 'Ülke en az 2 karakter olmalıdır'),
   isDefault: z.boolean().optional(),
 });
 
@@ -65,8 +65,8 @@ export default function AddressesPage() {
         setAddresses(response.data.addresses || []);
       }
     } catch (err: any) {
-      console.error('Error while loading addresses:', err);
-      setError('An error occurred while loading addresses');
+      console.error('Adresler yüklenirken hata:', err);
+      setError('Adresler yüklenirken bir hata oluştu');
     } finally {
       setIsLoading(false);
     }
@@ -103,7 +103,7 @@ export default function AddressesPage() {
 
   // Adres silme
   const handleDeleteAddress = async (addressId: string) => {
-    if (!window.confirm('Are you sure you want to delete this address?')) {
+    if (!window.confirm('Bu adresi silmek istediğinizden emin misiniz?')) {
       return;
     }
     
@@ -111,7 +111,7 @@ export default function AddressesPage() {
       setIsSubmitting(true);
       const response = await userService.deleteAddress(addressId);
       if (response.success) {
-        setActionSuccess('Address deleted successfully');
+        setActionSuccess('Adres başarıyla silindi');
         // Adres listesini güncelle
         loadAddresses();
         
@@ -121,8 +121,8 @@ export default function AddressesPage() {
         }, 3000);
       }
     } catch (err: any) {
-      console.error('Error while deleting address:', err);
-      setError(err.message || 'An error occurred while deleting the address');
+      console.error('Adres silinirken hata:', err);
+      setError(err.message || 'Adres silinirken bir hata oluştu');
     } finally {
       setIsSubmitting(false);
     }
@@ -138,13 +138,13 @@ export default function AddressesPage() {
         // Adres güncelleme
         const response = await userService.updateAddress(editingAddressId, data);
         if (response.success) {
-          setActionSuccess('Address updated successfully');
+          setActionSuccess('Adres başarıyla güncellendi');
         }
       } else {
         // Yeni adres ekleme
         const response = await userService.addAddress(data);
         if (response.success) {
-          setActionSuccess('Address added successfully');
+          setActionSuccess('Adres başarıyla eklendi');
         }
       }
       
@@ -161,8 +161,8 @@ export default function AddressesPage() {
         setActionSuccess(null);
       }, 3000);
     } catch (err: any) {
-      console.error('Error while saving address:', err);
-      setError(err.message || 'An error occurred while saving the address');
+      console.error('Adres kaydedilirken hata:', err);
+      setError(err.message || 'Adres kaydedilirken bir hata oluştu');
     } finally {
       setIsSubmitting(false);
     }
@@ -190,41 +190,51 @@ export default function AddressesPage() {
     <MainLayout>
       <div className="container mx-auto py-8 px-4">
         <div className="max-w-3xl mx-auto">
-          <h1 className="text-2xl font-bold mb-6">My Account</h1>
+          <h1 className="text-2xl font-bold mb-6">Hesabım</h1>
           
           {/* Profil navigasyonu */}
           <div className="bg-white rounded-lg shadow-md p-4 mb-6">
             <div className="flex flex-wrap gap-2">
               <Link href="/profile" className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md">
-                Profile
+                Profil Bilgilerim
               </Link>
               <Link href="/profile/addresses" className="px-4 py-2 bg-primary text-white rounded-md">
-                Addresses
+                Adreslerim
               </Link>
               <Link href="/profile/orders" className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md">
-                Orders
+                Siparişlerim
               </Link>
               <Link href="/wishlist" className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md">
-                Wishlist
+                İstek Listem
               </Link>
             </div>
           </div>
           
           {/* Başarı mesajı */}
           {actionSuccess && (
-            <div className="bg-green-100 text-green-700 p-4 rounded-lg mb-6">{actionSuccess}</div>
+            <div className="bg-green-100 text-green-700 p-4 rounded-lg mb-6">
+              {actionSuccess}
+            </div>
           )}
           
           {/* Hata mesajı */}
           {error && (
-            <div className="bg-red-100 text-red-700 p-4 rounded-lg mb-6">{error}</div>
+            <div className="bg-red-100 text-red-700 p-4 rounded-lg mb-6">
+              {error}
+            </div>
           )}
           
           {/* Adres ekleme butonu */}
           {!showAddForm && (
             <div className="mb-6">
-              <Button onClick={() => { setShowAddForm(true); setEditingAddressId(null); reset(); }}>
-                Add New Address
+              <Button
+                onClick={() => {
+                  setShowAddForm(true);
+                  setEditingAddressId(null);
+                  reset(); // Formu sıfırla
+                }}
+              >
+                Yeni Adres Ekle
               </Button>
             </div>
           )}
@@ -232,65 +242,151 @@ export default function AddressesPage() {
           {/* Adres ekleme/düzenleme formu */}
           {showAddForm && (
             <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-              <h2 className="text-lg font-medium mb-4">{editingAddressId ? 'Edit Address' : 'Add New Address'}</h2>
+              <h2 className="text-lg font-medium mb-4">
+                {editingAddressId ? 'Adresi Düzenle' : 'Yeni Adres Ekle'}
+              </h2>
               
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 {/* Adres tipi */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Address Type <span className="text-red-500">*</span></label>
-                  <select {...register('type')} className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
-                    <option value="shipping">Shipping Address</option>
-                    <option value="billing">Billing Address</option>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Adres Tipi <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    {...register('type')}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                  >
+                    <option value="shipping">Teslimat Adresi</option>
+                    <option value="billing">Fatura Adresi</option>
                   </select>
                 </div>
                 
                 {/* Sokak/Cadde */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Address <span className="text-red-500">*</span></label>
-                  <input type="text" {...register('street')} className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${errors.street ? 'border-red-500' : 'border-gray-300'}`} />
-                  {errors.street && (<p className="mt-1 text-sm text-red-600">{errors.street.message}</p>)}
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Adres <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    {...register('street')}
+                    className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
+                      errors.street ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                  />
+                  {errors.street && (
+                    <p className="mt-1 text-sm text-red-600">{errors.street.message}</p>
+                  )}
                 </div>
                 
                 {/* Şehir ve İlçe/Eyalet */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">City <span className="text-red-500">*</span></label>
-                    <input type="text" {...register('city')} className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${errors.city ? 'border-red-500' : 'border-gray-300'}`} />
-                    {errors.city && (<p className="mt-1 text-sm text-red-600">{errors.city.message}</p>)}
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Şehir <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      {...register('city')}
+                      className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
+                        errors.city ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                    />
+                    {errors.city && (
+                      <p className="mt-1 text-sm text-red-600">{errors.city.message}</p>
+                    )}
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">State/District <span className="text-red-500">*</span></label>
-                    <input type="text" {...register('state')} className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${errors.state ? 'border-red-500' : 'border-gray-300'}`} />
-                    {errors.state && (<p className="mt-1 text-sm text-red-600">{errors.state.message}</p>)}
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      İlçe/Eyalet <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      {...register('state')}
+                      className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
+                        errors.state ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                    />
+                    {errors.state && (
+                      <p className="mt-1 text-sm text-red-600">{errors.state.message}</p>
+                    )}
                   </div>
                 </div>
                 
                 {/* Posta Kodu ve Ülke */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">ZIP Code <span className="text-red-500">*</span></label>
-                    <input type="text" {...register('zipCode')} className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${errors.zipCode ? 'border-red-500' : 'border-gray-300'}`} />
-                    {errors.zipCode && (<p className="mt-1 text-sm text-red-600">{errors.zipCode.message}</p>)}
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Posta Kodu <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      {...register('zipCode')}
+                      className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
+                        errors.zipCode ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                    />
+                    {errors.zipCode && (
+                      <p className="mt-1 text-sm text-red-600">{errors.zipCode.message}</p>
+                    )}
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Country <span className="text-red-500">*</span></label>
-                    <input type="text" {...register('country')} className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${errors.country ? 'border-red-500' : 'border-gray-300'}`} />
-                    {errors.country && (<p className="mt-1 text-sm text-red-600">{errors.country.message}</p>)}
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Ülke <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      {...register('country')}
+                      className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
+                        errors.country ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                    />
+                    {errors.country && (
+                      <p className="mt-1 text-sm text-red-600">{errors.country.message}</p>
+                    )}
                   </div>
                 </div>
                 
                 {/* Varsayılan adres */}
                 <div className="flex items-center">
-                  <input type="checkbox" id="isDefault" {...register('isDefault')} className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded" />
-                  <label htmlFor="isDefault" className="ml-2 block text-sm text-gray-700">Set this address as default</label>
+                  <input
+                    type="checkbox"
+                    id="isDefault"
+                    {...register('isDefault')}
+                    className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                  />
+                  <label htmlFor="isDefault" className="ml-2 block text-sm text-gray-700">
+                    Bu adresi varsayılan olarak ayarla
+                  </label>
                 </div>
                 
                 {/* Form butonları */}
                 <div className="pt-4 flex justify-end space-x-3">
-                  <Button type="button" variant="secondary" onClick={() => { setShowAddForm(false); setEditingAddressId(null); }} disabled={isSubmitting}>Cancel</Button>
-                  <Button type="submit" disabled={isSubmitting}>{isSubmitting ? (<div className="flex items-center"><div className="animate-spin mr-2 h-4 w-4 border-t-2 border-b-2 border-white rounded-full"></div>Saving...</div>) : ('Save')}</Button>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => {
+                      setShowAddForm(false);
+                      setEditingAddressId(null);
+                    }}
+                    disabled={isSubmitting}
+                  >
+                    İptal
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <div className="flex items-center">
+                        <div className="animate-spin mr-2 h-4 w-4 border-t-2 border-b-2 border-white rounded-full"></div>
+                        Kaydediliyor...
+                      </div>
+                    ) : (
+                      'Kaydet'
+                    )}
+                  </Button>
                 </div>
               </form>
             </div>
@@ -298,12 +394,16 @@ export default function AddressesPage() {
           
           {/* Adres listesi */}
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-lg font-medium mb-4">Saved Addresses</h2>
+            <h2 className="text-lg font-medium mb-4">Kayıtlı Adreslerim</h2>
             
             {isLoading ? (
-              <div className="flex justify-center py-8"><div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div></div>
+              <div className="flex justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+              </div>
             ) : addresses.length === 0 ? (
-              <div className="py-4 text-gray-500 text-center">You have no saved addresses.</div>
+              <div className="py-4 text-gray-500 text-center">
+                Henüz kayıtlı adresiniz bulunmamaktadır.
+              </div>
             ) : (
               <div className="space-y-4">
                 {addresses.map((address) => (
@@ -311,16 +411,36 @@ export default function AddressesPage() {
                     <div className="flex justify-between items-start">
                       <div>
                         <div className="flex items-center mb-2">
-                          <span className="font-medium">{address.type === 'shipping' ? 'Shipping Address' : 'Billing Address'}</span>
-                          {address.isDefault && (<span className="ml-2 px-2 py-0.5 bg-green-100 text-green-800 text-xs rounded-full">Default</span>)}
+                          <span className="font-medium">
+                            {address.type === 'shipping' ? 'Teslimat Adresi' : 'Fatura Adresi'}
+                          </span>
+                          {address.isDefault && (
+                            <span className="ml-2 px-2 py-0.5 bg-green-100 text-green-800 text-xs rounded-full">
+                              Varsayılan
+                            </span>
+                          )}
                         </div>
                         <p className="text-gray-600">{address.street}</p>
-                        <p className="text-gray-600">{address.city}, {address.state} {address.zipCode}</p>
+                        <p className="text-gray-600">
+                          {address.city}, {address.state} {address.zipCode}
+                        </p>
                         <p className="text-gray-600">{address.country}</p>
                       </div>
                       <div className="flex space-x-2">
-                        <button onClick={() => handleEditAddress(address)} className="text-blue-600 hover:text-blue-800" disabled={isSubmitting}>Edit</button>
-                        <button onClick={() => address._id && handleDeleteAddress(address._id)} className="text-red-600 hover:text-red-800" disabled={isSubmitting}>Delete</button>
+                        <button
+                          onClick={() => handleEditAddress(address)}
+                          className="text-blue-600 hover:text-blue-800"
+                          disabled={isSubmitting}
+                        >
+                          Düzenle
+                        </button>
+                        <button
+                          onClick={() => address._id && handleDeleteAddress(address._id)}
+                          className="text-red-600 hover:text-red-800"
+                          disabled={isSubmitting}
+                        >
+                          Sil
+                        </button>
                       </div>
                     </div>
                   </div>

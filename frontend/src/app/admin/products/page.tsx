@@ -27,8 +27,8 @@ export default function AdminProductsPage() {
   const [assignCategoryId, setAssignCategoryId] = useState<string>('');
   const [categories, setCategories] = useState<Array<{_id: string, name: string}>>([]);
   const [bulkLoading, setBulkLoading] = useState(false);
-
   
+  // Ürünleri getir
   const fetchProducts = async (page = 1, search = '') => {
     setIsLoading(true);
     try {
@@ -53,6 +53,7 @@ export default function AdminProductsPage() {
     }
   };
 
+  // Sayfa yüklendiğinde ürünleri getir
   useEffect(() => {
     if (!loading) {
       if (!isAuthenticated) {
@@ -61,13 +62,14 @@ export default function AdminProductsPage() {
         router.push('/');
       } else {
         fetchProducts();
+        // Kategorileri getir
         const fetchCategories = async () => {
           try {
             const response = await categoryService.getCategories({ limit: 100 });
             const categoryList = (response as any)?.categories || [];
             setCategories(categoryList);
           } catch (err) {
-            console.error('Error while loading categories:', err);
+            console.error('Kategoriler yüklenirken hata:', err);
           }
         };
         fetchCategories();
@@ -75,15 +77,18 @@ export default function AdminProductsPage() {
     }
   }, [isAuthenticated, loading, router, user]);
 
+  // Arama işlemi
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     fetchProducts(1, searchQuery);
   };
 
+  // Sayfa değiştirme
   const handlePageChange = (page: number) => {
     fetchProducts(page, searchQuery);
   };
 
+  // Ürün seçme
   const handleSelectProduct = (productId: string) => {
     setSelectedProducts((prev) => {
       if (prev.includes(productId)) {
@@ -94,6 +99,7 @@ export default function AdminProductsPage() {
     });
   };
 
+  // Tüm ürünleri seç/kaldır
   const handleSelectAll = () => {
     if (selectedProducts.length === products.length) {
       setSelectedProducts([]);
@@ -102,35 +108,40 @@ export default function AdminProductsPage() {
     }
   };
 
+  // Ürün silme
   const handleDeleteProduct = async (productId: string) => {
-    if (window.confirm('Are you sure you want to delete this product?')) {
+    if (window.confirm('Bu ürünü silmek istediğinize emin misiniz?')) {
       try {
         await productService.deleteProduct(productId);
         fetchProducts(currentPage, searchQuery);
       } catch (err) {
-        setError('An error occurred while deleting the product.');
-        console.error('Product delete error:', err);
+        setError('Ürün silinirken bir hata oluştu.');
+        console.error('Ürün silme hatası:', err);
       }
     }
   };
 
+  // Seçili ürünleri toplu silme
   const handleBulkDelete = async () => {
     if (selectedProducts.length === 0) return;
     
-    if (window.confirm(`Are you sure you want to delete ${selectedProducts.length} products?`)) {
+    if (window.confirm(`${selectedProducts.length} ürünü silmek istediğinize emin misiniz?`)) {
       try {
+        // Burada normalde bir bulk delete API çağrısı olabilir
+        // Şimdilik her ürünü tek tek siliyoruz
         for (const productId of selectedProducts) {
           await productService.deleteProduct(productId);
         }
         setSelectedProducts([]);
         fetchProducts(currentPage, searchQuery);
       } catch (err) {
-        setError('An error occurred while deleting products.');
-        console.error('Bulk delete error:', err);
+        setError('Ürünler silinirken bir hata oluştu.');
+        console.error('Toplu silme hatası:', err);
       }
     }
   };
 
+  // Toplu aktif/pasif veya öne çıkarma
   const handleBulkUpdate = async (payload: { isActive?: boolean; isFeatured?: boolean }) => {
     if (selectedProducts.length === 0) return;
     setBulkLoading(true);
@@ -140,13 +151,14 @@ export default function AdminProductsPage() {
       setSelectedProducts([]);
       fetchProducts(currentPage, searchQuery);
     } catch (err) {
-      setError('An error occurred during bulk update.');
-      console.error('Bulk update error:', err);
+      setError('Toplu güncelleme sırasında hata oluştu.');
+      console.error('Toplu güncelleme hatası:', err);
     } finally {
       setBulkLoading(false);
     }
   };
 
+  // Yükleniyor durumu
   if (loading || !user || user.role !== 'admin') {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -159,18 +171,19 @@ export default function AdminProductsPage() {
     <AdminLayout>
       <div className="p-6">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Product Management</h1>
+          <h1 className="text-2xl font-bold">Ürün Yönetimi</h1>
           <Button>
-            <Link href="/admin/products/new">Add New Product</Link>
+            <Link href="/admin/products/new">Yeni Ürün Ekle</Link>
           </Button>
         </div>
 
+        {/* Arama ve filtreler */}
         <div className="bg-white rounded-lg shadow-md p-4 mb-6">
           <form onSubmit={handleSearch} className="flex gap-3 items-center justify-between">
             <div className="flex gap-2 flex-1">
               <input
                 type="text"
-                placeholder="Search products..."
+                placeholder="Ürün ara..."
                 className="flex-grow px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -179,46 +192,47 @@ export default function AdminProductsPage() {
                 value={featuredFilter}
                 onChange={(e) => setFeaturedFilter(e.target.value as any)}
                 className="px-3 py-2 border rounded-md text-sm"
-                aria-label="Featured filter"
+                aria-label="Öne çıkan filtresi"
               >
-                <option value="all">All</option>
-                <option value="featured">Featured</option>
+                <option value="all">Hepsi</option>
+                <option value="featured">Öne Çıkan</option>
                 <option value="normal">Normal</option>
               </select>
               <select
                 value={stockFilter}
                 onChange={(e) => setStockFilter(e.target.value as any)}
                 className="px-3 py-2 border rounded-md text-sm"
-                aria-label="Stock filter"
+                aria-label="Stok filtresi"
               >
-                <option value="all">All Stock</option>
-                <option value="in-stock">In Stock</option>
-                <option value="out-of-stock">Out of Stock</option>
+                <option value="all">Tüm Stoklar</option>
+                <option value="in-stock">Stokta</option>
+                <option value="out-of-stock">Tükendi</option>
               </select>
-              <Button type="submit">Search</Button>
+              <Button type="submit">Ara</Button>
             </div>
-            <span className="text-sm text-gray-500 whitespace-nowrap ml-4">Total {totalCount} records</span>
+            <span className="text-sm text-gray-500 whitespace-nowrap ml-4">Toplam {totalCount} kayıt</span>
           </form>
         </div>
 
+        {/* Toplu işlemler */}
         {selectedProducts.length > 0 && (
           <div className="bg-gray-100 rounded-lg p-4 mb-6 flex justify-between items-center">
-            <span>{selectedProducts.length} selected</span>
+            <span>{selectedProducts.length} ürün seçildi</span>
             <div className="flex gap-2">
               <Button variant="outline" onClick={() => setSelectedProducts([])}>
-                Clear Selection
+                Seçimi Temizle
               </Button>
               <Button variant="outline" disabled={bulkLoading} onClick={() => handleBulkUpdate({ isActive: true })}>
-                Set Active
+                Aktif Yap
               </Button>
               <Button variant="outline" disabled={bulkLoading} onClick={() => handleBulkUpdate({ isActive: false })}>
-                Set Inactive
+                Pasif Yap
               </Button>
               <Button variant="outline" disabled={bulkLoading} onClick={() => handleBulkUpdate({ isFeatured: true })}>
-                Feature
+                Öne Çıkar
               </Button>
               <Button variant="outline" disabled={bulkLoading} onClick={() => handleBulkUpdate({ isFeatured: false })}>
-                Unfeature
+                Öne Çıkarmayı Kaldır
               </Button>
               <div className="flex items-center gap-2">
                 <select
@@ -226,7 +240,7 @@ export default function AdminProductsPage() {
                   onChange={(e) => setAssignCategoryId(e.target.value)}
                   className="px-3 py-2 border rounded-md text-sm w-48"
                 >
-                  <option value="">Select category...</option>
+                  <option value="">Kategori seçin...</option>
                   {categories.map((category) => (
                     <option key={category._id} value={category._id}>
                       {category.name}
@@ -250,22 +264,24 @@ export default function AdminProductsPage() {
                     }
                   }}
                 >
-                  Assign Category
+                  Kategori Ata
                 </Button>
               </div>
               <Button variant="destructive" onClick={handleBulkDelete}>
-                Delete Selected
+                Seçilenleri Sil
               </Button>
             </div>
           </div>
         )}
 
+        {/* Hata mesajı */}
         {error && (
           <div className="bg-red-100 text-red-700 p-4 rounded-lg mb-6">
             {error}
           </div>
         )}
 
+        {/* Ürün tablosu */}
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
           {isLoading ? (
             <div className="flex justify-center items-center h-64">
@@ -273,7 +289,7 @@ export default function AdminProductsPage() {
             </div>
           ) : products.length === 0 ? (
             <div className="p-8 text-center text-gray-500">
-              No products found.
+              Ürün bulunamadı.
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -289,22 +305,22 @@ export default function AdminProductsPage() {
                       />
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Product
+                      Ürün
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Category
+                      Kategori
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Price
+                      Fiyat
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Stock
+                      Stok
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
+                      Durum
                     </th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
+                      İşlemler
                     </th>
                   </tr>
                 </thead>
@@ -361,7 +377,7 @@ export default function AdminProductsPage() {
                               : 'bg-gray-100 text-gray-800'
                           }`}
                         >
-                          {product.isFeatured ? 'Featured' : 'Normal'}
+                          {product.isFeatured ? 'Öne Çıkan' : 'Normal'}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -370,13 +386,13 @@ export default function AdminProductsPage() {
                             href={`/admin/products/${product._id}/edit`}
                             className="text-indigo-600 hover:text-indigo-900"
                           >
-                            Edit
+                            Düzenle
                           </Link>
                           <button
                             onClick={() => handleDeleteProduct(product._id)}
                             className="text-red-600 hover:text-red-900"
                           >
-                            Delete
+                            Sil
                           </button>
                         </div>
                       </td>
@@ -388,6 +404,7 @@ export default function AdminProductsPage() {
           )}
         </div>
 
+        {/* Sayfalama */}
         {totalPages > 1 && (
           <div className="flex justify-center mt-6">
             <div className="flex space-x-1">
@@ -400,7 +417,7 @@ export default function AdminProductsPage() {
                     : 'bg-white text-gray-700 hover:bg-gray-50'
                 }`}
               >
-                Previous
+                Önceki
               </button>
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                 <button
@@ -424,7 +441,7 @@ export default function AdminProductsPage() {
                     : 'bg-white text-gray-700 hover:bg-gray-50'
                 }`}
               >
-                Next
+                Sonraki
               </button>
             </div>
           </div>

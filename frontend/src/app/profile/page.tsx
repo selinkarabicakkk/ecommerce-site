@@ -14,9 +14,9 @@ import { z } from 'zod';
 
 // Form doğrulama şeması
 const profileSchema = z.object({
-  firstName: z.string().min(2, 'First name must be at least 2 characters'),
-  lastName: z.string().min(2, 'Last name must be at least 2 characters'),
-  email: z.string().email('Please enter a valid email address'),
+  firstName: z.string().min(2, 'Ad en az 2 karakter olmalıdır'),
+  lastName: z.string().min(2, 'Soyad en az 2 karakter olmalıdır'),
+  email: z.string().email('Geçerli bir e-posta adresi giriniz'),
   phoneNumber: z.string().optional(),
 });
 
@@ -85,8 +85,8 @@ export default function ProfilePage() {
         setUpdateSuccess(false);
       }, 3000);
     } catch (err: any) {
-      console.error('Error while updating profile:', err);
-      setUpdateError(err.message || 'An error occurred while updating your profile');
+      console.error('Profil güncellenirken hata:', err);
+      setUpdateError(err.message || 'Profil güncellenirken bir hata oluştu');
     } finally {
       setIsSubmitting(false);
     }
@@ -114,22 +114,22 @@ export default function ProfilePage() {
     <MainLayout>
       <div className="container mx-auto py-8 px-4">
         <div className="max-w-3xl mx-auto">
-          <h1 className="text-2xl font-bold mb-6">My Account</h1>
+          <h1 className="text-2xl font-bold mb-6">Hesabım</h1>
           
           {/* Profil navigasyonu */}
           <div className="bg-white rounded-lg shadow-md p-4 mb-6">
             <div className="flex flex-wrap gap-2">
               <Link href="/profile" className="px-4 py-2 bg-primary text-white rounded-md">
-                Profile
+                Profil Bilgilerim
               </Link>
               <Link href="/profile/addresses" className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md">
-                Addresses
+                Adreslerim
               </Link>
               <Link href="/profile/orders" className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md">
-                Orders
+                Siparişlerim
               </Link>
               <Link href="/wishlist" className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md">
-                Wishlist
+                İstek Listem
               </Link>
             </div>
           </div>
@@ -137,7 +137,7 @@ export default function ProfilePage() {
           {/* Başarı mesajı */}
           {updateSuccess && (
             <div className="bg-green-100 text-green-700 p-4 rounded-lg mb-6">
-              Your profile has been updated successfully.
+              Profil bilgileriniz başarıyla güncellendi.
             </div>
           )}
           
@@ -150,14 +150,14 @@ export default function ProfilePage() {
           
           {/* Profil formu */}
           <div className="card p-6">
-            <h2 className="text-lg font-medium mb-4">Profile Information</h2>
+            <h2 className="text-lg font-medium mb-4">Profil Bilgileri</h2>
             
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Ad */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    First Name <span className="text-red-500">*</span>
+                    Ad <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -174,7 +174,7 @@ export default function ProfilePage() {
                 {/* Soyad */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Last Name <span className="text-red-500">*</span>
+                    Soyad <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -191,7 +191,7 @@ export default function ProfilePage() {
                 {/* E-posta */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Email <span className="text-red-500">*</span>
+                    E-posta <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="email"
@@ -207,7 +207,7 @@ export default function ProfilePage() {
                 {/* Telefon */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Phone
+                    Telefon
                   </label>
                   <input
                     type="tel"
@@ -221,7 +221,7 @@ export default function ProfilePage() {
               {/* Şifre değiştirme bağlantısı */}
               <div className="pt-4">
                 <Link href="/auth/reset-password" className="text-primary hover:underline">
-                  I want to change my password
+                  Şifremi değiştirmek istiyorum
                 </Link>
               </div>
               
@@ -234,10 +234,10 @@ export default function ProfilePage() {
                   {isSubmitting ? (
                     <div className="flex items-center">
                       <div className="animate-spin mr-2 h-4 w-4 border-t-2 border-b-2 border-white rounded-full"></div>
-                      Updating...
+                      Güncelleniyor...
                     </div>
                   ) : (
-                    'Update Information'
+                    'Bilgileri Güncelle'
                   )}
                 </Button>
               </div>

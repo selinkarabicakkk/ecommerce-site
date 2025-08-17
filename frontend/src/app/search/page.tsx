@@ -41,8 +41,8 @@ export default function SearchPage() {
           setTotalPages(1);
         }
       } catch (error) {
-        console.error('Error while loading search results:', error);
-        setError('An error occurred while loading search results');
+        console.error('Arama sonuçları yüklenirken hata:', error);
+        setError('Arama sonuçları yüklenirken bir hata oluştu');
       } finally {
         setLoading(false);
       }
@@ -68,13 +68,13 @@ export default function SearchPage() {
   return (
     <MainLayout>
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold mb-6">Product Search</h1>
+        <h1 className="text-2xl font-bold mb-6">Ürün Arama</h1>
         
         {/* Arama çubuğu */}
         <div className="mb-8">
           <SearchBar 
             className="max-w-2xl mx-auto"
-            placeholder="What are you looking for?"
+            placeholder="Ne aramıştınız?"
             onSearch={handleSearch}
           />
         </div>
@@ -83,11 +83,11 @@ export default function SearchPage() {
         {query && (
           <div className="mb-6">
             <h2 className="text-xl font-semibold">
-              {loading ? 'Searching...' : `Search results for "${query}"`}
+              {loading ? 'Aranıyor...' : `"${query}" için arama sonuçları`}
             </h2>
             {!loading && products.length > 0 && (
               <p className="text-gray-500 mt-1">
-                {products.length} results found
+                {products.length} sonuç bulundu
               </p>
             )}
           </div>
@@ -132,7 +132,7 @@ export default function SearchPage() {
                     onClick={() => handlePageChange(page - 1)}
                     disabled={page === 1}
                   >
-                    Previous
+                    Önceki
                   </Button>
                   
                   {[...Array(totalPages)].map((_, i) => (
@@ -150,7 +150,7 @@ export default function SearchPage() {
                     onClick={() => handlePageChange(page + 1)}
                     disabled={page === totalPages}
                   >
-                    Next
+                    Sonraki
                   </Button>
                 </div>
               </div>
@@ -159,20 +159,20 @@ export default function SearchPage() {
         ) : query ? (
           <div className="text-center py-12">
             <div className="text-5xl mb-4">🔍</div>
-            <h3 className="text-xl font-medium mb-2">No results found</h3>
+            <h3 className="text-xl font-medium mb-2">Sonuç bulunamadı</h3>
             <p className="text-gray-500 mb-6">
-              No results for "{query}". Please try different keywords.
+              "{query}" için sonuç bulunamadı. Lütfen farklı anahtar kelimeler ile tekrar deneyin.
             </p>
             <div className="flex justify-center">
-              <Button onClick={() => setQuery('')}>Clear Search</Button>
+              <Button onClick={() => setQuery('')}>Aramayı Temizle</Button>
             </div>
           </div>
         ) : (
           <div className="text-center py-12">
             <div className="text-5xl mb-4">🔍</div>
-            <h3 className="text-xl font-medium mb-2">Use the search bar above to start searching</h3>
+            <h3 className="text-xl font-medium mb-2">Arama yapmak için yukarıdaki arama çubuğunu kullanın</h3>
             <p className="text-gray-500">
-              You can search by product name, description or category.
+              Ürün adı, açıklama veya kategori ile arama yapabilirsiniz.
             </p>
           </div>
         )}
