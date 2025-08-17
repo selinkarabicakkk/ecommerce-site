@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import MainLayout from '@/components/layout/MainLayout';
 import ProductCard from '@/components/product/ProductCard';
@@ -10,7 +10,7 @@ import Pagination from '@/components/ui/Pagination';
 import { productService } from '@/services';
 import { Product, ProductFilters } from '@/types';
 
-export default function ProductsPage() {
+function ProductsContent() {
   const searchParams = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -204,5 +204,23 @@ export default function ProductsPage() {
         </div>
       </div>
     </MainLayout>
+  );
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense
+      fallback={
+        <MainLayout>
+          <div className="container mx-auto px-4 py-8">
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+            </div>
+          </div>
+        </MainLayout>
+      }
+    >
+      <ProductsContent />
+    </Suspense>
   );
 }
