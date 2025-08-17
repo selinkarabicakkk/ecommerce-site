@@ -56,10 +56,11 @@ export const rateLimit = (options: RateLimitOptions) => {
 
     // Check if over limit
     if (store[key].count > max) {
-      return res.status(statusCode).json({
+      res.status(statusCode).json({
         success: false,
         message,
       });
+      return;
     }
 
     next();
