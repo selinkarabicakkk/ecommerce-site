@@ -32,8 +32,19 @@ const app: Express = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({
-  origin: config.frontendUrl,
-  credentials: true
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps, curl)
+    if (!origin) return callback(null, true);
+    const allowed = [
+      config.frontendUrl,
+      'https://'+(process.env.VERCEL_URL || ''),
+    ].filter(Boolean);
+    if (allowed.some((u) => origin === u)) {
+      return callback(null, true);
+    }
+    return callback(null, false);
+  },
+  credentials: true,
 }));
 
 // Swagger dokümantasyonunu kur
