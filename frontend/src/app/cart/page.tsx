@@ -155,13 +155,13 @@ export default function CartPage() {
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {items.map((item) => {
-                      const product = item.product as Product;
+                      const product = (item.product as unknown as Product) || null;
                       return (
                         <tr key={item._id}>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
                               <div className="h-16 w-16 flex-shrink-0 mr-4">
-                                {product.images && product.images.length > 0 ? (
+                                {product && product.images && product.images.length > 0 ? (
                                   <div className="relative h-16 w-16">
                                     <Image
                                       src={getAssetUrl(product.images[0])}
@@ -178,12 +178,16 @@ export default function CartPage() {
                                 )}
                               </div>
                               <div>
-                                <Link
-                                  href={`/products/${product.slug}`}
-                                  className="text-sm font-medium text-gray-900 hover:text-primary"
-                                >
-                                  {product.name}
-                                </Link>
+                                {product ? (
+                                  <Link
+                                    href={`/products/${product.slug}`}
+                                    className="text-sm font-medium text-gray-900 hover:text-primary"
+                                  >
+                                    {product.name}
+                                  </Link>
+                                ) : (
+                                  <span className="text-sm font-medium text-gray-900">Ürün mevcut değil</span>
+                                )}
                                 {item.variantOptions && Object.keys(item.variantOptions).length > 0 && (
                                   <div className="text-xs text-gray-500 mt-1">
                                     {Object.entries(item.variantOptions).map(([key, value]) => (
