@@ -220,23 +220,6 @@ Authorization: Bearer <JWT>
 - Veya File’dan OpenAPI JSON dosyasını içe aktarın
 - İsteklerde “Auth → Bearer” seçip token’ı girin
 
-## Ekran Görüntüleri
-
-README içinde görselleri göstermek için dosyaları şu klasöre koy:
-
-- `docs/screenshots/`
-
-Önerilen dosya isimleri ve yerleştirme:
-
-- Ana sayfa hero: `docs/screenshots/home-hero.png`
-- Ana sayfa kategoriler: `docs/screenshots/home-categories.png`
-- Ana sayfa popüler/öne çıkan: `docs/screenshots/home-featured-or-popular.png`
-- Ürün listesi: `docs/screenshots/products-list.png`
-- Ürün detay: `docs/screenshots/product-detail.png`
-- Sepet: `docs/screenshots/cart.png`
-- Ödeme: `docs/screenshots/checkout-payment.png`
-- Admin ürünler: `docs/screenshots/admin-products.png`
-- Admin kategoriler: `docs/screenshots/admin-categories.png`
 
 ### Örnek Görseller
 
