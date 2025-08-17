@@ -10,6 +10,7 @@
     "seed": "npx ts-node src/utils/seeder.ts",
     "seed:products": "npx ts-node src/utils/seedProducts.ts",
     "localize:products": "npx ts-node src/utils/localizeProductNames.ts",
+    "localize:categories": "npx ts-node src/utils/localizeCategoryNames.ts",
     "cleanup:old-products": "npx ts-node src/utils/cleanupOldProducts.ts",
     "inspect:inventory": "npx ts-node src/utils/inspectInventory.ts",
     "ensure:admin": "npx ts-node src/utils/ensureAdmin.ts",
