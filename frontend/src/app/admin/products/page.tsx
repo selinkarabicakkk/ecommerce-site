@@ -24,6 +24,7 @@ export default function AdminProductsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [stockFilter, setStockFilter] = useState<'all' | 'in-stock' | 'out-of-stock'>('all');
   const [featuredFilter, setFeaturedFilter] = useState<'all' | 'featured' | 'normal'>('all');
+  const [assignCategoryId, setAssignCategoryId] = useState<string>('');
   const [bulkLoading, setBulkLoading] = useState(false);
   
   // Ürünleri getir
@@ -221,6 +222,34 @@ export default function AdminProductsPage() {
               <Button variant="outline" disabled={bulkLoading} onClick={() => handleBulkUpdate({ isFeatured: false })}>
                 Öne Çıkarmayı Kaldır
               </Button>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  placeholder="Kategori ID"
+                  value={assignCategoryId}
+                  onChange={(e) => setAssignCategoryId(e.target.value)}
+                  className="px-3 py-2 border rounded-md text-sm w-40"
+                />
+                <Button
+                  variant="outline"
+                  disabled={bulkLoading || !assignCategoryId}
+                  onClick={async () => {
+                    if (!assignCategoryId) return;
+                    setBulkLoading(true);
+                    try {
+                      const items = selectedProducts.map((id) => ({ id, category: assignCategoryId }));
+                      await productService.bulkUpdateProducts(items as any);
+                      setSelectedProducts([]);
+                      setAssignCategoryId('');
+                      fetchProducts(currentPage, searchQuery);
+                    } finally {
+                      setBulkLoading(false);
+                    }
+                  }}
+                >
+                  Kategori Ata
+                </Button>
+              </div>
               <Button variant="destructive" onClick={handleBulkDelete}>
                 Seçilenleri Sil
               </Button>

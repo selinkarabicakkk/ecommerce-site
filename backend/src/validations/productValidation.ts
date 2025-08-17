@@ -70,6 +70,7 @@ export const bulkUpdateProductsSchema = z.object({
         id: z.string().min(1, 'Product ID is required'),
         isActive: z.boolean().optional(),
         isFeatured: z.boolean().optional(),
+        category: z.string().optional(),
       })
     )
     .min(1, 'At least one item is required'),
