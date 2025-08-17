@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { useAppSelector } from '@/store';
 import { productService } from '@/services';
 import { Product } from '@/types';
+import { getAssetUrl } from '@/lib/utils';
 
 export default function AdminProductsPage() {
   const router = useRouter();
@@ -265,7 +266,7 @@ export default function AdminProductsPage() {
                           <div className="h-10 w-10 bg-gray-200 rounded-md mr-3">
                             {product.images && product.images.length > 0 && (
                               <img
-                                src={`/uploads/images/${product.images[0]}`}
+                                src={getAssetUrl(product.images[0])}
                                 alt={product.name}
                                 className="h-10 w-10 object-cover rounded-md"
                               />
