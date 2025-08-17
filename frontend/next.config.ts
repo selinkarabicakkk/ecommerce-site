@@ -11,8 +11,13 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    domains: ['localhost', '127.0.0.1'],
+    domains: ['localhost', '127.0.0.1', 'ecommerce-site-backend-ebon.vercel.app'],
     remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'ecommerce-site-backend-ebon.vercel.app',
+        pathname: '/images/**',
+      },
       {
         protocol: 'http',
         hostname: 'localhost',
