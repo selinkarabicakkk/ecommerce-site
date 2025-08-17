@@ -46,28 +46,24 @@ export default function OrdersPage() {
   const getOrderStatusInfo = (status: string) => {
     switch (status) {
       case 'pending':
-        return { color: 'bg-yellow-100 text-yellow-800', label: 'Beklemede' };
+        return { color: 'bg-yellow-100 text-yellow-800', label: 'Pending' };
       case 'processing':
-        return { color: 'bg-blue-100 text-blue-800', label: 'İşleniyor' };
+        return { color: 'bg-blue-100 text-blue-800', label: 'Processing' };
       case 'shipped':
-        return { color: 'bg-indigo-100 text-indigo-800', label: 'Kargoda' };
+        return { color: 'bg-indigo-100 text-indigo-800', label: 'Shipped' };
       case 'delivered':
-        return { color: 'bg-green-100 text-green-800', label: 'Teslim Edildi' };
+        return { color: 'bg-green-100 text-green-800', label: 'Delivered' };
       case 'cancelled':
-        return { color: 'bg-red-100 text-red-800', label: 'İptal Edildi' };
+        return { color: 'bg-red-100 text-red-800', label: 'Cancelled' };
       default:
-        return { color: 'bg-gray-100 text-gray-800', label: 'Bilinmiyor' };
+        return { color: 'bg-gray-100 text-gray-800', label: 'Unknown' };
     }
   };
 
   // Tarih formatı
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return new Intl.DateTimeFormat('tr-TR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    }).format(date);
+    return new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: 'numeric' }).format(date);
   };
 
   // Yükleniyor durumu
@@ -92,23 +88,15 @@ export default function OrdersPage() {
     <MainLayout>
       <div className="container mx-auto py-8 px-4">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-2xl font-bold mb-6">Hesabım</h1>
+          <h1 className="text-2xl font-bold mb-6">My Account</h1>
           
           {/* Profil navigasyonu */}
           <div className="bg-white rounded-lg shadow-md p-4 mb-6">
             <div className="flex flex-wrap gap-2">
-              <Link href="/profile" className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md">
-                Profil Bilgilerim
-              </Link>
-              <Link href="/profile/addresses" className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md">
-                Adreslerim
-              </Link>
-              <Link href="/profile/orders" className="px-4 py-2 bg-primary text-white rounded-md">
-                Siparişlerim
-              </Link>
-              <Link href="/wishlist" className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md">
-                İstek Listem
-              </Link>
+              <Link href="/profile" className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md">Profile</Link>
+              <Link href="/profile/addresses" className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md">Addresses</Link>
+              <Link href="/profile/orders" className="px-4 py-2 bg-primary text-white rounded-md">My Orders</Link>
+              <Link href="/wishlist" className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md">Wishlist</Link>
             </div>
           </div>
           
@@ -121,7 +109,7 @@ export default function OrdersPage() {
           
           {/* Sipariş listesi */}
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-lg font-medium mb-6">Siparişlerim</h2>
+            <h2 className="text-lg font-medium mb-6">My Orders</h2>
             
             {isLoading ? (
               <div className="flex justify-center py-8">
@@ -129,10 +117,8 @@ export default function OrdersPage() {
               </div>
             ) : orders.length === 0 ? (
               <div className="py-8 text-center">
-                <p className="text-gray-500 mb-4">Henüz hiç siparişiniz bulunmuyor.</p>
-                <Link href="/products" className="text-primary hover:underline">
-                  Alışverişe Başla
-                </Link>
+                <p className="text-gray-500 mb-4">You don’t have any orders yet.</p>
+                <Link href="/products" className="text-primary hover:underline">Start Shopping</Link>
               </div>
             ) : (
               <div className="space-y-6">
@@ -142,16 +128,14 @@ export default function OrdersPage() {
                     <div className="bg-gray-50 p-4 border-b border-gray-200">
                       <div className="flex flex-wrap justify-between items-center gap-2">
                         <div>
-                          <p className="text-sm text-gray-500">Sipariş No: <span className="font-medium text-gray-700">{order._id}</span></p>
-                          <p className="text-sm text-gray-500">Tarih: <span className="font-medium text-gray-700">{formatDate(order.createdAt)}</span></p>
+                          <p className="text-sm text-gray-500">Order No: <span className="font-medium text-gray-700">{order._id}</span></p>
+                          <p className="text-sm text-gray-500">Date: <span className="font-medium text-gray-700">{formatDate(order.createdAt)}</span></p>
                         </div>
                         <div className="flex items-center gap-3">
                           <span className={`px-3 py-1 rounded-full text-xs font-medium ${getOrderStatusInfo(order.status).color}`}>
                             {getOrderStatusInfo(order.status).label}
                           </span>
-                          <Link href={`/profile/orders/${order._id}`} className="text-primary hover:underline text-sm">
-                            Detayları Görüntüle
-                          </Link>
+                          <Link href={`/profile/orders/${order._id}`} className="text-primary hover:underline text-sm">View Details</Link>
                         </div>
                       </div>
                     </div>
@@ -172,18 +156,14 @@ export default function OrdersPage() {
                             </div>
                             <div className="flex-grow">
                               <p className="font-medium">{item.name}</p>
-                              <p className="text-sm text-gray-500">
-                                {item.quantity} adet x {item.price.toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' })}
-                              </p>
+                              <p className="text-sm text-gray-500">{item.quantity} pcs x {item.price.toLocaleString('en-US', { style: 'currency', currency: 'TRY' })}</p>
                             </div>
                           </div>
                         ))}
                         
                         {/* Daha fazla ürün varsa */}
                         {order.orderItems.length > 2 && (
-                          <p className="text-sm text-gray-500">
-                            + {order.orderItems.length - 2} ürün daha
-                          </p>
+                          <p className="text-sm text-gray-500">+ {order.orderItems.length - 2} more item(s)</p>
                         )}
                       </div>
                     </div>
@@ -191,10 +171,8 @@ export default function OrdersPage() {
                     {/* Sipariş toplamı */}
                     <div className="bg-gray-50 p-4 border-t border-gray-200 flex justify-between items-center">
                       <div>
-                        <p className="text-sm text-gray-500">Toplam Tutar:</p>
-                        <p className="font-bold text-lg">
-                          {order.totalPrice.toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' })}
-                        </p>
+                        <p className="text-sm text-gray-500">Total Amount:</p>
+                        <p className="font-bold text-lg">{order.totalPrice.toLocaleString('en-US', { style: 'currency', currency: 'TRY' })}</p>
                       </div>
                       {order.status === 'delivered' && (
                         <Link
@@ -203,7 +181,7 @@ export default function OrdersPage() {
                             : order.orderItems[0].product._id}/review`}
                           className="px-4 py-2 bg-primary text-white rounded-md text-sm"
                         >
-                          Değerlendirme Yap
+                          Write a Review
                         </Link>
                       )}
                     </div>
