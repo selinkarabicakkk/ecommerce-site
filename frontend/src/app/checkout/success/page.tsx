@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import MainLayout from '@/components/layout/MainLayout';
@@ -31,7 +31,7 @@ interface Order {
   };
 }
 
-export default function CheckoutSuccessPage() {
+function CheckoutSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const orderId = searchParams.get('orderId');
@@ -54,7 +54,7 @@ export default function CheckoutSuccessPage() {
       try {
         setIsLoading(true);
         const response = await orderService.getOrderById(orderId);
-        setOrder(response.data);
+        setOrder(((response as any)?.order as Order) ?? (response as any)?.data ?? null);
       } catch (err: any) {
         console.error('Sipariş bilgileri yüklenirken hata:', err);
         setError(err.message || 'Sipariş bilgileri yüklenirken bir hata oluştu');
@@ -233,5 +233,23 @@ export default function CheckoutSuccessPage() {
         </div>
       </div>
     </MainLayout>
+  );
+}
+
+export default function CheckoutSuccessPage() {
+  return (
+    <Suspense
+      fallback={
+        <MainLayout>
+          <div className="container mx-auto py-8 px-4">
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+            </div>
+          </div>
+        </MainLayout>
+      }
+    >
+      <CheckoutSuccessContent />
+    </Suspense>
   );
 }
