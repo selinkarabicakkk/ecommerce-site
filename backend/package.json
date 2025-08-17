@@ -9,6 +9,7 @@
     "dev": "nodemon --watch \"src/**/*.ts\" --exec \"npx ts-node\" src/index.ts",
     "seed": "npx ts-node src/utils/seeder.ts",
     "seed:products": "npx ts-node src/utils/seedProducts.ts",
+    "cleanup:old-products": "npx ts-node src/utils/cleanupOldProducts.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
