@@ -7,8 +7,7 @@ import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/Button';
 import { useAppDispatch, useAppSelector } from '@/store';
 import { clearCart } from '@/store/slices/cartSlice';
-import { orderService } from '@/services';
-import useProductTracking from '@/hooks/useProductTracking';
+import { orderService, activityService } from '@/services';
 
 interface PaymentFormData {
   cardNumber: string;
@@ -20,7 +19,7 @@ interface PaymentFormData {
 export default function CheckoutPaymentPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { trackProductActivity } = useProductTracking();
+  // Aktivite kaydı için servis kullanılacak
   
   const { user, isAuthenticated, loading: authLoading } = useAppSelector((state) => state.auth);
   const { items, totalPrice, loading: cartLoading } = useAppSelector((state) => state.cart);
@@ -197,46 +196,32 @@ export default function CheckoutPaymentPage() {
       // Ödeme işlemi simülasyonu
       await new Promise((resolve) => setTimeout(resolve, 1500));
       
-      // Sipariş oluştur
+      // Sipariş oluştur (servisin tipine uygun sade payload)
       const orderData = {
         orderItems: orderDetails.items.map((item: any) => ({
           product: item.product._id,
           quantity: item.quantity,
-          price: item.product.price,
         })),
         shippingAddress: {
+          type: 'shipping' as const,
           street: orderDetails.shipping.street,
           city: orderDetails.shipping.city,
           state: orderDetails.shipping.state,
           zipCode: orderDetails.shipping.zipCode,
           country: orderDetails.shipping.country,
-        },
-        billingAddress: {
-          street: orderDetails.shipping.street,
-          city: orderDetails.shipping.city,
-          state: orderDetails.shipping.state,
-          zipCode: orderDetails.shipping.zipCode,
-          country: orderDetails.shipping.country,
+          isDefault: true,
         },
         paymentMethod: 'Credit Card',
-        paymentResult: {
-          id: `PAY-${Math.random().toString(36).substring(2, 15)}`,
-          status: 'completed',
-          updateTime: new Date().toISOString(),
-        },
-        taxPrice: orderDetails.taxPrice,
-        shippingPrice: orderDetails.shippingPrice,
-        totalPrice: orderDetails.totalPrice + orderDetails.taxPrice + orderDetails.shippingPrice,
-        isPaid: true,
-        paidAt: new Date().toISOString(),
       };
       
       const response = await orderService.createOrder(orderData);
       
       // Ürünleri satın alma olarak izle
-      orderDetails.items.forEach((item: any) => {
-        trackProductActivity(item.product._id, 'purchase');
-      });
+      for (const item of orderDetails.items as any[]) {
+        try {
+          await activityService.logActivity({ productId: item.product._id, activityType: 'purchase' });
+        } catch {}
+      }
       
       // Sepeti temizle
       dispatch(clearCart());
@@ -245,7 +230,9 @@ export default function CheckoutPaymentPage() {
       localStorage.removeItem('shippingInfo');
       
       // Başarı sayfasına yönlendir
-      router.push(`/checkout/success?orderId=${response.data._id}`);
+      const createdOrder: any = (response as any).order || response.data;
+      const orderId = createdOrder?._id || '';
+      router.push(`/checkout/success?orderId=${orderId}`);
     } catch (error: any) {
       console.error('Ödeme işlemi sırasında hata:', error);
       setPaymentError(error.message || 'Ödeme işlemi sırasında bir hata oluştu');

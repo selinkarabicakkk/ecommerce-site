@@ -20,7 +20,11 @@ export const activityService = {
   // Popüler ürünleri getir
   getPopularProducts: async (limit: number = 8) => {
     const response = await api.get<ApiResponse<any>>(`/recommendations/popular?limit=${limit}`);
-    return response.data;
+    const raw: any = response.data;
+    if (raw && raw.products) {
+      return { success: raw.success, data: raw.products } as ApiResponse<any>;
+    }
+    return raw;
   },
 
   // Kullanıcıya özel önerilen ürünleri getir
