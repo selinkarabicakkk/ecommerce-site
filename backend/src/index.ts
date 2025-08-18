@@ -31,32 +31,21 @@ const app: Express = express();
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Centralized CORS options to support preflight (OPTIONS) and auth headers
-const normalizeOrigin = (value: string): string => {
-  try {
-    const trimmed = value.trim().replace(/\/$/, '');
-    const url = new URL(trimmed);
-    return url.origin;
-  } catch {
-    return value.trim().replace(/\/$/, '');
-  }
-};
-
-const corsOptions = {
-  // Geçici: tüm origin'lere izin ver; cors paketi credentials=true iken gelen origin'i aynen döndürür
-  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-    return callback(null, true);
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps, curl)
+    if (!origin) return callback(null, true);
+    const allowed = [
+      config.frontendUrl,
+      'https://'+(process.env.VERCEL_URL || ''),
+    ].filter(Boolean);
+    if (allowed.some((u) => origin === u)) {
+      return callback(null, true);
+    }
+    return callback(null, false);
   },
   credentials: true,
-  methods: ['GET','HEAD','PUT','PATCH','POST','DELETE','OPTIONS'],
-  allowedHeaders: ['Content-Type','Authorization'],
-  optionsSuccessStatus: 204,
-};
-
-app.use(cors(corsOptions));
-// Ensure preflight requests are handled for all routes
-app.options('*', cors(corsOptions));
+}));
 
 // Swagger dokümantasyonunu kur
 setupSwagger(app);
