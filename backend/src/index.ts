@@ -33,17 +33,39 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Centralized CORS options to support preflight (OPTIONS) and auth headers
+const normalizeOrigin = (value: string): string => {
+  try {
+    const trimmed = value.trim().replace(/\/$/, '');
+    const url = new URL(trimmed);
+    return url.origin;
+  } catch {
+    return value.trim().replace(/\/$/, '');
+  }
+};
+
 const corsOptions = {
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-    // Allow requests with no origin (like mobile apps, curl)
     if (!origin) return callback(null, true);
-    const allowed = [
+
+    const allowedListRaw = [
       config.frontendUrl,
       'https://'+(process.env.VERCEL_URL || ''),
-    ].filter(Boolean);
-    if (allowed.some((u) => origin === u)) {
+    ].filter(Boolean) as string[];
+
+    const allowedList = allowedListRaw.map((u) => normalizeOrigin(u));
+    const requestOrigin = normalizeOrigin(origin);
+
+    const requestHostname = (() => { try { return new URL(requestOrigin).hostname; } catch { return ''; } })();
+    const allowedHostnames = allowedList.map((u) => { try { return new URL(u).hostname; } catch { return ''; } });
+
+    const isExactAllowed = allowedList.includes(requestOrigin);
+    const matchesAllowedHostname = allowedHostnames.some((h) => h && (requestHostname === h || requestHostname.endsWith(`.${h}`)));
+    const isVercelPreview = requestHostname.endsWith('.vercel.app');
+
+    if (isExactAllowed || matchesAllowedHostname || isVercelPreview) {
       return callback(null, true);
     }
+
     return callback(null, false);
   },
   credentials: true,
