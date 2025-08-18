@@ -24,6 +24,11 @@ Modern, ölçeklenebilir ve kullanıcı dostu bir e-ticaret platformu. Müşteri
 
 ## Genel Bakış
 
+Canlı ortam (Vercel):
+
+- Uygulama (Frontend): `https://ecommerce-site-frontend-one.vercel.app/`
+- API (Backend): `https://ecommerce-site-backend-mu.vercel.app/`
+
 ## Teknoloji Yığını
 
 ### Frontend
@@ -112,8 +117,13 @@ npm install
 npm run dev
 ```
 
+Geliştirme ortamı:
 Uygulama: `http://localhost:3000`
 API: `http://localhost:5000/api`
+
+Canlı ortam (Vercel):
+Uygulama: `https://ecommerce-site-frontend-one.vercel.app/`
+API: `https://ecommerce-site-backend-mu.vercel.app/api`
 
 ## Ortam Değişkenleri
 
@@ -143,6 +153,15 @@ NEXT_PUBLIC_ASSETS_BASE_URL=http://localhost:5000
 ```
 
 Not: Next.js Image için `next.config.ts` içerisinde `images.domains` ve `remotePatterns` alanlarında `localhost:5000` ve `127.0.0.1:5000` tanımlıdır.
+
+#### Production (Vercel) İçin Frontend Env
+
+```
+NEXT_PUBLIC_API_URL=https://ecommerce-site-backend-mu.vercel.app/api
+NEXT_PUBLIC_ASSETS_BASE_URL=https://ecommerce-site-backend-mu.vercel.app
+```
+
+Not: `next.config.ts` içinde production görseller için `images.domains`/`remotePatterns` alanında `ecommerce-site-backend-mu.vercel.app` tanımlıdır.
 
 ## Görsellerin Yönetimi ve URL Kuralları
 
@@ -199,8 +218,10 @@ Detaylı şema ve örnekler için `backend/src/routes/*` ve controller’lara ba
 
 ## API Dokümanı (Swagger)
 
-- Swagger UI: `http://localhost:5000/api-docs`
-- OpenAPI JSON: `http://localhost:5000/api-docs.json`
+- Swagger UI (Geliştirme): `http://localhost:5000/api-docs`
+- OpenAPI JSON (Geliştirme): `http://localhost:5000/api-docs.json`
+- Swagger UI (Canlı): `https://ecommerce-site-backend-mu.vercel.app/api-docs`
+- OpenAPI JSON (Canlı): `https://ecommerce-site-backend-mu.vercel.app/api-docs.json`
 - Kimlik Doğrulama: Korumalı uçlar için Authorization header kullanın:
 
 ```http

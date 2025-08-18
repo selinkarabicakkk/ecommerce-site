@@ -21,6 +21,10 @@ const swaggerOptions = {
         url: `http://localhost:${config.port}`,
         description: 'Geliştirme sunucusu',
       },
+      {
+        url: 'https://ecommerce-site-backend-mu.vercel.app',
+        description: 'Canlı (Vercel)',
+      },
     ],
     components: {
       securitySchemes: {
@@ -53,4 +57,5 @@ export const setupSwagger = (app: Express): void => {
   });
   
   console.log(`Swagger UI kullanılabilir: http://localhost:${config.port}/api-docs`);
+  console.log('Swagger UI (Canlı): https://ecommerce-site-backend-mu.vercel.app/api-docs');
 };
