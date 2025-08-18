@@ -31,8 +31,10 @@ const app: Express = express();
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors({
-  origin: (origin, callback) => {
+
+// Centralized CORS options to support preflight (OPTIONS) and auth headers
+const corsOptions = {
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
     // Allow requests with no origin (like mobile apps, curl)
     if (!origin) return callback(null, true);
     const allowed = [
@@ -45,7 +47,14 @@ app.use(cors({
     return callback(null, false);
   },
   credentials: true,
-}));
+  methods: ['GET','HEAD','PUT','PATCH','POST','DELETE','OPTIONS'],
+  allowedHeaders: ['Content-Type','Authorization'],
+  optionsSuccessStatus: 204,
+};
+
+app.use(cors(corsOptions));
+// Ensure preflight requests are handled for all routes
+app.options('*', cors(corsOptions));
 
 // Swagger dokümantasyonunu kur
 setupSwagger(app);
