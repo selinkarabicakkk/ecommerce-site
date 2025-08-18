@@ -44,29 +44,9 @@ const normalizeOrigin = (value: string): string => {
 };
 
 const corsOptions = {
+  // Geçici: tüm origin'lere izin ver; cors paketi credentials=true iken gelen origin'i aynen döndürür
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-    if (!origin) return callback(null, true);
-
-    const allowedListRaw = [
-      config.frontendUrl,
-      'https://'+(process.env.VERCEL_URL || ''),
-    ].filter(Boolean) as string[];
-
-    const allowedList = allowedListRaw.map((u) => normalizeOrigin(u));
-    const requestOrigin = normalizeOrigin(origin);
-
-    const requestHostname = (() => { try { return new URL(requestOrigin).hostname; } catch { return ''; } })();
-    const allowedHostnames = allowedList.map((u) => { try { return new URL(u).hostname; } catch { return ''; } });
-
-    const isExactAllowed = allowedList.includes(requestOrigin);
-    const matchesAllowedHostname = allowedHostnames.some((h) => h && (requestHostname === h || requestHostname.endsWith(`.${h}`)));
-    const isVercelPreview = requestHostname.endsWith('.vercel.app');
-
-    if (isExactAllowed || matchesAllowedHostname || isVercelPreview) {
-      return callback(null, true);
-    }
-
-    return callback(null, false);
+    return callback(null, true);
   },
   credentials: true,
   methods: ['GET','HEAD','PUT','PATCH','POST','DELETE','OPTIONS'],
